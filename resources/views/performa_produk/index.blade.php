@@ -1,0 +1,356 @@
+@extends('layouts.main')
+
+@section('content')
+    <div class="card shadow border-0 mx-auto">
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-lg-4">
+                    <h1 class="h3 fw-bold text-center mb-4">
+                        Impor Data Analisis Produk
+                    </h1>
+                    <div class="mb-3">
+                        <label for="csv-upload" class="form-label fw-semibold">
+                            Pilih File CSV Anda:
+                        </label>
+                        <input type="file" id="csv-upload" accept=".csv" class="form-control" />
+                        <div id="selected-file-name" class="form-text text-center mt-2 d-none">
+                            File terpilih: <span class="fw-medium"></span>
+                        </div>
+                    </div>
+
+                    <button id="upload-button" class="btn btn-primary w-100 fw-bold mb-2" disabled>
+                        Unggah dan Impor Data
+                    </button>
+                    <button class="btn btn-danger w-100 fw-bold mb-2" type="button" onclick="resetData()">
+                        Reset semua data
+                    </button>
+
+                    <div id="message-area" class="alert text-center fw-medium d-none mt-3" role="alert">
+                        <!-- Pesan akan ditampilkan di sini -->
+                    </div>
+
+                    <div class="mt-4 small text-muted text-center">
+                        <div class="fw-semibold mb-2">
+                            Pastikan file CSV Anda memiliki header yang sesuai dengan urutan ini:
+                        </div>
+                        <div class="bg-light p-3 rounded border text-start" style="font-size: 0.85em;">
+                            Kode Produk, Produk, Status Produk Saat Ini, Kode Variasi, Nama Variasi, Status Variasi Saat
+                            Ini, SKU
+                            Induk, Pengunjung Produk (Kunjungan), Halaman Produk Dilihat, Pengunjung Melihat Tanpa Membeli,
+                            Tingkat
+                            Pengunjung Melihat Tanpa Membeli, Klik Pencarian, Suka, Pengunjung Produk (Menambahkan Produk ke
+                            Keranjang), Dimasukkan ke Keranjang (Produk), Tingkat Konversi Produk Dimasukkan ke Keranjang,
+                            Total
+                            Pembeli (Pesanan Dibuat), Produk (Pesanan Dibuat), Total Penjualan (Pesanan Dibuat) (IDR),
+                            Tingkat
+                            Konversi (Pesanan yang Dibuat), Total Pembeli (Pesanan Siap Dikirim), Produk (Pesanan Siap
+                            Dikirim),
+                            Penjualan (Pesanan Siap Dikirim) (IDR), Tingkat Konversi (Pesanan Siap Dikirim), Tingkat
+                            Konversi
+                            (Pesanan Siap Dikirim dibagi Pesanan Dibuat), % Pembelian Ulang (Pesanan Siap Dikirim),
+                            Rata-rata Hari
+                            Pembelian Terulang (Pesanan Siap Dikirim)
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="row mb-4">
+                        <div class="col-lg-4">
+                            <div class="card shadow border-0 mb-4">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        Jumlah Data
+                                    </h5>
+                                </div>
+                                <div class="card-body d-flex justify-content-center align-items-center">
+                                    <div class="fw-bold fs-3" id="data-count">
+                                        0
+                                    </div>
+                                </div>
+                                <div class="card-footer text-end">
+                                    <a href="/performa-produk/lists">List Data</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card shadow border-0 mb-4">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        Total Penjualan (IDR)
+                                    </h5>
+                                </div>
+                                <div class="card-body d-flex justify-content-center align-items-center">
+                                    <div class="fw-bold fs-3" id="totalPenjualan">
+                                        0
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <p>Data ini diambil dari kolom Penjualan (Pesanan Siap Dikirim) (IDR)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card shadow border-0 mb-4">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        Total Produk Pesanan Siap Dikirim
+                                    </h5>
+                                </div>
+                                <div class="card-body d-flex justify-content-center align-items-center">
+                                    <div class="fw-bold fs-3" id="totalProdukSiapDikirim">
+                                        0
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <p>Data ini diambil dari kolom Produk (Pesanan Siap Dikirim)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-lg-6">
+                            <div class="card shadow border-0 mb-4">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        5 Produk Terlaris (Pie Chart)
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="topProductsPieChart" height="250"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card shadow border-0 mb-4">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        5 Produk Kurang Laris
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive text-sm">
+                                        <table class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Kode Produk</th>
+                                                    <th>Nama Produk</th>
+                                                    <th>Total Pesanan Siap Dikirim</th>
+                                                    <th>Total Penjualan (IDR)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="produk-kurang-laris">
+                                                <!-- Data akan diisi melalui JavaScript -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+@push('scripts')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-7r6/5kQ5lHppZArYrusS4x+hQVFGk3jfbQfVIAtFZ6w=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        getCountData(); // Panggil fungsi untuk mendapatkan jumlah data saat halaman dimuat
+        // Fungsi untuk menampilkan pesan (didefinisikan di global scope)
+        function showMessage(msg, isSuccess) {
+            const messageArea = document.getElementById('message-area');
+            messageArea.textContent = msg;
+            messageArea.classList.remove('hidden');
+            messageArea.classList.remove('d-none');
+            if (isSuccess) {
+                messageArea.classList.remove('bg-danger', 'text-white');
+                messageArea.classList.add('bg-success', 'text-white');
+            } else {
+                messageArea.classList.remove('bg-success', 'text-white');
+                messageArea.classList.add('bg-danger', 'text-white');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('csv-upload');
+            const uploadButton = document.getElementById('upload-button');
+            const messageArea = document.getElementById('message-area');
+            const selectedFileNameDisplay = document.getElementById('selected-file-name');
+            let selectedFile = null;
+
+            // Event listener untuk perubahan file input
+            fileInput.addEventListener('change', function(event) {
+                selectedFile = event.target.files[0];
+                if (selectedFile) {
+                    selectedFileNameDisplay.querySelector('span').textContent = selectedFile.name;
+                    selectedFileNameDisplay.classList.remove('hidden');
+                    uploadButton.disabled = false; // Aktifkan tombol unggah
+                    messageArea.classList.add('hidden'); // Sembunyikan pesan sebelumnya
+                } else {
+                    selectedFileNameDisplay.classList.add('hidden');
+                    uploadButton.disabled = true; // Nonaktifkan tombol unggah
+                }
+            });
+
+            // Event listener untuk tombol unggah
+            uploadButton.addEventListener('click', async function() {
+                if (!selectedFile) {
+                    showMessage('Silakan pilih file CSV terlebih dahulu.', false);
+                    return;
+                }
+
+                uploadButton.disabled = true;
+                uploadButton.textContent = 'Mengunggah...';
+                showMessage('Mengunggah dan memproses file...', true);
+
+                const formData = new FormData();
+                formData.append('csv_file',
+                    selectedFile); // Pastikan nama 'csv_file' sesuai dengan validator Laravel
+
+                try {
+                    // Ambil CSRF token dari meta tag
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content');
+                    formData.append('_token', csrfToken);
+
+                    const response = await fetch('/performa-produk/import', {
+                        method: 'POST',
+                        body: formData,
+                        // Headers Content-Type tidak perlu diatur secara manual untuk FormData
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        getCountData()
+                        showMessage(data.message || 'File CSV berhasil diimpor!', true);
+                        fileInput.value = ''; // Reset input file
+                        selectedFile = null;
+                        selectedFileNameDisplay.classList.add('hidden');
+                    } else {
+                        showMessage(data.message || 'Terjadi kesalahan saat mengimpor file.', false);
+                    }
+                } catch (error) {
+                    console.error('Error uploading CSV:', error);
+                    showMessage('Terjadi kesalahan jaringan atau server: ' + error.message, false);
+                } finally {
+                    uploadButton.disabled = false;
+                    uploadButton.textContent = 'Unggah dan Impor Data';
+                }
+            });
+        });
+
+        function getCountData() {
+            $.ajax({
+                url: '/performa-produk/getcountdata',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+                success: function(response) {
+                    $('#data-count').text(response.count);
+                    $('#totalProdukSiapDikirim').text(
+                        new Intl.NumberFormat('id-ID', {
+                            maximumFractionDigits: 0
+                        }).format(response.totalProdukSiapDikirim)
+                    );
+                    // Format totalPenjualan ke format Rupiah
+                    $('#totalPenjualan').text(
+                        new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0
+                        }).format(response.totalPenjualan)
+                    );
+
+                    loadTopProductsPieChart(response.limaProdukLaris)
+                    const kurangLarisRows = response.limaProdukKurangLaris.map((item, idx) => {
+                        return `<tr>
+                            <td>${idx + 1}</td>
+                            <td>${item.kode_produk}</td>
+                            <td>${item.nama_produk}</td>
+                            <td>${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(item.total_pesanan)}</td>
+                            <td>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.total_penjualan)}</td>
+                        </tr>`;
+                    }).join('');
+                    $('#produk-kurang-laris').html(kurangLarisRows);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Gagal mengambil jumlah data:', error);
+                }
+            });
+        }
+
+        function resetData() {
+            if (!confirm('Apakah Anda yakin ingin mereset semua data? Tindakan ini tidak dapat dibatalkan.')) {
+                return;
+            }
+            $.ajax({
+                url: '/performa-produk/reset-data',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+                success: function(response) {
+                    getCountData()
+                    showMessage(response.message || 'Database berhasil direset!', true);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Gagal mengambil jumlah data:', error);
+                    alert('Terjadi kesalahan saat mereset data.');
+                }
+            });
+        }
+
+        function loadTopProductsPieChart(response) {
+            // Urutkan data dari terbesar ke terkecil berdasarkan total_penjualan_
+            const sorted = response.slice().sort((a, b) => b.total_penjualan_ - a.total_penjualan_);
+            // Tambahkan penomoran pada label dan total_penjualan_ dalam ()
+            const labels = sorted.map((item, idx) =>
+                `${idx + 1}. ${item.nama_produk} (Rp${item.total_penjualan_.toLocaleString('id-ID')})`
+            );
+            const data = sorted.map(item => item.total_penjualan_);
+
+            const ctx = document.getElementById('topProductsPieChart').getContext('2d');
+            if (window.topProductsPieChartInstance) {
+                window.topProductsPieChartInstance.destroy();
+            }
+            window.topProductsPieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'
+                        ],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    let value = context.parsed || 0;
+                                    return label + ': ' + value.toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+@endpush
