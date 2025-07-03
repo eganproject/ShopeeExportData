@@ -3,7 +3,7 @@
 @section('content')
     <div class="card shadow border-0 mx-auto">
         <div class="card-body p-4">
-            <div class="row">
+            <div class="row mb-4">
                 <div class="col-lg-4">
                     <h1 class="h3 fw-bold text-center mb-4">
                         Impor Data Analisis Produk
@@ -28,14 +28,15 @@
                     <div id="message-area" class="alert text-center fw-medium d-none mt-3" role="alert">
                         <!-- Pesan akan ditampilkan di sini -->
                     </div>
-
+                </div>
+                <div class="col-lg-8">
                     <div class="mt-4 small text-muted text-center">
                         <div class="fw-semibold mb-2">
                             Pastikan file CSV Anda memiliki header yang sesuai dengan urutan ini:
                         </div>
                         <div class="bg-light p-3 rounded border text-start" style="font-size: 0.85em;">
                             Kode Produk, Produk, Status Produk Saat Ini, Kode Variasi, Nama Variasi, Status Variasi Saat
-                            Ini, SKU
+                            Ini, Kode Variasi 2, SKU
                             Induk, Pengunjung Produk (Kunjungan), Halaman Produk Dilihat, Pengunjung Melihat Tanpa Membeli,
                             Tingkat
                             Pengunjung Melihat Tanpa Membeli, Klik Pencarian, Suka, Pengunjung Produk (Menambahkan Produk ke
@@ -52,8 +53,13 @@
                             Pembelian Terulang (Pesanan Siap Dikirim)
                         </div>
                     </div>
+                    <div class="mt-2 text-end"> 
+                    <a href="/performa-produk/compare">Compare data dari 2 periode ? Klik disini! </a>
+                    </div>
                 </div>
-                <div class="col-lg-8">
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
                     <div class="row mb-4">
                         <div class="col-lg-4">
                             <div class="card shadow border-0 mb-4">
@@ -107,46 +113,72 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-4">
-                        <div class="col-lg-6">
-                            <div class="card shadow border-0 mb-4">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">
-                                        5 Produk Terlaris (Pie Chart)
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="topProductsPieChart" height="250"></canvas>
-                                </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-lg-6">
+                    <div class="card shadow border-0 mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                5 Produk Terlaris (Pie Chart)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="topProductsPieChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card shadow border-0 mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                5 Produk Kurang Laris
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive text-sm">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Kode Produk</th>
+                                            <th>Nama Produk</th>
+                                            <th>Total Pesanan Siap Dikirim</th>
+                                            <th>Total Penjualan (IDR)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="produk-kurang-laris">
+                                        <!-- Data akan diisi melalui JavaScript -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <div class="card shadow border-0 mb-4">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">
-                                        5 Produk Kurang Laris
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive text-sm">
-                                        <table class="table table-striped table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Kode Produk</th>
-                                                    <th>Nama Produk</th>
-                                                    <th>Total Pesanan Siap Dikirim</th>
-                                                    <th>Total Penjualan (IDR)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="produk-kurang-laris">
-                                                <!-- Data akan diisi melalui JavaScript -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                </div>
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title
+                                mb-0">
+                            Performa Produk
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered" id="performa-produk-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kode Produk</th>
+                                        <th>Produk</th>
+                                        <th>Total Penjualan</th>
+                                        <th>Persentase Penjualan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -156,8 +188,22 @@
 
 
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-7r6/5kQ5lHppZArYrusS4x+hQVFGk3jfbQfVIAtFZ6w=" crossorigin="anonymous"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="//cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="//cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+
+    <!-- jQuery -->
+    <script src="//code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- JSZip (untuk export excel) -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="//cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+    <!-- Buttons extension -->
+    <script src="//cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         getCountData(); // Panggil fungsi untuk mendapatkan jumlah data saat halaman dimuat
@@ -280,6 +326,9 @@
                         </tr>`;
                     }).join('');
                     $('#produk-kurang-laris').html(kurangLarisRows);
+
+                    getPerformaProduk()
+
                 },
                 error: function(xhr, status, error) {
                     console.error('Gagal mengambil jumlah data:', error);
@@ -349,6 +398,53 @@
                             }
                         }
                     }
+                }
+            });
+        }
+
+        function getPerformaProduk() {
+            $.ajax({
+                url: '/performa-produk/get-performa-produk',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+                success: function(response) {
+                    var tableBody = '';
+
+                    $('#performa-produk-table tbody').empty(); // Kosongkan tabel sebelum mengisi data baru
+                    response.produk_performances.forEach((item, index) => {
+                        tableBody += `<tr>
+                            <td>${index + 1}</td>
+                            <td>${item.kode_produk}</td>
+                            <td>${item.nama_produk}</td>
+                            <td>${Number(item.total_penjualan).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</td>
+                            <td>${item.persentase_penjualan}</td>
+                        </tr>`;
+                    });
+                    $('#performa-produk-table tbody').html(tableBody);
+                    // Inisialisasi DataTable dengan tombol export Excel
+                    if ($.fn.DataTable.isDataTable('#performa-produk-table')) {
+                        $('#performa-produk-table').DataTable().destroy();
+                    }
+                    $('#performa-produk-table').DataTable({
+                        responsive: true,
+                        columnDefs: [{
+                                orderable: false,
+                                targets: 0
+                            } // Nonaktifkan pengurutan pada kolom No
+                        ],
+                        dom: 'Bfrtip',
+                        buttons: [{
+                            extend: 'excelHtml5',
+                            text: 'Export Excel',
+                            title: 'Performa Produk'
+                        }]
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Gagal mengambil performa produk:', error);
                 }
             });
         }

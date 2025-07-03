@@ -21,7 +21,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/performa-produk">Performa Produk</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('performa-produk') ? 'active' : '' }}" href="/performa-produk">Performa Produk</a>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -224,7 +224,7 @@ class PerformaProdukController extends Controller
         LIMIT 5;");
         $limaProdukKurangLaris = DB::select("SELECT kode_produk, TRIM(
                 SUBSTRING_INDEX(produk, ' ', 5)
-            ) AS nama_produk, SUM(produk_pesanan_siap_dikirim) AS total_pesanan,SUM(total_penjualan_pesanan_dibuat_idr) AS total_penjualan
+            ) AS nama_produk, SUM(produk_pesanan_siap_dikirim) AS total_pesanan,SUM(penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
             FROM produk_performances
             GROUP BY kode_produk
             HAVING SUM(produk_pesanan_siap_dikirim) > 0
@@ -308,5 +308,36 @@ class PerformaProdukController extends Controller
             'recordsFiltered' => $total,
             'data' => $data,
         ]);
+    }
+
+    public function getPerformaProduk()
+    {
+        $grandTotalPenjualan = DB::select("SELECT SUM(penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
+        FROM produk_performances");
+
+        $totalPenjualanProduk = DB::select("SELECT kode_produk, produk AS nama_produk, SUM(produk_pesanan_siap_dikirim) AS total_pesanan,SUM(penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
+        FROM produk_performances
+        GROUP BY kode_produk");
+
+        $data = [];
+        foreach ($totalPenjualanProduk as $produk) {
+            $data[] = [
+                'kode_produk' => $produk->kode_produk,
+                'nama_produk' => $produk->nama_produk,
+                'total_pesanan' => $produk->total_pesanan,
+                'total_penjualan' => $produk->total_penjualan,
+                'persentase_penjualan' => $grandTotalPenjualan[0]->total_penjualan > 0 ? round(($produk->total_penjualan / $grandTotalPenjualan[0]->total_penjualan) * 100, 3) : 0,
+            ];
+        }
+
+        // Urutkan data berdasarkan total_penjualan dari terbesar ke terkecil
+        usort($data, function ($a, $b) {
+            return $b['total_penjualan'] <=> $a['total_penjualan'];
+        });
+
+        return response()->json([
+            'grand_total_penjualan' => $grandTotalPenjualan[0]->total_penjualan,
+            'produk_performances' => $data,
+        ], 200);
     }
 }
