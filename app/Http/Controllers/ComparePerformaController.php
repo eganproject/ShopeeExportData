@@ -429,18 +429,30 @@ class ComparePerformaController extends Controller
         $totalProdukDimasukanKeKeranjangTwo = ProductCompareTableTwo::sum('dimasukkan_ke_keranjang_produk');
 
         $dataPerforma = DB::select("
-            SELECT a.kode_produk, a.nama_produk, a.total_pesanan AS total_pesanan_1, b.total_pesanan AS total_pesanan_2, a.total_penjualan AS total_penjualan_1, b.total_penjualan AS total_penjualan_2,
+            SELECT a.kode_produk, a.nama_produk, a.pengunjung_produk_kunjungan as pengunjung_produk_kunjungan_1, b.pengunjung_produk_kunjungan as pengunjung_produk_kunjungan_2, a.dimasukkan_ke_keranjang_produk as dimasukkan_ke_keranjang_produk_1, b.dimasukkan_ke_keranjang_produk as dimasukkan_ke_keranjang_produk_2, a.total_pesanan AS total_pesanan_1, b.total_pesanan AS total_pesanan_2, a.total_penjualan AS total_penjualan_1, b.total_penjualan AS total_penjualan_2,
+                  CASE
+                    WHEN a.pengunjung_produk_kunjungan IS NULL OR a.pengunjung_produk_kunjungan = 0 THEN 0 -- Menghindari pembagian dengan nol atau nilai null
+                    ELSE ((b.pengunjung_produk_kunjungan - a.pengunjung_produk_kunjungan) * 100.0 / a.pengunjung_produk_kunjungan)
+                END AS persentase_perubahan_pengunjung_produk_kunjungan,
+              CASE
+                    WHEN a.dimasukkan_ke_keranjang_produk IS NULL OR a.dimasukkan_ke_keranjang_produk = 0 THEN 0 -- Menghindari pembagian dengan nol atau nilai null
+                    ELSE ((b.dimasukkan_ke_keranjang_produk - a.dimasukkan_ke_keranjang_produk) * 100.0 / a.dimasukkan_ke_keranjang_produk)
+                END AS persentase_perubahan_dimasukkan_ke_keranjang_produk,
+            CASE
+                    WHEN a.total_pesanan IS NULL OR a.total_pesanan = 0 THEN 0 -- Menghindari pembagian dengan nol atau nilai null
+                    ELSE ((b.total_pesanan - a.total_pesanan) * 100.0 / a.total_pesanan)
+                END AS persentase_perubahan_total_pesanan,
             CASE
                     WHEN a.total_penjualan IS NULL OR a.total_penjualan = 0 THEN 0 -- Menghindari pembagian dengan nol atau nilai null
                     ELSE ((b.total_penjualan - a.total_penjualan) * 100.0 / a.total_penjualan)
                 END AS persentase_perubahan_penjualan
             FROM (
-                    SELECT a.kode_produk, a.produk AS nama_produk, SUM(a.produk_pesanan_siap_dikirim) AS total_pesanan,SUM(a.penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
+                    SELECT a.kode_produk, a.pengunjung_produk_kunjungan, a.dimasukkan_ke_keranjang_produk, a.produk AS nama_produk, SUM(a.produk_pesanan_siap_dikirim) AS total_pesanan,SUM(a.penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
                     FROM product_compare_table_ones AS a
                     GROUP BY kode_produk
                 ) AS a 
                 JOIN (
-                        SELECT a.kode_produk, a.produk AS nama_produk, SUM(a.produk_pesanan_siap_dikirim) AS total_pesanan,SUM(a.penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
+                        SELECT a.kode_produk, a.produk AS nama_produk, a.pengunjung_produk_kunjungan, a.dimasukkan_ke_keranjang_produk, SUM(a.produk_pesanan_siap_dikirim) AS total_pesanan,SUM(a.penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
                     FROM product_compare_table_twos AS a
                     GROUP BY kode_produk
                 ) AS b ON a.kode_produk = b.kode_produk 

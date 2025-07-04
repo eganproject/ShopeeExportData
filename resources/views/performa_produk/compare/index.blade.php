@@ -221,20 +221,38 @@
             </div>
             <div class="row">
                 <div class="col-lg-12">
+                <div class="mt-4 small text-muted text-center">
+                        <div class="fw-semibold mb-2">
+                            Note :
+                        </div>
+                        <div class="bg-light p-3 rounded border text-start" style="font-size: 0.85em;">
+                          Produk dibawah sudah di merge dengan produk variannya, jadi : 
+                          <ul>
+                          <li> ketika ada perbedaan antara jumlah pengunjung lebih kecil daripada produk dimasukkan ke keranjang itu bisa terjadi ketika pengunjung memasukkan beberapa variasi kedalam keranjangnya.</li>
+                          </ul>  
+                        </div>
+                    </div>
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered" id="compareTable">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Kode Produk</th>
-                                    <th>Produk</th>
-                                    <th>Total Pesanan 1</th>
-                                    <th>Total Pesanan 2</th>
-                                    <th>Total Penjualan 1</th>
-                                    <th>Total Penjualan 2</th>
-                                    <th>Persentase Perubahan Penjualan (%)</th>
-                                    <th>Persentase Produk Terkait Omset 1 (%)</th>
-                                    <th>Persentase Produk Terkait Omset 2 (%)</th>
+                        <table class="table table-striped table-bordered align-middle text-center table-hover" id="compareTable">
+                            <thead class="table-primary align-middle">
+                                <tr class="text-center">
+                                    <th scope="col">No</th>
+                                    <th scope="col">Kode Produk</th>
+                                    <th scope="col" style="min-width: 300px;">Produk</th>
+                                    <th scope="col">Total Pengunjung 1</th>
+                                    <th scope="col">Total Pengunjung 2</th>
+                                    <th scope="col">Persentase Perubahan Total Pengunjung (%)</th>
+                                    <th scope="col">Dimasukan ke Keranjang 1</th>
+                                    <th scope="col">Dimasukan ke Keranjang 2</th>
+                                    <th scope="col">Persentase Perubahan Dimasukkan Ke Keranjang (%)</th>
+                                    <th scope="col">Total Pesanan 1</th>
+                                    <th scope="col">Total Pesanan 2</th>
+                                    <th scope="col">Persentase Perubahan Total Pesanan (%)</th>
+                                    <th scope="col">Total Penjualan Siap Dikirim 1</th>
+                                    <th scope="col">Total Penjualan Siap Dikirim 2</th>
+                                    <th scope="col">Persentase Perubahan Penjualan (%)</th>
+                                    <th scope="col">Persentase Produk Terkait Omset 1 (%)</th>
+                                    <th scope="col">Persentase Produk Terkait Omset 2 (%)</th>
                                 </tr>
                             </thead>
                             <tbody id="dataPerformaTable">
@@ -608,21 +626,34 @@
             const tableBody = document.getElementById('dataPerformaTable');
             tableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi data baru
             let persentasePerubahanPenjualan = 0;
+            let persentase_perubahan_dimasukkan_ke_keranjang_produk = 0;
+            let persentase_perubahan_total_pesanan = 0;
+            let persentase_perubahan_pengunjung_produk_kunjungan = 0;
             let iiindex = 0;
             data.forEach(item => {
                 const row = document.createElement('tr');
                 persentasePerubahanPenjualan = parseFloat(item.persentase_perubahan_penjualan) || 0;
+                persentase_perubahan_dimasukkan_ke_keranjang_produk = parseFloat(item.persentase_perubahan_dimasukkan_ke_keranjang_produk) || 0;
+                persentase_perubahan_pengunjung_produk_kunjungan = parseFloat(item.persentase_perubahan_pengunjung_produk_kunjungan) || 0;
+                persentase_perubahan_total_pesanan = parseFloat(item.persentase_perubahan_total_pesanan) || 0;
                 row.innerHTML = `
                 <td>${iiindex+1}</td>
-                    <td>${item.kode_produk || ''}</td>
-                    <td>${item.nama_produk || ''}</td>
-                    <td>${formatAngka(item.total_pesanan_1) || 0}</td>
-                    <td>${formatAngka(item.total_pesanan_2) || 0}</td>
-                    <td>${formatAngka(item.total_penjualan_1) || '0'}</td>
-                    <td>${formatAngka(item.total_penjualan_2) || '0'}</td>
-                    <td class="${persentasePerubahanPenjualan > 0 ? 'text-success' : 'text-danger' }">${persentasePerubahanPenjualan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td>${item.persentase_kontribusi_penjualan_1}</td>
-                    <td>${item.persentase_kontribusi_penjualan_2}</td>
+                    <td class="text-start">${item.kode_produk || ''}</td>
+                    <td class="text-start"><a href="/performa-produk/compare/detail/"> ${item.nama_produk || ''}</a></td>
+                    <td class="text-end">${formatAngka(item.pengunjung_produk_kunjungan_1) || 0}</td>
+                    <td class="text-end">${formatAngka(item.pengunjung_produk_kunjungan_2) || 0}</td>
+                    <td class="text-center ${persentase_perubahan_pengunjung_produk_kunjungan > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_pengunjung_produk_kunjungan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-end">${formatAngka(item.dimasukkan_ke_keranjang_produk_1) || 0}</td>
+                    <td class="text-end">${formatAngka(item.dimasukkan_ke_keranjang_produk_2) || 0}</td>
+                    <td class="text-center ${persentase_perubahan_dimasukkan_ke_keranjang_produk > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_dimasukkan_ke_keranjang_produk.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-end">${formatAngka(item.total_pesanan_1) || 0}</td>
+                    <td class="text-end">${formatAngka(item.total_pesanan_2) || 0}</td>
+                    <td class="text-center ${persentase_perubahan_total_pesanan > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_total_pesanan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-end">${formatAngka(item.total_penjualan_1) || '0'}</td>
+                    <td class="text-end">${formatAngka(item.total_penjualan_2) || '0'}</td>
+                    <td class="text-center ${persentasePerubahanPenjualan > 0 ? 'text-success' : 'text-danger' }">${persentasePerubahanPenjualan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-center">${item.persentase_kontribusi_penjualan_1}</td>
+                    <td class="text-center">${item.persentase_kontribusi_penjualan_2}</td>
                 `;
 
                 iiindex++;
