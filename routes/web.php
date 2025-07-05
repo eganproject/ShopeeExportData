@@ -21,4 +21,5 @@ Route::group(['prefix' => 'performa-produk'], function () {
     Route::post('/compare/getcountdata', [ComparePerformaController::class, 'getCountData'])->name('comparePerforma.getCountData');
     Route::post('/compare/import_1', [ComparePerformaController::class, 'importOne'])->name('comparePerforma.importOne');
     Route::post('/compare/import_2', [ComparePerformaController::class, 'importTwo'])->name('comparePerforma.importTwo');
+    Route::get('/compare/detail/{kode_produk}', [ComparePerformaController::class, 'show'])->name('comparePerforma.importTwo');
 });

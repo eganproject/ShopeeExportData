@@ -242,15 +242,17 @@
                                     <th scope="col">Total Pengunjung 1</th>
                                     <th scope="col">Total Pengunjung 2</th>
                                     <th scope="col">Persentase Perubahan Total Pengunjung (%)</th>
-                                    <th scope="col">Dimasukan ke Keranjang 1</th>
-                                    <th scope="col">Dimasukan ke Keranjang 2</th>
-                                    <th scope="col">Persentase Perubahan Dimasukkan Ke Keranjang (%)</th>
+                                    <th scope="col">Pengunjung Produk Dimasukan ke Keranjang 1</th>
+                                    <th scope="col">Pengunjung Produk Dimasukan ke Keranjang 2</th>
+                                    <th scope="col">Persentase Perubahan Pengunjung Produk Ke Keranjang (%)</th>
                                     <th scope="col">Total Pesanan 1</th>
                                     <th scope="col">Total Pesanan 2</th>
                                     <th scope="col">Persentase Perubahan Total Pesanan (%)</th>
                                     <th scope="col">Total Penjualan Siap Dikirim 1</th>
                                     <th scope="col">Total Penjualan Siap Dikirim 2</th>
                                     <th scope="col">Persentase Perubahan Penjualan (%)</th>
+                                    <th scope="col">Average Order Value (AOV) (%)</th>
+                                    <th scope="col">Jumlah Pesanan Rata-rata per Hari</th>
                                     <th scope="col">Persentase Produk Terkait Omset 1 (%)</th>
                                     <th scope="col">Persentase Produk Terkait Omset 2 (%)</th>
                                 </tr>
@@ -626,32 +628,34 @@
             const tableBody = document.getElementById('dataPerformaTable');
             tableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi data baru
             let persentasePerubahanPenjualan = 0;
-            let persentase_perubahan_dimasukkan_ke_keranjang_produk = 0;
+            let persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang = 0;
             let persentase_perubahan_total_pesanan = 0;
             let persentase_perubahan_pengunjung_produk_kunjungan = 0;
             let iiindex = 0;
             data.forEach(item => {
                 const row = document.createElement('tr');
                 persentasePerubahanPenjualan = parseFloat(item.persentase_perubahan_penjualan) || 0;
-                persentase_perubahan_dimasukkan_ke_keranjang_produk = parseFloat(item.persentase_perubahan_dimasukkan_ke_keranjang_produk) || 0;
+                persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang = parseFloat(item.persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang) || 0;
                 persentase_perubahan_pengunjung_produk_kunjungan = parseFloat(item.persentase_perubahan_pengunjung_produk_kunjungan) || 0;
                 persentase_perubahan_total_pesanan = parseFloat(item.persentase_perubahan_total_pesanan) || 0;
                 row.innerHTML = `
                 <td>${iiindex+1}</td>
                     <td class="text-start">${item.kode_produk || ''}</td>
-                    <td class="text-start"><a href="/performa-produk/compare/detail/"> ${item.nama_produk || ''}</a></td>
+                    <td class="text-start"><a href="/performa-produk/compare/detail/${item.kode_produk}"> ${item.nama_produk || ''}</a></td>
                     <td class="text-end">${formatAngka(item.pengunjung_produk_kunjungan_1) || 0}</td>
                     <td class="text-end">${formatAngka(item.pengunjung_produk_kunjungan_2) || 0}</td>
                     <td class="text-center ${persentase_perubahan_pengunjung_produk_kunjungan > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_pengunjung_produk_kunjungan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="text-end">${formatAngka(item.dimasukkan_ke_keranjang_produk_1) || 0}</td>
-                    <td class="text-end">${formatAngka(item.dimasukkan_ke_keranjang_produk_2) || 0}</td>
-                    <td class="text-center ${persentase_perubahan_dimasukkan_ke_keranjang_produk > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_dimasukkan_ke_keranjang_produk.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-end">${formatAngka(item.pengunjung_produk_menambahkan_ke_keranjang_1) || 0}</td>
+                    <td class="text-end">${formatAngka(item.pengunjung_produk_menambahkan_ke_keranjang_2) || 0}</td>
+                    <td class="text-center ${persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-end">${formatAngka(item.total_pesanan_1) || 0}</td>
                     <td class="text-end">${formatAngka(item.total_pesanan_2) || 0}</td>
                     <td class="text-center ${persentase_perubahan_total_pesanan > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_total_pesanan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-end">${formatAngka(item.total_penjualan_1) || '0'}</td>
                     <td class="text-end">${formatAngka(item.total_penjualan_2) || '0'}</td>
                     <td class="text-center ${persentasePerubahanPenjualan > 0 ? 'text-success' : 'text-danger' }">${persentasePerubahanPenjualan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-center">${item.aov}</td>
+                    <td class="text-center">${item.jumlah_pesanan_rata_rata_per_hari}</td>
                     <td class="text-center">${item.persentase_kontribusi_penjualan_1}</td>
                     <td class="text-center">${item.persentase_kontribusi_penjualan_2}</td>
                 `;
