@@ -216,19 +216,20 @@ class PerformaProdukController extends Controller
     public function getcountdata()
     {
         $count = ProdukPerformance::count();
-        $totalPenjualan = DB::select("SELECT SUM(penjualan_pesanan_siap_dikirim_idr) as omset FROM produk_performances");
-        $totalProdukSiapDikirim = DB::select("SELECT SUM(produk_pesanan_siap_dikirim) as produkPesananSiapDikirim FROM produk_performances");
+        $totalPenjualan = DB::select("SELECT SUM(penjualan_pesanan_siap_dikirim_idr) as omset FROM produk_performances WHERE kode_variasi IS NULL");
+        $totalProdukSiapDikirim = DB::select("SELECT SUM(produk_pesanan_siap_dikirim) as produkPesananSiapDikirim FROM produk_performances WHERE kode_variasi IS NULL");
         $limaProdukLaris = DB::select("SELECT kode_produk, TRIM(
                 SUBSTRING_INDEX(produk, ' ', 5)
-            ) AS nama_produk, SUM(total_penjualan_pesanan_dibuat_idr) AS total_penjualan_ FROM produk_performances GROUP BY kode_produk ORDER BY total_penjualan_ DESC
+            ) AS nama_produk, SUM(penjualan_pesanan_siap_dikirim_idr) AS total_penjualan_ FROM produk_performances WHERE kode_variasi IS NULL GROUP BY kode_produk ORDER BY total_penjualan_ DESC
         LIMIT 5;");
         $limaProdukKurangLaris = DB::select("SELECT kode_produk, TRIM(
                 SUBSTRING_INDEX(produk, ' ', 5)
             ) AS nama_produk, SUM(produk_pesanan_siap_dikirim) AS total_pesanan,SUM(penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
             FROM produk_performances
+            WHERE kode_variasi IS NULL
             GROUP BY kode_produk
             HAVING SUM(produk_pesanan_siap_dikirim) > 0
-            ORDER BY total_penjualan_pesanan_dibuat_idr ASC
+            ORDER BY penjualan_pesanan_siap_dikirim_idr ASC
             LIMIT 5;");
         return response()->json(['count' => $count, 'totalPenjualan' => $totalPenjualan[0]->omset, 'totalProdukSiapDikirim' => $totalProdukSiapDikirim[0]->produkPesananSiapDikirim, 'limaProdukLaris' => $limaProdukLaris, 'limaProdukKurangLaris' => $limaProdukKurangLaris], 200);
     }
@@ -250,12 +251,13 @@ class PerformaProdukController extends Controller
         // Pencarian (search)
         $search = $request->input('search');
         if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('kode_produk', 'like', "%{$search}%")
-                    ->orWhere('produk', 'like', "%{$search}%")
-                    ->orWhere('status_produk_saat_ini', 'like', "%{$search}%")
-                    ->orWhere('kode_variasi', 'like', "%{$search}%");
-            });
+            $query->whereNull('kode_variasi')
+                ->where(function ($q) use ($search) {
+                    $q->where('kode_produk', 'like', "%{$search}%")
+                        ->orWhere('produk', 'like', "%{$search}%")
+                        ->orWhere('status_produk_saat_ini', 'like', "%{$search}%")
+                        ->orWhere('kode_variasi', 'like', "%{$search}%");
+                });
         }
 
         // Sorting
@@ -313,10 +315,11 @@ class PerformaProdukController extends Controller
     public function getPerformaProduk()
     {
         $grandTotalPenjualan = DB::select("SELECT SUM(penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
-        FROM produk_performances");
+        FROM produk_performances WHERE kode_variasi IS NULL");
 
         $totalPenjualanProduk = DB::select("SELECT kode_produk, produk AS nama_produk, SUM(produk_pesanan_siap_dikirim) AS total_pesanan,SUM(penjualan_pesanan_siap_dikirim_idr) AS total_penjualan
         FROM produk_performances
+        WHERE kode_variasi IS NULL
         GROUP BY kode_produk");
 
         $data = [];

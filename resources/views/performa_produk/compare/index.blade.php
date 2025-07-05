@@ -244,15 +244,19 @@
                                     <th scope="col">Persentase Perubahan Total Pengunjung (%)</th>
                                     <th scope="col">Pengunjung Produk Dimasukan ke Keranjang 1</th>
                                     <th scope="col">Pengunjung Produk Dimasukan ke Keranjang 2</th>
-                                    <th scope="col">Persentase Perubahan Pengunjung Produk Ke Keranjang (%)</th>
+                                    <th scope="col">Persentase Perubahan Pengunjung Produk Masukkan Ke Keranjang (%)</th>
                                     <th scope="col">Total Pesanan 1</th>
                                     <th scope="col">Total Pesanan 2</th>
                                     <th scope="col">Persentase Perubahan Total Pesanan (%)</th>
+                                    <th scope="col">Total Penjualan dibuat 1</th>
+                                    <th scope="col">Total Penjualan dibuat 2</th>
+                                    <th scope="col">Persentase Perubahan Total Penjualan Dibuat(%)</th>
                                     <th scope="col">Total Penjualan Siap Dikirim 1</th>
                                     <th scope="col">Total Penjualan Siap Dikirim 2</th>
-                                    <th scope="col">Persentase Perubahan Penjualan (%)</th>
+                                    <th scope="col">Persentase Perubahan Penjualan Siap Dikirim(%)</th>
+                                    <th scope="col">Selisih Penjualan Pesanan Dibuat ke Dikirim</th>
                                     <th scope="col">Average Order Value (AOV) (%)</th>
-                                    <th scope="col">Jumlah Pesanan Rata-rata per Hari</th>
+                                    <th scope="col">Rata-rata Jumlah Pesanan per Hari</th>
                                     <th scope="col">Persentase Produk Terkait Omset 1 (%)</th>
                                     <th scope="col">Persentase Produk Terkait Omset 2 (%)</th>
                                 </tr>
@@ -272,23 +276,7 @@
 
 
 @push('scripts')
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="//cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="//cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
-
-    <!-- jQuery -->
-    <script src="//code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <!-- JSZip (untuk export excel) -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-    <!-- DataTables JS -->
-    <script src="//cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-
-    <!-- Buttons extension -->
-    <script src="//cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="//cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
     <script>
         // Fungsi untuk menampilkan pesan (didefinisikan di global scope)
         getCountData()
@@ -628,6 +616,7 @@
             const tableBody = document.getElementById('dataPerformaTable');
             tableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi data baru
             let persentasePerubahanPenjualan = 0;
+            let persentasePerubahanPenjualanDibuat = 0;
             let persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang = 0;
             let persentase_perubahan_total_pesanan = 0;
             let persentase_perubahan_pengunjung_produk_kunjungan = 0;
@@ -635,6 +624,7 @@
             data.forEach(item => {
                 const row = document.createElement('tr');
                 persentasePerubahanPenjualan = parseFloat(item.persentase_perubahan_penjualan) || 0;
+                persentasePerubahanPenjualanDibuat = parseFloat(item.persentase_perubahan_penjualan_dibuat) || 0;
                 persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang = parseFloat(item.persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang) || 0;
                 persentase_perubahan_pengunjung_produk_kunjungan = parseFloat(item.persentase_perubahan_pengunjung_produk_kunjungan) || 0;
                 persentase_perubahan_total_pesanan = parseFloat(item.persentase_perubahan_total_pesanan) || 0;
@@ -651,9 +641,13 @@
                     <td class="text-end">${formatAngka(item.total_pesanan_1) || 0}</td>
                     <td class="text-end">${formatAngka(item.total_pesanan_2) || 0}</td>
                     <td class="text-center ${persentase_perubahan_total_pesanan > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_total_pesanan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-end">${formatAngka(item.total_penjualan_dibuat_1) || '0'}</td>
+                    <td class="text-end">${formatAngka(item.total_penjualan_dibuat_2) || '0'}</td>
+                    <td class="text-center ${persentasePerubahanPenjualanDibuat > 0 ? 'text-success' : 'text-danger' }">${persentasePerubahanPenjualanDibuat.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="text-end">${formatAngka(item.total_penjualan_1) || '0'}</td>
                     <td class="text-end">${formatAngka(item.total_penjualan_2) || '0'}</td>
                     <td class="text-center ${persentasePerubahanPenjualan > 0 ? 'text-success' : 'text-danger' }">${persentasePerubahanPenjualan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="text-center">${formatAngka(item.selisih_pesanan_dibuat_ke_siap_dikirim)}</td>
                     <td class="text-center">${item.aov}</td>
                     <td class="text-center">${item.jumlah_pesanan_rata_rata_per_hari}</td>
                     <td class="text-center">${item.persentase_kontribusi_penjualan_1}</td>
