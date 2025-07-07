@@ -421,8 +421,6 @@ class ComparePerformaController extends Controller
         $jumlahDataTwo = ProductCompareTableTwo::count();
 
         $dataPerforma = DB::select("
-        
-
 SELECT *,
      CASE
                 WHEN pengunjung_produk_kunjungan_1 = 0 OR pengunjung_produk_kunjungan_1 IS NULL THEN 0
@@ -468,7 +466,7 @@ FROM (
         // Mencari persentase kontribusi total_penjualan_1 perproduk dari totalPenjualanOne
         $totalPenjualanOne = ProductCompareTableOne::whereNull('kode_variasi')->sum('penjualan_pesanan_siap_dikirim_idr');
         $totalPenjualanTwo = ProductCompareTableTwo::whereNull('kode_variasi')->sum('penjualan_pesanan_siap_dikirim_idr');
-         $totalProdukSiapDikirimOne = ProductCompareTableOne::whereNull('kode_variasi')->sum('produk_pesanan_siap_dikirim');
+        $totalProdukSiapDikirimOne = ProductCompareTableOne::whereNull('kode_variasi')->sum('produk_pesanan_siap_dikirim');
         $totalProdukSiapDikirimTwo = ProductCompareTableTwo::whereNull('kode_variasi')->sum('produk_pesanan_siap_dikirim');
 
         $totalProdukDimasukanKeKeranjangOne = ProductCompareTableOne::whereNull('kode_variasi')->sum('pengunjung_produk_menambahkan_ke_keranjang');
@@ -497,6 +495,7 @@ FROM (
         }
         unset($item);
 
+
         return response()->json([
             'jumlah_data_one' => $jumlahDataOne,
             'jumlah_data_two' => $jumlahDataTwo,
@@ -512,152 +511,102 @@ FROM (
 
     public function show($kode_produk)
     {
-        // Logika untuk menampilkan detail performa produk berdasarkan kode_produk
-        $status2Month = true;
-        $monthOne = ProductCompareTableOne::where('kode_produk', $kode_produk)->get();
-        $monthTwo = ProductCompareTableTwo::where('kode_produk', $kode_produk)->get();
+       
 
-        // Jika Produk Tidak ada pada bulan pertama / bulan kedua, ambil satu aja bulan yang ada 
-        if (!$monthOne) {
-            $monthOne = [];
-            $status2Month = false;
-        } else if (!$monthTwo) {
-            $monthTwo = [];
-            $status2Month = false;
-        }
-
-      
-
-        // Mencari persentase kontribusi total_penjualan_1 perproduk dari totalPenjualanOne
-        $totalPenjualanOne = ProductCompareTableOne::where('kode_produk', $kode_produk)->sum('penjualan_pesanan_siap_dikirim_idr');
-        $totalPenjualanTwo = ProductCompareTableTwo::where('kode_produk', $kode_produk)->sum('penjualan_pesanan_siap_dikirim_idr');
-        
-
-
-        return view('performa_produk.compare.show', ['monthOne' => $monthOne, 'monthTwo' => $monthTwo, 'kode_produk' => $kode_produk, 'status2Month' => $status2Month, 'total_penjualan_one' => $totalPenjualanOne, 'total_penjualan_two' => $totalPenjualanTwo]);
-    }
-
-    public function getDataTable(Request $request){
-        $kodeProduk = $request->kodeProduk;
-        
-          $dataPerforma = DB::select("
-        SELECT * FROM ( SELECT
-            COALESCE(a.kode_produk, b.kode_produk) AS kode_produk, 
-            COALESCE(a.nama_produk, b.nama_produk) AS nama_produk, 
-            a.pengunjung_produk_kunjungan AS pengunjung_produk_kunjungan_1,
-            IFNULL(b.pengunjung_produk_kunjungan,0) AS pengunjung_produk_kunjungan_2,
-            a.pengunjung_produk_menambahkan_ke_keranjang AS pengunjung_produk_menambahkan_ke_keranjang_1,
-            IFNULL(b.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_2,
-            a.total_pesanan AS total_pesanan_1,
-            IFNULL(b.total_pesanan,0) AS total_pesanan_2,
-            a.total_penjualan_dibuat AS total_penjualan_dibuat_1,
-            IFNULL(b.total_penjualan_dibuat,0) AS total_penjualan_dibuat_2,
-            a.total_penjualan AS total_penjualan_1,
-            IFNULL(b.total_penjualan,0) AS total_penjualan_2,
-            CASE
-                WHEN a.pengunjung_produk_kunjungan = 0 OR a.pengunjung_produk_kunjungan IS NULL THEN 0
-                ELSE ((IFNULL(b.pengunjung_produk_kunjungan,0) - a.pengunjung_produk_kunjungan) * 100.0 / a.pengunjung_produk_kunjungan)
+        $dataPerformaProduk = DB::select("
+        SELECT *,
+     CASE
+                WHEN pengunjung_produk_kunjungan_1 = 0 OR pengunjung_produk_kunjungan_1 IS NULL THEN 0
+                ELSE ((IFNULL(pengunjung_produk_kunjungan_2,0) - pengunjung_produk_kunjungan_1) * 100.0 / pengunjung_produk_kunjungan_1)
             END AS persentase_perubahan_pengunjung_produk_kunjungan,
-            CASE
-                WHEN a.pengunjung_produk_menambahkan_ke_keranjang = 0 OR a.pengunjung_produk_menambahkan_ke_keranjang IS NULL THEN 0
-                ELSE ((IFNULL(b.pengunjung_produk_menambahkan_ke_keranjang,0) - a.pengunjung_produk_menambahkan_ke_keranjang) * 100.0 / a.pengunjung_produk_menambahkan_ke_keranjang) 
+ 				CASE
+                WHEN pengunjung_produk_menambahkan_ke_keranjang_1 = 0 OR pengunjung_produk_menambahkan_ke_keranjang_1 IS NULL THEN 0
+                ELSE ((IFNULL(pengunjung_produk_menambahkan_ke_keranjang_2,0) - pengunjung_produk_menambahkan_ke_keranjang_1) * 100.0 / pengunjung_produk_menambahkan_ke_keranjang_1) 
             END AS persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang,
             CASE 
-                WHEN a.total_pesanan = 0 OR a.total_pesanan IS NULL THEN 0
-                ELSE ((IFNULL(b.total_pesanan,0)- a.total_pesanan) * 100.0 / a.total_pesanan)
+                WHEN total_pesanan_1 = 0 OR total_pesanan_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_pesanan_2,0)- total_pesanan_1) * 100.0 / total_pesanan_1)
             END AS persentase_perubahan_total_pesanan,
-            CASE 
-                WHEN a.total_penjualan_dibuat = 0 OR a.total_penjualan_dibuat IS NULL THEN 0
-                ELSE ((IFNULL(b.total_penjualan_dibuat,0) - a.total_penjualan_dibuat) * 100.0 / a.total_penjualan_dibuat)
+              CASE 
+                WHEN total_penjualan_dibuat_1 = 0 OR total_penjualan_dibuat_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_penjualan_dibuat_2,0) - total_penjualan_dibuat_1) * 100.0 / total_penjualan_dibuat_1)
             END AS persentase_perubahan_penjualan_dibuat,
-            CASE 
-                WHEN a.total_penjualan = 0 OR a.total_penjualan IS NULL THEN 0
-                ELSE ((IFNULL(b.total_penjualan,0) - a.total_penjualan) * 100.0 / a.total_penjualan)
+              CASE 
+                WHEN total_penjualan_1 = 0 OR total_penjualan_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_penjualan_2,0) - total_penjualan_1) * 100.0 / total_penjualan_1)
             END AS persentase_perubahan_penjualan
-        FROM (
-            SELECT
-                kode_produk,
-                SUM(IFNULL(pengunjung_produk_kunjungan,0)) AS pengunjung_produk_kunjungan,
-                SUM(IFNULL(pengunjung_produk_menambahkan_ke_keranjang,0)) AS pengunjung_produk_menambahkan_ke_keranjang,
-                produk AS nama_produk,
-                SUM(IFNULL(produk_pesanan_siap_dikirim,0)) AS total_pesanan,
-                 SUM(IFNULL(total_penjualan_pesanan_dibuat_idr,0)) AS total_penjualan_dibuat,
-                SUM(IFNULL(penjualan_pesanan_siap_dikirim_idr,0)) AS total_penjualan
-            FROM product_compare_table_ones
-        ) AS a
-        LEFT JOIN (
-            SELECT
-                kode_produk,
-                produk AS nama_produk,
-                SUM(IFNULL(pengunjung_produk_kunjungan,0)) AS pengunjung_produk_kunjungan,
-                SUM(IFNULL(pengunjung_produk_menambahkan_ke_keranjang,0)) AS pengunjung_produk_menambahkan_ke_keranjang,
-                SUM(IFNULL(produk_pesanan_siap_dikirim,0)) AS total_pesanan,
-                 SUM(IFNULL(total_penjualan_pesanan_dibuat_idr,0)) AS total_penjualan_dibuat,
-                SUM(IFNULL(penjualan_pesanan_siap_dikirim_idr,0)) AS total_penjualan
-            FROM product_compare_table_twos
-        ) AS b ON a.kode_produk = b.kode_produk
+FROM (
+				SELECT
+                a.kode_produk,
+                a.produk AS nama_produk,
+               IFNULL(a.pengunjung_produk_kunjungan,0) AS pengunjung_produk_kunjungan_1,
+					IFNULL(b.pengunjung_produk_kunjungan,0) AS pengunjung_produk_kunjungan_2,
+					IFNULL(a.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_1,
+                IFNULL(b.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_2,                
+                IFNULL(a.produk_pesanan_siap_dikirim,0) AS total_pesanan_1,
+                IFNULL(b.produk_pesanan_siap_dikirim,0) AS total_pesanan_2,
+                 IFNULL(a.total_penjualan_pesanan_dibuat_idr,0) AS total_penjualan_dibuat_1,
+                 IFNULL(b.total_penjualan_pesanan_dibuat_idr,0) AS total_penjualan_dibuat_2,
+                IFNULL(a.penjualan_pesanan_siap_dikirim_idr,0) AS total_penjualan_1,
+                IFNULL(b.penjualan_pesanan_siap_dikirim_idr,0) AS total_penjualan_2,
+                IFNULL(a.total_pembeli_pesanan_siap_dikirim,0) AS total_pembeli_1,
+                IFNULL(b.total_pembeli_pesanan_siap_dikirim,0) AS total_pembeli_2
+            FROM product_compare_table_ones AS a
+            LEFT JOIN product_compare_table_twos AS b ON a.kode_produk = b.kode_produk AND b.kode_variasi is null 
+            WHERE a.kode_variasi IS NULL 
+            GROUP BY a.kode_produk, a.produk       			
+				) AS ax
+        WHERE ax.kode_produk = ?
+        ", [$kode_produk]);
 
-        UNION ALL
+        return view('performa_produk.compare.show', ['kode_produk' => $kode_produk,  'dataPerformaProduk' => $dataPerformaProduk]);
+    }
 
-        SELECT
-            b.kode_produk AS kode_produk,
-            b.nama_produk AS nama_produk,
-            IFNULL(a.pengunjung_produk_kunjungan,0) AS pengunjung_produk_kunjungan_1, 
-            b.pengunjung_produk_kunjungan AS pengunjung_produk_kunjungan_2,
-            IFNULL(a.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_1,
-            b.pengunjung_produk_menambahkan_ke_keranjang AS pengunjung_produk_menambahkan_ke_keranjang_2,
-            IFNULL(a.total_pesanan,0) AS total_pesanan_1,
-            b.total_pesanan AS total_pesanan_2,
-            IFNULL(a.total_penjualan_dibuat,0) AS total_penjualan_dibuat_1,
-            b.total_penjualan_dibuat AS total_penjualan_dibuat_2,
-            IFNULL(a.total_penjualan,0) AS total_penjualan_1,
-            b.total_penjualan AS total_penjualan_2,
-            ((b.pengunjung_produk_kunjungan - IFNULL(a.pengunjung_produk_kunjungan,0)) * 100.0 / IFNULL(a.pengunjung_produk_kunjungan,1))
-            AS persentase_perubahan_pengunjung_produk_kunjungan,
-            ((b.pengunjung_produk_menambahkan_ke_keranjang - IFNULL(a.pengunjung_produk_menambahkan_ke_keranjang,0)) * 100.0 / IFNULL(a.pengunjung_produk_menambahkan_ke_keranjang,1))
-            AS persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang,
-            CASE
-                WHEN a.total_pesanan IS NULL OR a.total_pesanan = 0 THEN 0
-                ELSE ((b.total_pesanan - a.total_pesanan) * 100.0 / a.total_pesanan)
+    public function getDataTable(Request $request)
+    {
+        $kodeProduk = $request->kodeProduk;
+
+        $dataPerforma = DB::select("
+       SELECT *,
+ 				CASE
+                WHEN pengunjung_produk_menambahkan_ke_keranjang_1 = 0 OR pengunjung_produk_menambahkan_ke_keranjang_1 IS NULL THEN 0
+                ELSE ((IFNULL(pengunjung_produk_menambahkan_ke_keranjang_2,0) - pengunjung_produk_menambahkan_ke_keranjang_1) * 100.0 / pengunjung_produk_menambahkan_ke_keranjang_1) 
+            END AS persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang,
+            CASE 
+                WHEN total_pesanan_1 = 0 OR total_pesanan_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_pesanan_2,0)- total_pesanan_1) * 100.0 / total_pesanan_1)
             END AS persentase_perubahan_total_pesanan,
-             CASE
-                WHEN a.total_penjualan_dibuat IS NULL OR a.total_penjualan_dibuat = 0 THEN 0
-                ELSE ((b.total_penjualan_dibuat - a.total_penjualan_dibuat) * 100.0 / a.total_penjualan_dibuat)
+              CASE 
+                WHEN total_penjualan_dibuat_1 = 0 OR total_penjualan_dibuat_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_penjualan_dibuat_2,0) - total_penjualan_dibuat_1) * 100.0 / total_penjualan_dibuat_1)
             END AS persentase_perubahan_penjualan_dibuat,
-            CASE
-                WHEN a.total_penjualan IS NULL OR a.total_penjualan = 0 THEN 0
-                ELSE ((b.total_penjualan - a.total_penjualan) * 100.0 / a.total_penjualan)
+              CASE 
+                WHEN total_penjualan_1 = 0 OR total_penjualan_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_penjualan_2,0) - total_penjualan_1) * 100.0 / total_penjualan_1)
             END AS persentase_perubahan_penjualan
-        FROM (
-            SELECT
-                kode_produk,
-                SUM(IFNULL(pengunjung_produk_kunjungan,0)) AS pengunjung_produk_kunjungan,
-                SUM(IFNULL(pengunjung_produk_menambahkan_ke_keranjang,0)) AS pengunjung_produk_menambahkan_ke_keranjang,
-                produk AS nama_produk,
-                SUM(IFNULL(produk_pesanan_siap_dikirim,0)) AS total_pesanan,
-                SUM(IFNULL(total_penjualan_pesanan_dibuat_idr,0)) AS total_penjualan_dibuat,                
-                SUM(IFNULL(penjualan_pesanan_siap_dikirim_idr,0)) AS total_penjualan
-            FROM product_compare_table_ones
-        ) AS a
-        RIGHT JOIN (
-            SELECT
-                kode_produk,
-                produk AS nama_produk,
-                SUM(IFNULL(pengunjung_produk_kunjungan,0)) AS pengunjung_produk_kunjungan,
-                SUM(IFNULL(pengunjung_produk_menambahkan_ke_keranjang,0)) AS pengunjung_produk_menambahkan_ke_keranjang,
-                SUM(IFNULL(produk_pesanan_siap_dikirim,0)) AS total_pesanan,
-                 SUM(IFNULL(total_penjualan_pesanan_dibuat_idr,0)) AS total_penjualan_dibuat,
-                SUM(IFNULL(penjualan_pesanan_siap_dikirim_idr,0)) AS total_penjualan
-            FROM product_compare_table_twos
-        ) AS b ON a.kode_produk = b.kode_produk
-        WHERE a.kode_produk IS NULL ) as a
-        WHERE kode_produk = ?
+FROM (
+				SELECT
+                a.kode_produk,
+                a.produk AS nama_produk,
+            	a.nama_variasi,
+					IFNULL(a.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_1,
+                IFNULL(b.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_2,                
+                IFNULL(a.produk_pesanan_siap_dikirim,0) AS total_pesanan_1,
+                IFNULL(b.produk_pesanan_siap_dikirim,0) AS total_pesanan_2,
+                 IFNULL(a.total_penjualan_pesanan_dibuat_idr,0) AS total_penjualan_dibuat_1,
+                 IFNULL(b.total_penjualan_pesanan_dibuat_idr,0) AS total_penjualan_dibuat_2,
+                IFNULL(a.penjualan_pesanan_siap_dikirim_idr,0) AS total_penjualan_1,
+                IFNULL(b.penjualan_pesanan_siap_dikirim_idr,0) AS total_penjualan_2
+            FROM product_compare_table_ones AS a
+            LEFT JOIN product_compare_table_twos AS b ON a.kode_produk = b.kode_produk AND a.kode_variasi = b.kode_variasi AND b.kode_variasi IS NOT null 
+            WHERE a.kode_variasi IS NOT NULL 
+            GROUP BY a.kode_variasi   			
+				) AS ax
+				   WHERE ax.kode_produk = ?
         ; 
         ", [$kodeProduk]);
 
-        dd($kodeProduk);
-
-          $totalPenjualanOne = ProductCompareTableOne::where('kode_produk', $kodeProduk)->sum('penjualan_pesanan_siap_dikirim_idr');
+        $totalPenjualanOne = ProductCompareTableOne::where('kode_produk', $kodeProduk)->sum('penjualan_pesanan_siap_dikirim_idr');
         $totalPenjualanTwo = ProductCompareTableTwo::where('kode_produk', $kodeProduk)->sum('penjualan_pesanan_siap_dikirim_idr');
         foreach ($dataPerforma as &$item) {
             if ($item->total_penjualan_1 > 0) {
@@ -671,7 +620,7 @@ FROM (
                 $item->persentase_kontribusi_penjualan_2 = number_format(0, 2);
             }
             $total_pesanan = $item->total_pesanan_1 + $item->total_pesanan_2;
-            $item->jumlah_pesanan_rata_rata_per_hari = number_format($total_pesanan / 62, 2); // Asumsi 62 hari
+            $item->jumlah_pesanan_rata_rata_per_hari = number_format($total_pesanan / 62, 0); // Asumsi 62 hari
 
             $item->selisih_pesanan_dibuat_ke_siap_dikirim = ($item->total_penjualan_dibuat_1 + $item->total_penjualan_dibuat_2) - ($item->total_penjualan_1 + $item->total_penjualan_2);
 

@@ -94,7 +94,7 @@
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div id="persentasePerbedaanDataJumlah"></div>
+                            <div id="persentasePerbedaanDataJumlah" class="d-flex justify-content-center"></div>
                         </div>
                         <div class="col-lg-5">
                             <div class="card shadow border-0 mb-4">
@@ -129,7 +129,7 @@
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div id="persentasePerbedaanDataTotalPenjualan"></div>
+                            <div id="persentasePerbedaanDataTotalPenjualan" class="d-flex justify-content-center"></div>
                         </div>
                         <div class="col-lg-5">
                             <div class="card shadow border-0 mb-4">
@@ -200,7 +200,7 @@
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div id="persentasePerbedaanDataTotalProdukDimasukanKeranjang"></div>
+                            <div id="persentasePerbedaanDataTotalProdukDimasukanKeranjang" class="d-flex justify-content-center"></div>
                         </div>
                         <div class="col-lg-5">
                             <div class="card shadow border-0 mb-4">
