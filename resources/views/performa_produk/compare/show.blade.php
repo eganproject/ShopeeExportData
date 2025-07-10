@@ -33,7 +33,7 @@
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">Jumlah Variasi :</label>
                                         <p class="form-control-static" id="status_produk_1">
-                                            {{ count($dataPerformaProduk) }}</p>
+                                            {{ $count }}</p>
                                     </div>
                                 </div>
                             </div>

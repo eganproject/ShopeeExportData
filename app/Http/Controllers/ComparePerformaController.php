@@ -559,7 +559,10 @@ FROM (
         WHERE ax.kode_produk = ?
         ", [$kode_produk]);
 
-        return view('performa_produk.compare.show', ['kode_produk' => $kode_produk,  'dataPerformaProduk' => $dataPerformaProduk]);
+        $count = ProductCompareTableOne::where('kode_produk', $kode_produk)->count();
+
+
+        return view('performa_produk.compare.show', ['kode_produk' => $kode_produk,  'dataPerformaProduk' => $dataPerformaProduk, 'count' => $count -1]);
     }
 
     public function getDataTable(Request $request)
