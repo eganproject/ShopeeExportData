@@ -471,6 +471,8 @@ FROM (
 
         $totalProdukDimasukanKeKeranjangOne = ProductCompareTableOne::whereNull('kode_variasi')->sum('pengunjung_produk_menambahkan_ke_keranjang');
         $totalProdukDimasukanKeKeranjangTwo = ProductCompareTableTwo::whereNull('kode_variasi')->sum('pengunjung_produk_menambahkan_ke_keranjang');
+
+        $chartData = null;
         foreach ($dataPerforma as &$item) {
             if ($item->total_penjualan_1 > 0) {
                 $item->persentase_kontribusi_penjualan_1 = number_format(($item->total_penjualan_1 * 100) / $totalPenjualanOne, 2);
@@ -492,8 +494,74 @@ FROM (
             } else {
                 $item->aov = number_format(0, 2);
             }
+
+
+            $chartData[] = [
+                'x' => $item->total_pesanan_1,
+                'y' => $item->total_pesanan_2,
+                'nama_produk' => $item->nama_produk
+            ];
         }
         unset($item);
+
+        $tenTopSales = DB::select(
+            "
+                SELECT *,
+            CASE
+                WHEN pengunjung_produk_kunjungan_1 = 0 OR pengunjung_produk_kunjungan_1 IS NULL THEN 0
+                ELSE ((IFNULL(pengunjung_produk_kunjungan_2,0) - pengunjung_produk_kunjungan_1) * 100.0 / pengunjung_produk_kunjungan_1)
+            END AS persentase_perubahan_pengunjung_produk_kunjungan,
+ 				CASE
+                WHEN pengunjung_produk_menambahkan_ke_keranjang_1 = 0 OR pengunjung_produk_menambahkan_ke_keranjang_1 IS NULL THEN 0
+                ELSE ((IFNULL(pengunjung_produk_menambahkan_ke_keranjang_2,0) - pengunjung_produk_menambahkan_ke_keranjang_1) * 100.0 / pengunjung_produk_menambahkan_ke_keranjang_1) 
+            END AS persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang,
+            CASE 
+                WHEN total_pesanan_1 = 0 OR total_pesanan_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_pesanan_2,0)- total_pesanan_1) * 100.0 / total_pesanan_1)
+            END AS persentase_perubahan_total_pesanan,
+              CASE 
+                WHEN total_penjualan_dibuat_1 = 0 OR total_penjualan_dibuat_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_penjualan_dibuat_2,0) - total_penjualan_dibuat_1) * 100.0 / total_penjualan_dibuat_1)
+            END AS persentase_perubahan_penjualan_dibuat,
+              CASE 
+                WHEN total_penjualan_1 = 0 OR total_penjualan_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_penjualan_2,0) - total_penjualan_1) * 100.0 / total_penjualan_1)
+            END AS persentase_perubahan_penjualan,
+            IFNULL(total_penjualan_1,0) + IFNULL(total_penjualan_2,0) AS total_penjualan_2_periode
+            FROM (
+				SELECT
+                a.kode_produk,
+                a.produk AS nama_produk,
+               IFNULL(a.pengunjung_produk_kunjungan,0) AS pengunjung_produk_kunjungan_1,
+					IFNULL(b.pengunjung_produk_kunjungan,0) AS pengunjung_produk_kunjungan_2,
+					IFNULL(a.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_1,
+                IFNULL(b.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_2,                
+                IFNULL(a.produk_pesanan_siap_dikirim,0) AS total_pesanan_1,
+                IFNULL(b.produk_pesanan_siap_dikirim,0) AS total_pesanan_2,
+                 IFNULL(a.total_penjualan_pesanan_dibuat_idr,0) AS total_penjualan_dibuat_1,
+                 IFNULL(b.total_penjualan_pesanan_dibuat_idr,0) AS total_penjualan_dibuat_2,
+                IFNULL(a.penjualan_pesanan_siap_dikirim_idr,0) AS total_penjualan_1,
+                IFNULL(b.penjualan_pesanan_siap_dikirim_idr,0) AS total_penjualan_2
+            FROM product_compare_table_ones AS a
+            LEFT JOIN product_compare_table_twos AS b ON a.kode_produk = b.kode_produk AND b.kode_variasi is null 
+            WHERE a.kode_variasi IS NULL 
+            GROUP BY a.kode_produk, a.produk       			
+				) AS ax ORDER BY total_penjualan_1 + total_penjualan_2 DESC 
+				LIMIT 10
+            "
+        );
+
+        $chartLabels = [];
+        $chartValues = [];
+
+        // 3. Balik urutan array agar data terbesar ada di paling atas chart
+        $reversedData = array_reverse($tenTopSales);
+
+        // 4. Loop untuk mengisi data chart
+        foreach ($reversedData as $sale) {
+            $chartLabels[] = $sale->nama_produk;
+            $chartValues[] = $sale->total_penjualan_2_periode;
+        }
 
 
         return response()->json([
@@ -506,12 +574,16 @@ FROM (
             'total_produk_dimasukan_ke_keranjang_one' => $totalProdukDimasukanKeKeranjangOne,
             'total_produk_dimasukan_ke_keranjang_two' => $totalProdukDimasukanKeKeranjangTwo,
             'data_performa' => $dataPerforma,
+            'chartData' => $chartData,
+            'tenTopSales' => $tenTopSales,
+            'chartLabels' => $chartLabels,
+            'chartValues' => $chartValues
         ], 200);
     }
 
     public function show($kode_produk)
     {
-       
+
 
         $dataPerformaProduk = DB::select("
         SELECT *,
@@ -562,7 +634,7 @@ FROM (
         $count = ProductCompareTableOne::where('kode_produk', $kode_produk)->count();
 
 
-        return view('performa_produk.compare.show', ['kode_produk' => $kode_produk,  'dataPerformaProduk' => $dataPerformaProduk, 'count' => $count -1]);
+        return view('performa_produk.compare.show', ['kode_produk' => $kode_produk,  'dataPerformaProduk' => $dataPerformaProduk, 'count' => $count - 1]);
     }
 
     public function getDataTable(Request $request)

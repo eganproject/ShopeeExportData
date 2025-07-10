@@ -324,9 +324,6 @@
                         <div class="card-body text-center">
                             <label class="form-label fw-semibold">Rata rata pesanan perhari</label>
                             <h3 class="form-control-static">
-                            @php
-                                
-                            @endphp
                                 {{ number_format(($dataPerformaProduk[0]->total_pesanan_1 + $dataPerformaProduk[0]->total_pesanan_2) / 62, 0, ',', '.') ?? 'N/A' }}
                                 </h3>
                         </div>

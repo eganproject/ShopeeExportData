@@ -71,6 +71,11 @@
                         Unggah dan Impor Data
                     </button>
                 </div>
+                <div class="col-lg-12">
+                    <div class="mt-4 small text-muted text-center">
+                        <a href="/performa-produk/kategori">Kategori</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -200,7 +205,8 @@
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div id="persentasePerbedaanDataTotalProdukDimasukanKeranjang" class="d-flex justify-content-center"></div>
+                            <div id="persentasePerbedaanDataTotalProdukDimasukanKeranjang"
+                                class="d-flex justify-content-center"></div>
                         </div>
                         <div class="col-lg-5">
                             <div class="card shadow border-0 mb-4">
@@ -219,21 +225,43 @@
                     </div>
                 </div>
             </div>
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="col-lg-6">
+                    <div class="mb-4">
+                        <canvas id="myScatterChart"></canvas>
+                    </div>
+                    <div class="mb-4">
+                        <canvas id="topSalesChart"></canvas>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-lg-12">
-                <div class="mt-4 small text-muted text-center">
+                    <div class="my-4 small text-muted text-center">
                         <div class="fw-semibold mb-2">
                             Note :
                         </div>
                         <div class="bg-light p-3 rounded border text-start" style="font-size: 0.85em;">
-                          Produk dibawah sudah di merge dengan produk variannya, jadi : 
-                          <ul>
-                          <li> ketika ada perbedaan antara jumlah pengunjung lebih kecil daripada produk dimasukkan ke keranjang itu bisa terjadi ketika pengunjung memasukkan beberapa variasi kedalam keranjangnya.</li>
-                          </ul>  
+                            Produk dibawah sudah di merge dengan produk variannya, jadi :
+                            <ul>
+                                <li> ketika ada perbedaan antara jumlah pengunjung lebih kecil daripada produk dimasukkan ke
+                                    keranjang itu bisa terjadi ketika pengunjung memasukkan beberapa variasi kedalam
+                                    keranjangnya.</li>
+                            </ul>
                         </div>
                     </div>
+                    <div class="d-flex justify-content-center align-items-center">
+                        {{-- <div class="ms-3">
+                            <select class="form-select" id="viewSelector">
+                                <option value="semua">Semua</option>
+                                <option value="table">10 Produk Terlaris</option>
+                                <option value="chart">Grafik</option>
+                            </select>
+                        </div> --}}
+                    </div>
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered align-middle text-center table-hover" id="compareTable">
+                        <table class="table table-striped table-bordered align-middle text-center table-hover"
+                            id="compareTable">
                             <thead class="table-primary align-middle">
                                 <tr class="text-center">
                                     <th scope="col">No</th>
@@ -244,7 +272,8 @@
                                     <th scope="col">Persentase Perubahan Total Pengunjung (%)</th>
                                     <th scope="col">Pengunjung Produk Dimasukan ke Keranjang 1</th>
                                     <th scope="col">Pengunjung Produk Dimasukan ke Keranjang 2</th>
-                                    <th scope="col">Persentase Perubahan Pengunjung Produk Masukkan Ke Keranjang (%)</th>
+                                    <th scope="col">Persentase Perubahan Pengunjung Produk Masukkan Ke Keranjang (%)
+                                    </th>
                                     <th scope="col">Total Pesanan 1</th>
                                     <th scope="col">Total Pesanan 2</th>
                                     <th scope="col">Persentase Perubahan Total Pesanan (%)</th>
@@ -276,7 +305,6 @@
 
 
 @push('scripts')
-   
     <script>
         // Fungsi untuk menampilkan pesan (didefinisikan di global scope)
         getCountData()
@@ -461,11 +489,15 @@
                 success: function(response) {
                     $('#jumlah_data_1').text(response.jumlah_data_one || 0);
                     $('#jumlah_data_2').text(response.jumlah_data_two || 0);
+
                     // Format angka ke mata uang IDR
                     function formatAngka(angka) {
                         if (!angka || isNaN(angka)) return '0';
                         return parseFloat(angka).toLocaleString('id-ID');
                     }
+
+                    generateChartScatter(response.chartData)
+                    topSalesChart(response.chartLabels, response.chartValues)
 
                     $('#totalPenjualan_1').text(formatAngka(response.total_penjualan_one));
                     $('#totalPenjualan_2').text(formatAngka(response.total_penjualan_two));
@@ -625,8 +657,10 @@
                 const row = document.createElement('tr');
                 persentasePerubahanPenjualan = parseFloat(item.persentase_perubahan_penjualan) || 0;
                 persentasePerubahanPenjualanDibuat = parseFloat(item.persentase_perubahan_penjualan_dibuat) || 0;
-                persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang = parseFloat(item.persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang) || 0;
-                persentase_perubahan_pengunjung_produk_kunjungan = parseFloat(item.persentase_perubahan_pengunjung_produk_kunjungan) || 0;
+                persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang = parseFloat(item
+                    .persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang) || 0;
+                persentase_perubahan_pengunjung_produk_kunjungan = parseFloat(item
+                    .persentase_perubahan_pengunjung_produk_kunjungan) || 0;
                 persentase_perubahan_total_pesanan = parseFloat(item.persentase_perubahan_total_pesanan) || 0;
                 row.innerHTML = `
                 <td>${iiindex+1}</td>
@@ -661,8 +695,8 @@
             // Inisialisasi DataTable
             $('#compareTable').DataTable({
                 dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                     "<'row'<'col-sm-12'tr>>" +
-                     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'Bp>>",
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'Bp>>",
                 buttons: [{
                     extend: 'excelHtml5',
                     text: 'Export to Excel',
@@ -675,6 +709,119 @@
                 ],
                 destroy: true // Agar DataTable bisa diinisialisasi ulang tanpa error
             });
+        }
+
+        function generateChartScatter(dataChart){
+               const chartData = dataChart;
+
+        // 2. Mendapatkan konteks dari elemen canvas
+        const ctx = document.getElementById('myScatterChart').getContext('2d');
+
+        // 3. Membuat chart baru
+        const myScatterChart = new Chart(ctx, {
+            type: 'scatter', // Tipe chart adalah 'scatter'
+            data: {
+                datasets: [{
+                    label: 'Data Produk',
+                    // Menggunakan data dari controller
+                    data: chartData,
+                    // Memberi warna pada titik-titik (dots)
+                    backgroundColor: 'rgba(118, 106, 204, 0.8)', // Warna ungu seperti di gambar
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        // Memaksa sumbu x untuk mulai dari 0
+                        beginAtZero: true, 
+                        title: {
+                            display: true,
+                            text: 'Total Pesanan 1' // Label untuk sumbu X
+                        }
+                    },
+                    y: {
+                        // Memaksa sumbu y untuk mulai dari 0
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Total Pesanan 2' // Label untuk sumbu Y
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                // console.log(context)
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += `(X: ${context.parsed.x}, Y: ${context.parsed.y}), Produk : ${context.raw.nama_produk}}`;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        }
+
+
+        function topSalesChart(chartLabels, chartValues){
+              const labels = chartLabels;
+        const dataValues = chartValues;
+
+        // Mendapatkan elemen canvas
+        const ctx = document.getElementById('topSalesChart').getContext('2d');
+
+        // Membuat chart baru
+        const topSalesChart = new Chart(ctx, {
+            // Tipe chart utama adalah 'bar'
+            type: 'bar',
+            data: {
+                labels: labels, // Label untuk sumbu Y (nama produk)
+                datasets: [{
+                    label: 'Jumlah Penjualan',
+                    data: dataValues, // Data untuk sumbu X (nilai penjualan)
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // Warna batang
+                    borderColor: 'rgba(54, 162, 235, 1)', // Warna border batang
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                // Konfigurasi KUNCI untuk membuat chart horizontal
+                indexAxis: 'y',
+                
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        // Sembunyikan legend karena judul sudah cukup jelas
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Grafik 10 Penjualan Tertinggi', // Judul Chart
+                        font: {
+                            size: 20
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Jumlah Terjual' // Label Sumbu X
+                        }
+                    },
+                    y: {
+                        // Tidak perlu title di sini karena labelnya sudah jelas
+                    }
+                }
+            }
+        });
         }
     </script>
 @endpush
