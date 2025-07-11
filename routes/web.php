@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PerformaProdukController;
 use App\Http\Controllers\ComparePerformaController;
+use App\Http\Controllers\KategoriProdukController;
 
 Route::get('/', function () {
     return view('index');
@@ -10,6 +11,14 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'performa-produk'], function () {
     Route::get('/', [PerformaProdukController::class, 'index'])->name('performa_produk.index');
+    Route::get('/kategori', [KategoriProdukController::class, 'index'])->name('performa_produk.kategori');
+    Route::get('/kategori/get-product-codes/{id}', [KategoriProdukController::class, 'getProductCodes'])->name('performa_produk.getProductCodes');
+    Route::post('/kategori/add', [KategoriProdukController::class, 'store'])->name('performa_produk.createKategori');
+    Route::post('/kategori/add-product', [KategoriProdukController::class, 'storeProduct'])->name('performa_produk.createProductCode');
+    Route::delete('/kategori/delete-product-code/{id}', [KategoriProdukController::class, 'deleteProductCode'])->name('performa_produk.deleteProductCode');
+    Route::get('/kategori/get', [KategoriProdukController::class, 'lists'])->name('performa_produk.lists');
+    Route::get('/kategori/detail/{id}', [KategoriProdukController::class, 'show'])->name('performa_produk.showCategori');
+    Route::delete('/kategori/delete/{id}', [KategoriProdukController::class, 'destroy'])->name('performa_produk.destroyKategori');
     Route::post('/import', [PerformaProdukController::class, 'import'])->name('performa_produk.import');
     Route::post('/getcountdata', [PerformaProdukController::class, 'getcountdata'])->name('performa_produk.getcountdata');
     Route::post('/reset-data', [PerformaProdukController::class, 'resetData'])->name('performa_produk.resetData');
