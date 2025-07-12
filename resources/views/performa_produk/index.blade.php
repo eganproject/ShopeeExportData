@@ -53,8 +53,8 @@
                             Pembelian Terulang (Pesanan Siap Dikirim)
                         </div>
                     </div>
-                    <div class="mt-2 text-end"> 
-                    <a href="/performa-produk/compare">Compare data dari 2 periode ? Klik disini! </a>
+                    <div class="mt-2 text-end">
+                        <a href="/performa-produk/compare">Compare data dari 2 periode ? Klik disini! </a>
                     </div>
                 </div>
             </div>
@@ -155,6 +155,12 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-12">
+                    <div class="mb-5" style="position: relative; height: 500px;">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
                 <div class="card shadow mb-4">
                     <div class="card-header">
                         <h5 class="card-title
@@ -206,8 +212,84 @@
     <script src="//cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        getCountData(); // Panggil fungsi untuk mendapatkan jumlah data saat halaman dimuat
-        // Fungsi untuk menampilkan pesan (didefinisikan di global scope)
+        getCountData();
+
+
+        function createOrUpdateChart(produkData) {
+            // slice
+            produkData = produkData.slice(0, 10);
+
+            let myChart;
+            // Ekstrak nama produk untuk menjadi label di sumbu X
+            const labels = produkData.map(product => product.nama_produk);
+
+            // Ekstrak data penjualan total saja
+            const totalPenjualan = produkData.map(product => parseFloat(product.total_penjualan));
+
+            const ctx = document.getElementById('salesChart').getContext('2d');
+
+            // Hancurkan instance chart yang ada sebelum membuat yang baru
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Penjualan',
+                        data: totalPenjualan,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)', // Biru
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    // indexAxis: 'y', // Uncomment jika ingin grafik horizontal
+                    scales: {
+                        x: {
+                            ticks: {
+                                callback: function(value) {
+                                    const label = this.getLabelForValue(value);
+                                    if (label.length > 20) {
+                                        return label.substring(0, 20) + '...';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000000) return (value / 1000000) + 'jt';
+                                    if (value >= 1000) return (value / 1000) + 'k';
+                                    return value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '10 Top Produk Berdasarkan Total Penjualan'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    return labels[tooltipItems[0].dataIndex];
+                                }
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+
         function showMessage(msg, isSuccess) {
             const messageArea = document.getElementById('message-area');
             messageArea.textContent = msg;
@@ -314,7 +396,7 @@
                             minimumFractionDigits: 0
                         }).format(response.totalPenjualan)
                     );
-
+                    
                     loadTopProductsPieChart(response.limaProdukLaris)
                     const kurangLarisRows = response.limaProdukKurangLaris.map((item, idx) => {
                         return `<tr>
@@ -411,6 +493,7 @@
                 },
                 dataType: 'json',
                 success: function(response) {
+                    createOrUpdateChart(response.produk_performances)
                     var tableBody = '';
 
                     $('#performa-produk-table tbody').empty(); // Kosongkan tabel sebelum mengisi data baru
