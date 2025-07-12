@@ -226,13 +226,18 @@
                 </div>
             </div>
             <div class="d-flex justify-content-center align-items-center">
-                <div class="col-lg-6">
+                <div class="col-lg-10">
                     <div class="mb-4">
                         <canvas id="myScatterChart"></canvas>
                     </div>
                     <div class="mb-4">
                         <canvas id="topSalesChart"></canvas>
                     </div>
+                </div>
+            </div>
+            <div class="mb-4 mx-4">
+                <div class="mb-5" style="position: relative; height: 500px;">
+                    <canvas id="salesChart"></canvas>
                 </div>
             </div>
             <div class="row">
@@ -308,6 +313,90 @@
     <script>
         // Fungsi untuk menampilkan pesan (didefinisikan di global scope)
         getCountData()
+
+        function chartPenjualanCompare(produkData) {
+            //memfilter agar produk data ini maksimal diambil 10 data untuk dibuatkan chart
+            let myChart;
+
+            // Ekstrak nama produk untuk menjadi label di sumbu X
+            const labels = produkData.map(product => product.nama_produk);
+
+            // Ekstrak data penjualan untuk setiap dataset
+            const totalPenjualan1 = produkData.map(product => parseFloat(product.total_penjualan_1));
+            const totalPenjualan2 = produkData.map(product => parseFloat(product.total_penjualan_2));
+
+            const ctx = document.getElementById('salesChart').getContext('2d');
+
+            // Hancurkan instance chart yang ada sebelum membuat yang baru
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Penjualan Periode 1',
+                        data: totalPenjualan1,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)', // Biru
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Total Penjualan Periode 2',
+                        data: totalPenjualan2,
+                        backgroundColor: 'rgba(255, 159, 64, 0.8)', // Oranye
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    // indexAxis: 'y', // Uncomment baris ini jika nama produk terlalu panjang dan ingin grafik menjadi horizontal
+                    scales: {
+                        x: {
+                            ticks: {
+                                // Fungsi untuk memotong nama produk jika terlalu panjang
+                                callback: function(value) {
+                                    const label = this.getLabelForValue(value);
+                                    if (label.length > 20) {
+                                        return label.substring(0, 20) + '...';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    // Format angka menjadi lebih ringkas (misal: 1jt, 1k)
+                                    if (value >= 1000000) return (value / 1000000) + 'jt';
+                                    if (value >= 1000) return (value / 1000) + 'k';
+                                    return value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '10 Top Produk Berdasarkan Total Penjualan'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                // Menampilkan nama produk lengkap di tooltip
+                                title: function(tooltipItems) {
+                                    return labels[tooltipItems[0].dataIndex];
+                                }
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
 
         function showMessage(msg, isSuccess) {
             const messageArea = document.getElementById('message-area');
@@ -498,6 +587,7 @@
 
                     generateChartScatter(response.chartData)
                     topSalesChart(response.chartLabels, response.chartValues)
+                    chartPenjualanCompare(response.tenTopSales)
 
                     $('#totalPenjualan_1').text(formatAngka(response.total_penjualan_one));
                     $('#totalPenjualan_2').text(formatAngka(response.total_penjualan_two));
@@ -711,117 +801,118 @@
             });
         }
 
-        function generateChartScatter(dataChart){
-               const chartData = dataChart;
+        function generateChartScatter(dataChart) {
+            const chartData = dataChart;
 
-        // 2. Mendapatkan konteks dari elemen canvas
-        const ctx = document.getElementById('myScatterChart').getContext('2d');
+            // 2. Mendapatkan konteks dari elemen canvas
+            const ctx = document.getElementById('myScatterChart').getContext('2d');
 
-        // 3. Membuat chart baru
-        const myScatterChart = new Chart(ctx, {
-            type: 'scatter', // Tipe chart adalah 'scatter'
-            data: {
-                datasets: [{
-                    label: 'Data Produk',
-                    // Menggunakan data dari controller
-                    data: chartData,
-                    // Memberi warna pada titik-titik (dots)
-                    backgroundColor: 'rgba(118, 106, 204, 0.8)', // Warna ungu seperti di gambar
-                }]
-            },
-            options: {
-                scales: {
-                    x: {
-                        // Memaksa sumbu x untuk mulai dari 0
-                        beginAtZero: true, 
-                        title: {
-                            display: true,
-                            text: 'Total Pesanan 1' // Label untuk sumbu X
+            // 3. Membuat chart baru
+            const myScatterChart = new Chart(ctx, {
+                type: 'scatter', // Tipe chart adalah 'scatter'
+                data: {
+                    datasets: [{
+                        label: 'Data Produk',
+                        // Menggunakan data dari controller
+                        data: chartData,
+                        // Memberi warna pada titik-titik (dots)
+                        backgroundColor: 'rgba(118, 106, 204, 0.8)', // Warna ungu seperti di gambar
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            // Memaksa sumbu x untuk mulai dari 0
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Pesanan 1' // Label untuk sumbu X
+                            }
+                        },
+                        y: {
+                            // Memaksa sumbu y untuk mulai dari 0
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Pesanan 2' // Label untuk sumbu Y
+                            }
                         }
                     },
-                    y: {
-                        // Memaksa sumbu y untuk mulai dari 0
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Total Pesanan 2' // Label untuk sumbu Y
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                // console.log(context)
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    // console.log(context)
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label +=
+                                        `(X: ${context.parsed.x}, Y: ${context.parsed.y}), Produk : ${context.raw.nama_produk}}`;
+                                    return label;
                                 }
-                                label += `(X: ${context.parsed.x}, Y: ${context.parsed.y}), Produk : ${context.raw.nama_produk}}`;
-                                return label;
                             }
                         }
                     }
                 }
-            }
-        });
+            });
         }
 
 
-        function topSalesChart(chartLabels, chartValues){
-              const labels = chartLabels;
-        const dataValues = chartValues;
+        function topSalesChart(chartLabels, chartValues) {
+            const labels = chartLabels;
+            const dataValues = chartValues;
 
-        // Mendapatkan elemen canvas
-        const ctx = document.getElementById('topSalesChart').getContext('2d');
+            // Mendapatkan elemen canvas
+            const ctx = document.getElementById('topSalesChart').getContext('2d');
 
-        // Membuat chart baru
-        const topSalesChart = new Chart(ctx, {
-            // Tipe chart utama adalah 'bar'
-            type: 'bar',
-            data: {
-                labels: labels, // Label untuk sumbu Y (nama produk)
-                datasets: [{
-                    label: 'Jumlah Penjualan',
-                    data: dataValues, // Data untuk sumbu X (nilai penjualan)
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // Warna batang
-                    borderColor: 'rgba(54, 162, 235, 1)', // Warna border batang
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                // Konfigurasi KUNCI untuk membuat chart horizontal
-                indexAxis: 'y',
-                
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        // Sembunyikan legend karena judul sudah cukup jelas
-                        display: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Grafik 10 Penjualan Tertinggi', // Judul Chart
-                        font: {
-                            size: 20
-                        }
-                    }
+            // Membuat chart baru
+            const topSalesChart = new Chart(ctx, {
+                // Tipe chart utama adalah 'bar'
+                type: 'bar',
+                data: {
+                    labels: labels, // Label untuk sumbu Y (nama produk)
+                    datasets: [{
+                        label: 'Jumlah Penjualan',
+                        data: dataValues, // Data untuk sumbu X (nilai penjualan)
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)', // Warna batang
+                        borderColor: 'rgba(54, 162, 235, 1)', // Warna border batang
+                        borderWidth: 1
+                    }]
                 },
-                scales: {
-                    x: {
-                        beginAtZero: true,
+                options: {
+                    // Konfigurasi KUNCI untuk membuat chart horizontal
+                    indexAxis: 'y',
+
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            // Sembunyikan legend karena judul sudah cukup jelas
+                            display: false
+                        },
                         title: {
                             display: true,
-                            text: 'Jumlah Terjual' // Label Sumbu X
+                            text: 'Grafik 10 Penjualan Tertinggi', // Judul Chart
+                            font: {
+                                size: 20
+                            }
                         }
                     },
-                    y: {
-                        // Tidak perlu title di sini karena labelnya sudah jelas
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Jumlah Terjual' // Label Sumbu X
+                            }
+                        },
+                        y: {
+                            // Tidak perlu title di sini karena labelnya sudah jelas
+                        }
                     }
                 }
-            }
-        });
+            });
         }
     </script>
 @endpush

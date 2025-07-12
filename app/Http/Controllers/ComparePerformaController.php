@@ -587,7 +587,7 @@ FROM (
 
         $dataPerformaProduk = DB::select("
         SELECT *,
-     CASE
+            CASE
                 WHEN pengunjung_produk_kunjungan_1 = 0 OR pengunjung_produk_kunjungan_1 IS NULL THEN 0
                 ELSE ((IFNULL(pengunjung_produk_kunjungan_2,0) - pengunjung_produk_kunjungan_1) * 100.0 / pengunjung_produk_kunjungan_1)
             END AS persentase_perubahan_pengunjung_produk_kunjungan,
@@ -606,7 +606,11 @@ FROM (
               CASE 
                 WHEN total_penjualan_1 = 0 OR total_penjualan_1 IS NULL THEN 0
                 ELSE ((IFNULL(total_penjualan_2,0) - total_penjualan_1) * 100.0 / total_penjualan_1)
-            END AS persentase_perubahan_penjualan
+            END AS persentase_perubahan_penjualan,
+                  CASE 
+                WHEN total_pesanan_dibuat_1 = 0 OR total_pesanan_dibuat_1 IS NULL THEN 0
+                ELSE ((IFNULL(total_pesanan_dibuat_2,0) - total_pesanan_dibuat_1) * 100.0 / total_pesanan_dibuat_1)
+            END AS persentase_perubahan_total_pesanan_dibuat
 FROM (
 				SELECT
                 a.kode_produk,
@@ -622,7 +626,9 @@ FROM (
                 IFNULL(a.penjualan_pesanan_siap_dikirim_idr,0) AS total_penjualan_1,
                 IFNULL(b.penjualan_pesanan_siap_dikirim_idr,0) AS total_penjualan_2,
                 IFNULL(a.total_pembeli_pesanan_siap_dikirim,0) AS total_pembeli_1,
-                IFNULL(b.total_pembeli_pesanan_siap_dikirim,0) AS total_pembeli_2
+                IFNULL(b.total_pembeli_pesanan_siap_dikirim,0) AS total_pembeli_2,
+                IFNULL(a.produk_pesanan_dibuat,0) as total_pesanan_dibuat_1,
+                IFNULL(b.produk_pesanan_dibuat,0) as total_pesanan_dibuat_2
             FROM product_compare_table_ones AS a
             LEFT JOIN product_compare_table_twos AS b ON a.kode_produk = b.kode_produk AND b.kode_variasi is null 
             WHERE a.kode_variasi IS NULL 
@@ -662,7 +668,7 @@ FROM (
 FROM (
 				SELECT
                 a.kode_produk,
-                a.produk AS nama_produk,
+                CONCAT(a.nama_variasi, ' - ', a.produk) AS nama_produk,
             	a.nama_variasi,
 					IFNULL(a.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_1,
                 IFNULL(b.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_2,                

@@ -141,6 +141,52 @@
                 <div class="col-lg-5">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
+                            <label class="form-label fw-semibold">Total Pesanan Dibuat 1</label>
+                            <h3 class="form-control-static">
+                                {{ number_format($dataPerformaProduk[0]->total_pesanan_dibuat_1, 0, ',', '.') ?? 'N/A' }}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 d-flex align-items-center justify-content-center">
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-center mx-4">
+
+                                @if ($dataPerformaProduk[0]->total_pesanan_dibuat_1 < $dataPerformaProduk[0]->total_pesanan_dibuat_2)
+                                    <i class="fa-solid fa-arrow-up" style="color: #28a745;"></i>
+                                @elseif ($dataPerformaProduk[0]->total_pesanan_dibuat_1 > $dataPerformaProduk[0]->total_pesanan_dibuat_2)
+                                    <i class="fa-solid fa-arrow-down" style="color: #dc3545;"></i>
+                                @else
+                                    <i class="fa-solid fa-equals" style="color: #6c757d;"></i>
+                                @endif
+
+                            </div>
+
+                            <p class="text-center fw-bold mb-0">
+                                {{ number_format($dataPerformaProduk[0]->total_pesanan_dibuat_2 - $dataPerformaProduk[0]->total_pesanan_dibuat_1, 0, ',', '.') ?? 'N/A' }}
+                            </p>
+                            <p class="text-center mb-0 fw-bold">
+                                @if ($dataPerformaProduk[0]->persentase_perubahan_total_pesanan_dibuat != 0)
+                                    {{ number_format($dataPerformaProduk[0]->persentase_perubahan_total_pesanan_dibuat, 2) }}%
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card shadow mb-4">
+                        <div class="card-body text-center">
+                            <label class="form-label fw-semibold">Total Pesanan Dibuat 2</label>
+                            <h3 class="form-control-static">
+                                {{ number_format($dataPerformaProduk[0]->total_pesanan_dibuat_2, 0, ',', '.') ?? 'N/A' }}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card shadow mb-4">
+                        <div class="card-body text-center">
                             <label class="form-label fw-semibold">Total Pesanan Siap Dikirim 1</label>
                             <h3 class="form-control-static">
                                 {{ number_format($dataPerformaProduk[0]->total_pesanan_1, 0, ',', '.') ?? 'N/A' }}</h3>
@@ -277,7 +323,7 @@
                 <div class="col-lg-5">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <label class="form-label fw-semibold">Perbedaan Total Penjualan Dibuat dan Siap Dikirim
+                            <label class="form-label fw-semibold">Selisih Total Penjualan Dibuat dan Siap Dikirim
                                 1</label>
                             <h3 class="form-control-static">
                                 @php
@@ -294,12 +340,12 @@
                     </div>
                 </div>
                 <div class="col-lg-2 d-flex align-items-center justify-content-center">
-                    
+
                 </div>
                 <div class="col-lg-5">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <label class="form-label fw-semibold">Perbedaan Total Penjualan Dibuat dan Siap Dikirim
+                            <label class="form-label fw-semibold">Selisih Total Penjualan Dibuat dan Siap Dikirim
                                 2</label>
                             <h3 class="form-control-static">
                                 {{ number_format($perbedaan_2, 0, ',', '.') ?? 'N/A' }}</h3>
@@ -308,40 +354,47 @@
                 </div>
             </div>
             <div class="d-flex justify-content-center mb-4">
-                <div class="col-lg-6"> 
-                     <div class="card shadow mb-4">
+                <div class="col-lg-6">
+                    <div class="card shadow mb-4">
                         <div class="card-body text-center">
                             <label class="form-label fw-semibold">Average Order Value (AOV)</label>
                             <h3 class="form-control-static">
-                               {{ number_format(($dataPerformaProduk[0]->total_penjualan_1 + $dataPerformaProduk[0]->total_penjualan_2) / ($dataPerformaProduk[0]->total_pesanan_1 + $dataPerformaProduk[0]->total_pesanan_2), 0, ',', '.') ?? 'N/A' }}</h3>
+                                {{ number_format(($dataPerformaProduk[0]->total_penjualan_1 + $dataPerformaProduk[0]->total_penjualan_2) / ($dataPerformaProduk[0]->total_pesanan_1 + $dataPerformaProduk[0]->total_pesanan_2), 0, ',', '.') ?? 'N/A' }}
+                            </h3>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="d-flex justify-content-center mb-4">
-                <div class="col-lg-6"> 
-                     <div class="card shadow mb-4">
+                <div class="col-lg-6">
+                    <div class="card shadow mb-4">
                         <div class="card-body text-center">
                             <label class="form-label fw-semibold">Rata rata pesanan perhari</label>
                             <h3 class="form-control-static">
                                 {{ number_format(($dataPerformaProduk[0]->total_pesanan_1 + $dataPerformaProduk[0]->total_pesanan_2) / 62, 0, ',', '.') ?? 'N/A' }}
-                                </h3>
+                            </h3>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="d-flex justify-content-center mb-4">
-                <div class="col-lg-6"> 
-                     <div class="card shadow mb-4">
+                <div class="col-lg-6">
+                    <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <label class="form-label fw-semibold">Rata rata pesanan per pembeli</label>
+                            <label class="form-label fw-semibold">Average Order Quantity (AOQ)</label>
                             <h3 class="form-control-static">
-                                {{ number_format(($dataPerformaProduk[0]->total_pesanan_1 + $dataPerformaProduk[0]->total_pesanan_2) /($dataPerformaProduk[0]->total_pembeli_1 + $dataPerformaProduk[0]->total_pembeli_2), 0, ',', '.') ?? 'N/A' }}</h3>
+                                {{ number_format(($dataPerformaProduk[0]->total_pesanan_1 + $dataPerformaProduk[0]->total_pesanan_2) / ($dataPerformaProduk[0]->total_pembeli_1 + $dataPerformaProduk[0]->total_pembeli_2), 0, ',', '.') ?? 'N/A' }}
+                            </h3>
                         </div>
                     </div>
                 </div>
             </div>
-            
+            <div class="mb-4 mx-4">
+                <div class="mb-5" style="position: relative; height: 500px;">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
 
             <div class="row">
                 <div class="col-lg-12">
@@ -397,6 +450,92 @@
     <script>
         getData()
 
+    
+        /**
+         * Fungsi untuk membuat atau memperbarui chart.
+         * @param {Array} salesData - Array objek yang berisi data penjualan.
+         */
+        function createOrUpdateChart(produkData) {
+    let myChart;
+            // Ekstrak nama produk untuk menjadi label di sumbu X
+            const labels = produkData.map(product => product.nama_produk);
+
+            // Ekstrak data penjualan untuk setiap dataset
+            const totalPenjualan1 = produkData.map(product => parseFloat(product.total_penjualan_1));
+            const totalPenjualan2 = produkData.map(product => parseFloat(product.total_penjualan_2));
+
+            const ctx = document.getElementById('salesChart').getContext('2d');
+
+            // Hancurkan instance chart yang ada sebelum membuat yang baru
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Penjualan Periode 1',
+                        data: totalPenjualan1,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)', // Biru
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Total Penjualan Periode 2',
+                        data: totalPenjualan2,
+                        backgroundColor: 'rgba(255, 159, 64, 0.8)', // Oranye
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    // indexAxis: 'y', // Uncomment baris ini jika nama produk terlalu panjang dan ingin grafik menjadi horizontal
+                    scales: {
+                        x: {
+                            ticks: {
+                                // Fungsi untuk memotong nama produk jika terlalu panjang
+                                callback: function(value) {
+                                    const label = this.getLabelForValue(value);
+                                    if (label.length > 20) {
+                                        return label.substring(0, 20) + '...';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    // Format angka menjadi lebih ringkas (misal: 1jt, 1k)
+                                    if (value >= 1000000) return (value / 1000000) + 'jt';
+                                    if (value >= 1000) return (value / 1000) + 'k';
+                                    return value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '10 Top Produk Berdasarkan Total Penjualan'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                // Menampilkan nama produk lengkap di tooltip
+                                title: function(tooltipItems) {
+                                    return labels[tooltipItems[0].dataIndex];
+                                }
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
         function getData() {
             $.ajax({
                 url: '/performa-produk/compare/detail/getDataTable',
@@ -407,6 +546,7 @@
                 },
                 success: function(response) {
                     tableDataPerforma(response.data)
+                    createOrUpdateChart(response.data)
                 }
             });
 
