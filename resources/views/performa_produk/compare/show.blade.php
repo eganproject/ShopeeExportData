@@ -228,6 +228,31 @@
                         </div>
                     </div>
                 </div>
+                 <div class="col-lg-5">
+                    <div class="card shadow mb-4">
+                        <div class="card-body text-center">
+                            <label class="form-label fw-semibold">Selisih Pesanan Dibuat ke Siap Dikirim 1</label>
+                            <h3 class="form-control-static">
+                                {{ number_format($dataPerformaProduk[0]->total_pesanan_dibuat_1 - $dataPerformaProduk[0]->total_pesanan_1, 0, ',', '.') ?? 'N/A' }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 d-flex align-items-center justify-content-center">
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                          
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card shadow mb-4">
+                        <div class="card-body text-center">
+                            <label class="form-label fw-semibold">Selisih Pesanan Dibuat ke Siap Dikirim 2</label>
+                            <h3 class="form-control-static">
+                                {{ number_format($dataPerformaProduk[0]->total_pesanan_dibuat_2 - $dataPerformaProduk[0]->total_pesanan_2, 0, ',', '.') ?? 'N/A' }}</h3>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-lg-5">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">

@@ -648,7 +648,7 @@ FROM (
         $kodeProduk = $request->kodeProduk;
 
         $dataPerforma = DB::select("
-       SELECT *,
+            SELECT *,
  				CASE
                 WHEN pengunjung_produk_menambahkan_ke_keranjang_1 = 0 OR pengunjung_produk_menambahkan_ke_keranjang_1 IS NULL THEN 0
                 ELSE ((IFNULL(pengunjung_produk_menambahkan_ke_keranjang_2,0) - pengunjung_produk_menambahkan_ke_keranjang_1) * 100.0 / pengunjung_produk_menambahkan_ke_keranjang_1) 
@@ -665,7 +665,7 @@ FROM (
                 WHEN total_penjualan_1 = 0 OR total_penjualan_1 IS NULL THEN 0
                 ELSE ((IFNULL(total_penjualan_2,0) - total_penjualan_1) * 100.0 / total_penjualan_1)
             END AS persentase_perubahan_penjualan
-FROM (
+            FROM (
 				SELECT
                 a.kode_produk,
                 CONCAT(a.nama_variasi, ' - ', a.produk) AS nama_produk,
