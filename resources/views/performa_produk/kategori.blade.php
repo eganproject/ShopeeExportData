@@ -1,188 +1,287 @@
+
 @extends('layouts.main')
 
+{{-- Menambahkan style kustom dan library eksternal --}}
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    /* Font dan body */
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Inter', sans-serif; /* Font modern yang mudah dibaca */
+    }
+
+    /* Kustomisasi Card */
+    .custom-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%; /* Membuat card memiliki tinggi yang sama dalam satu baris */
+    }
+    .custom-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Tombol modern */
+    .btn-modern {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        transition: all 0.2s ease;
+    }
+    .btn-modern:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Kustomisasi Tabel dengan DataTables */
+    .dataTables_wrapper {
+        padding-top: 1rem;
+    }
+    .dataTables_filter input,
+    .dataTables_length select {
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        border: 1px solid #dee2e6 !important;
+    }
+    .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .table tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    /* Loading Overlay */
+    #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7);
+        display: none; /* Awalnya disembunyikan */
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+</style>
+@endpush
+
+
 @section('content')
-    <div class="card shadow border-0 mx-auto">
-        <div class="card-body p-4">
-            <h1 class="h3 fw-bold text-center mb-4">
-                Manajemen Kategori Produk
-            </h1>
-            <div class="row">
-                <div class="row mb-4">
-                    <div class="col-lg-8 mx-auto">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Tambah Kategori Baru</h6>
+    {{-- Indikator Loading --}}
+    <div id="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Header Halaman -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mt-2 mb-0 fw-bold">Manajemen Kategori Produk</h3>
+                <small class="text-muted">Tambah, lihat, dan hapus kategori produk.</small>
+            </div>
+        </div>
+
+        <!-- Konten Utama: Form dan Tabel -->
+        <div class="row g-4">
+            <!-- Kolom Form Tambah Kategori -->
+            <div class="col-lg-4">
+                <div class="card custom-card">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold">Tambah Kategori Baru</h5>
+                        <p class="text-muted small">Buat kategori baru untuk mengelompokkan produk Anda.</p>
+                        <form id="add-category-form">
+                            <div class="mb-3">
+                                <label for="category_name" class="form-label fw-semibold">Nama Kategori</label>
+                                <input type="text" class="form-control" id="category_name" name="category_name" placeholder="Contoh: Pakaian Pria" required>
                             </div>
-                            <div class="card-body">
-                                <form id="add-category-form">
-                                    <div class="mb-3">
-                                        <label for="category_name" class="form-label fw-semibold">Nama Kategori:</label>
-                                        <input type="text" class="form-control" id="category_name" name="category_name"
-                                            required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary w-100">Tambah Kategori</button>
-                                </form>
-                                <div id="message-area" class="alert text-center fw-medium d-none mt-3" role="alert">
-                                    <!-- Pesan akan ditampilkan di sini -->
-                                </div>
-                            </div>
-                        </div>
+                            <button type="submit" class="btn btn-primary btn-modern w-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill me-1" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/></svg>
+                                Tambah Kategori
+                            </button>
+                        </form>
                     </div>
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Daftar Kategori</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-bordered" id="categories-table">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Nama Kategori</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Data kategori akan dimuat di sini melalui JavaScript -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+            <!-- Kolom Tabel Daftar Kategori -->
+            <div class="col-lg-8">
+                <div class="card custom-card">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold">Daftar Kategori</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="categories-table" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Kategori</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data diisi via JS -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    @endsection
+    </div>
+@endsection
 
-    @push('scripts')
-        <script>
-            // Fungsi untuk menampilkan pesan
-            function showMessage(msg, isSuccess) {
-                const messageArea = document.getElementById('message-area');
-                messageArea.textContent = msg;
-                messageArea.classList.remove('d-none');
-                if (isSuccess) {
-                    messageArea.classList.remove('alert-danger');
-                    messageArea.classList.add('alert-success');
-                } else {
-                    messageArea.classList.remove('alert-success');
-                    messageArea.classList.add('alert-danger');
-                }
+@push('scripts')
+{{-- Sertakan library eksternal --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    // --- VARIABEL GLOBAL & HELPER ---
+    let categoriesTableInstance;
+    const showLoading = () => $('#loading-overlay').css('display', 'flex');
+    const hideLoading = () => $('#loading-overlay').hide();
+
+    /**
+     * Fungsi untuk memuat atau memuat ulang data kategori ke dalam DataTable.
+     */
+    function loadCategories() {
+        showLoading();
+        $.ajax({
+            url: '/performa-produk/kategori/get',
+            type: 'GET',
+            success: function(response) {
+                // Gunakan API DataTables untuk memperbarui data secara efisien
+                categoriesTableInstance.clear();
+                categoriesTableInstance.rows.add(response.categories || []);
+                categoriesTableInstance.draw();
+            },
+            error: function(xhr) {
+                Swal.fire('Gagal!', 'Tidak dapat memuat daftar kategori dari server.', 'error');
+            },
+            complete: function() {
+                hideLoading();
             }
+        });
+    }
 
-            // Fungsi untuk memuat data kategori ke tabel
-            function loadCategories() {
+    /**
+     * Fungsi untuk menghapus kategori dengan konfirmasi SweetAlert.
+     * @param {string} categoryId - ID kategori yang akan dihapus.
+     */
+    function deleteCategory(categoryId) {
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Kategori ini dan semua data produk di dalamnya akan dihapus!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                showLoading();
                 $.ajax({
-                    url: '/performa-produk/kategori/get',
-                    type: 'GET',
-                    success: function(response) {
-                        // Inisialisasi DataTable jika belum ada
-                        if (!$.fn.DataTable.isDataTable('#categories-table')) {
-                            $('#categories-table').DataTable({
-                                data: response.categories,
-                                destroy: true,
-                                columns: [{
-                                        data: null,
-                                        render: function(data, type, row, meta) {
-                                            return meta.row + 1;
-                                        }
-                                    },
-                                    {
-                                        data: 'nama_kategori',
-                                        render: function(data, type, row) {
-                                            return `<a href="/performa-produk/kategori/detail/${row.id}" class="text-primary">${data}</a>`;
-                                        }
-                                    },
-                                    {
-                                        data: 'id',
-                                        render: function(data, type, row) {
-                                            return `<button class="btn btn-danger btn-sm delete-category" data-id="${data}">Hapus</button>`;
-                                        },
-                                        orderable: false,
-                                        searchable: false
-                                    }
-                                ],
-                                language: {
-                                    emptyTable: "Tidak ada data kategori."
-                                }
-                            });
-                        } else {
-                            // Jika sudah ada, update datanya saja
-                            const table = $('#categories-table').DataTable();
-                            table.clear();
-                            table.rows.add(response.categories);
-                            table.draw();
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading categories:', error);
-                        showMessage('Gagal memuat kategori.', false);
-                    }
-                });
-            }
-
-            // Event listener untuk form tambah kategori
-            $('#add-category-form').on('submit', function(e) {
-                e.preventDefault();
-                const categoryName = $('#category_name').val();
-
-                $.ajax({
-                    url: '/performa-produk/kategori/add',
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        nama_kategori: categoryName
-                    },
+                    url: `/performa-produk/kategori/delete/${categoryId}`,
+                    type: 'DELETE',
+                    data: { _token: '{{ csrf_token() }}' },
                     success: function(response) {
                         if (response.success) {
-                            showMessage(response.message, true);
-                            $('#category_name').val(''); // Kosongkan input
-                            loadCategories(); // Muat ulang daftar kategori
+                            Swal.fire('Berhasil!', response.message, 'success');
+                            loadCategories(); // Muat ulang data setelah berhasil
                         } else {
-                            showMessage(response.message, false);
+                            Swal.fire('Gagal!', response.message, 'error');
                         }
                     },
-                    error: function(xhr, status, error) {
-                        console.error('Error adding category:', error);
-                        showMessage('Terjadi kesalahan saat menambahkan kategori.', false);
+                    error: function(xhr) {
+                        Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus kategori.', 'error');
+                    },
+                    complete: function() {
+                        hideLoading();
                     }
                 });
-            });
+            }
+        });
+    }
 
-            // Event listener untuk tombol hapus kategori (delegasi event)
-            $(document).on('click', '.delete-category', function() {
-                const categoryId = $(this).data('id');
-                if (confirm('Apakah Anda yakin ingin menghapus kategori ini?')) {
-                    $.ajax({
-                        url: '/performa-produk/kategori/delete/' + categoryId,
-                        type: 'DELETE',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                showMessage(response.message, true);
-                                loadCategories(); // Muat ulang daftar kategori
-                            } else {
-                                showMessage(response.message, false);
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error deleting category:', error);
-                            showMessage('Terjadi kesalahan saat menghapus kategori.', false);
-                        }
-                    });
+    // --- INISIALISASI & EVENT LISTENERS ---
+    $(document).ready(function() {
+        // Inisialisasi DataTable saat dokumen siap
+        categoriesTableInstance = $('#categories-table').DataTable({
+            processing: true,
+            columns: [
+                { data: null, searchable: false, orderable: false, render: (data, type, row, meta) => meta.row + 1 },
+                { 
+                    data: 'nama_kategori',
+                    render: (data, type, row) => `<a href="/performa-produk/kategori/detail/${row.id}" class="text-decoration-none fw-semibold">${data}</a>`
+                },
+                { 
+                    data: 'id',
+                    searchable: false, 
+                    orderable: false,
+                    render: (data) => `<button class="btn btn-danger btn-sm" onclick="deleteCategory('${data}')">Hapus</button>`
+                }
+            ],
+            language: {
+                emptyTable: "Belum ada kategori yang ditambahkan.",
+                zeroRecords: "Kategori tidak ditemukan.",
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ entri",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                infoEmpty: "Menampilkan 0 sampai 0 dari 0 entri",
+                infoFiltered: "(difilter dari _MAX_ total entri)",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Berikutnya",
+                    previous: "Sebelumnya"
+                }
+            }
+        });
+
+        // Muat data untuk pertama kali
+        loadCategories();
+
+        // Event listener untuk form tambah kategori
+        $('#add-category-form').on('submit', function(e) {
+            e.preventDefault();
+            showLoading();
+            const categoryName = $('#category_name').val();
+
+            $.ajax({
+                url: '/performa-produk/kategori/add',
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    nama_kategori: categoryName
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: response.message, timer: 2000, showConfirmButton: false });
+                        $('#category_name').val(''); // Kosongkan input
+                        loadCategories(); // Muat ulang daftar kategori
+                    } else {
+                        Swal.fire('Gagal!', response.message, 'error');
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat menambahkan kategori.', 'error');
+                },
+                complete: function() {
+                    hideLoading();
                 }
             });
-
-            // Muat kategori saat halaman pertama kali dimuat
-            $(document).ready(function() {
-                loadCategories();
-            });
-        </script>
-    @endpush
+        });
+    });
+</script>
+@endpush

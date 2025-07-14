@@ -1,389 +1,483 @@
 @extends('layouts.main')
 
+{{-- Menambahkan style kustom dan library eksternal --}}
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    /* Font dan body */
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Inter', sans-serif; /* Font modern yang mudah dibaca */
+    }
+
+    /* Kustomisasi Card */
+    .custom-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    .custom-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Summary Cards */
+    .summary-card {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+    }
+    .summary-card .icon-bg {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        margin-right: 1rem;
+    }
+    .summary-card .icon-bg svg {
+        width: 24px;
+        height: 24px;
+    }
+    .summary-card .card-title {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    .summary-card .card-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #212529;
+    }
+    
+    /* Tombol modern */
+    .btn-modern {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        transition: all 0.2s ease;
+    }
+    .btn-modern:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Kustomisasi Tabel dengan DataTables */
+    .dataTables_wrapper {
+        padding: 1rem 0;
+    }
+    .dataTables_filter input {
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        border: 1px solid #dee2e6 !important;
+    }
+    .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .table tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+
+    /* Loading Overlay */
+    #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7);
+        display: none; /* Awalnya disembunyikan */
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+</style>
+@endpush
+
+
 @section('content')
-    <a href="/performa-produk/kategori" class="btn btn-sm btn-secondary mb-4">Kembali</a>
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <div class="mb-4">
-                <h4>{{ $kategori->nama_kategori }}</h4>
-            </div>
+    {{-- Indikator Loading --}}
+    <div id="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
-            <form id="productForm">
-                @csrf
-                <div class="form-group">
-                    <label for="product_code">Kode Produk (SKU)</label>
-                    <input type="hidden" name="kategori_id" id="kategori_id" value="{{ $kategori->id }}">
-                    <input type="text" class="form-control" id="product_code" name="product_code"
-                        placeholder="Masukan kode produk." required>
-                </div>
-                <button type="submit" class="btn btn-primary mt-2">Submit</button>
-            </form>
+    <div class="container-fluid">
+        <!-- Header Halaman -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a href="/performa-produk/kategori" class="btn btn-sm btn-outline-secondary btn-modern">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-1" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/></svg>
+                    Kembali
+                </a>
+                <h3 class="mt-2 mb-0 fw-bold">{{ $kategori->nama_kategori }}</h3>
+                <small class="text-muted">Analisis performa produk untuk kategori ini.</small>
+            </div>
         </div>
 
-        <div class="mt-4 mb-4">
+        <!-- Bagian Form dan Daftar SKU -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4">
+                <div class="card custom-card h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold">Tambah Produk</h5>
+                        <p class="text-muted small">Masukkan SKU produk untuk ditambahkan ke dalam analisis.</p>
+                        <form id="productForm">
+                            @csrf
+                            <input type="hidden" name="kategori_id" id="kategori_id" value="{{ $kategori->id }}">
+                            <div class="mb-3">
+                                <label for="product_code" class="form-label fw-semibold">Kode Produk (SKU)</label>
+                                <input type="text" class="form-control" id="product_code" name="product_code" placeholder="Contoh: BAJU-001-XL" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-modern w-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill me-1" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/></svg>
+                                Tambah
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card custom-card h-100">
+                    <div class="card-body">
+                        <h5 class="fw-bold">Daftar Kode Produk</h5>
+                        <div class="table-responsive">
+                            <table id="productCodesTable" class="table table-hover align-middle" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kode Produk</th>
+                                        <th>Nama Produk</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card custom-card summary-card">
+                    <div class="icon-bg" style="background-color: #e7f3ff; color: #0d6efd;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v4h-2zm0 6h2v2h-2z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="card-title">Total Penjualan Periode 1</h6>
+                        <p class="card-text" id="totalPenjualanPeriode1">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="card custom-card summary-card">
+                    <div class="icon-bg" id="selisihIconBg" style="background-color: #e8f5e9; color: #198754;">
+                        <svg id="selisihIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="card-title">Perubahan Penjualan</h6>
+                        <p class="card-text" id="selisihPenjualan">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12">
+                <div class="card custom-card summary-card">
+                    <div class="icon-bg" style="background-color: #fff0e4; color: #fd7e14;">
+                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v4h-2zm0 6h2v2h-2z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="card-title">Total Penjualan Periode 2</h6>
+                        <p class="card-text" id="totalPenjualanPeriode2">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card custom-card mb-4">
             <div class="card-body">
-                <table id="productCodesTable" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Kode Produk</th>
-                            <th>Nama Produk</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="mb-4 d-flex justify-content-center">
-            <div class="card text-white bg-success mb-3 me-3" style="max-width: 22rem;">
-                <div class="card-header text-center fw-bold">Total Penjualan Periode 1</div>
-                <div class="card-body">
-                    <h5 class="card-title text-center" id="totalPenjualanPeriode1">0</h5>
-                    <p class="card-text text-center">Total penjualan seluruh produk pada periode 1.</p>
-                </div>
-            </div>
-            <!-- Selisih Kenaikan/Penurunan -->
-            <div class="card mb-3 me-3 d-flex flex-column justify-content-center align-items-center"
-                style="max-width: 18rem; min-width: 18rem; background: #f8f9fa;">
-                <div class="card-header text-center fw-bold" style="color: #333;">Selisih</div>
-                <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                    <h5 class="card-title text-center" id="selisihPenjualan" style="font-size: 2rem;">0</h5>
-                    <p class="card-text text-center" id="statusPerubahan" style="margin-bottom: 0;">-</p>
-                </div>
-            </div>
-            <div class="card text-white bg-primary mb-3" style="max-width: 22rem;">
-                <div class="card-header text-center fw-bold">Total Penjualan Periode 2</div>
-                <div class="card-body">
-                    <h5 class="card-title text-center" id="totalPenjualanPeriode2">0</h5>
-                    <p class="card-text text-center">Total penjualan seluruh produk pada periode 2.</p>
+                <div style="height: 450px;">
+                    <canvas id="salesChart"></canvas>
                 </div>
             </div>
         </div>
-        <div class="mb-4 mx-4">
-            <div class="mb-5" style="position: relative; height: 500px;">
-                <canvas id="salesChart"></canvas>
+
+        <!-- Tabel Perbandingan Utama -->
+        <div class="card custom-card">
+            <div class="card-body">
+                 <h5 class="fw-bold">Detail Perbandingan Performa Produk</h5>
+                 <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="compareTable" style="width:100%;">
+                        <thead class="text-center">
+                            <tr>
+                                <th>No</th>
+                                <th>SKU</th>
+                                <th style="min-width: 250px;">Produk</th>
+                                <th>Pesanan 1</th>
+                                <th>Pesanan 2</th>
+                                <th>Perubahan Pesanan (%)</th>
+                                <th>Penjualan 1</th>
+                                <th>Penjualan 2</th>
+                                <th>Perubahan Penjualan (%)</th>
+                                <th>AOV</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            <!-- Data diisi via JS -->
+                        </tbody>
+                    </table>
+                 </div>
             </div>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered align-middle text-center table-hover" id="compareTable">
-                <thead class="table-primary align-middle">
-                    <tr class="text-center">
-                        <th scope="col">No</th>
-                        <th scope="col">Kode Produk</th>
-                        <th scope="col" style="min-width: 300px;">Produk</th>
-                        <th scope="col">Total Pengunjung 1</th>
-                        <th scope="col">Total Pengunjung 2</th>
-                        <th scope="col">Persentase Perubahan Total Pengunjung (%)</th>
-                        <th scope="col">Pengunjung Produk Dimasukan ke Keranjang 1</th>
-                        <th scope="col">Pengunjung Produk Dimasukan ke Keranjang 2</th>
-                        <th scope="col">Persentase Perubahan Pengunjung Produk Masukkan Ke Keranjang (%)
-                        </th>
-                        <th scope="col">Total Pesanan 1</th>
-                        <th scope="col">Total Pesanan 2</th>
-                        <th scope="col">Persentase Perubahan Total Pesanan (%)</th>
-                        <th scope="col">Total Penjualan dibuat 1</th>
-                        <th scope="col">Total Penjualan dibuat 2</th>
-                        <th scope="col">Persentase Perubahan Total Penjualan Dibuat(%)</th>
-                        <th scope="col">Total Penjualan Siap Dikirim 1</th>
-                        <th scope="col">Total Penjualan Siap Dikirim 2</th>
-                        <th scope="col">Persentase Perubahan Penjualan Siap Dikirim(%)</th>
-                        <th scope="col">Selisih Penjualan Pesanan Dibuat ke Dikirim</th>
-                        <th scope="col">Average Order Value (AOV) (%)</th>
-                        <th scope="col">Rata-rata Jumlah Pesanan per Hari</th>
-                    </tr>
-                </thead>
-                <tbody id="dataPerformaTable">
-                    <!-- Data akan diisi melalui JavaScript -->
-                </tbody>
-            </table>
         </div>
     </div>
 @endsection
 
 @push('scripts')
-    {{-- Sertakan Chart.js --}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{-- Sertakan library eksternal --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- DataTables dan Ekstensi Tombol (untuk Export Excel) --}}
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
 
-    <script>
-        // Deklarasikan variabel chart di scope global agar bisa diakses dari fungsi manapun
-        let myChart;
-        /**
-         * Fungsi untuk membuat atau memperbarui chart.
-         * @param {Array} salesData - Array objek yang berisi data penjualan.
-         */
-        function createOrUpdateChart(produkData) {
-            //memfilter agar produk data ini maksimal diambil 10 data untuk dibuatkan chart
-            produkData = produkData.slice(0, 10);
 
-            // Ekstrak nama produk untuk menjadi label di sumbu X
-            const labels = produkData.map(product => product.nama_produk);
+<script>
+    // --- VARIABEL GLOBAL ---
+    let myChart;
+    let productCodesTableInstance;
+    let compareTableInstance;
+    const kategoriId = $('#kategori_id').val();
 
-            // Ekstrak data penjualan untuk setiap dataset
-            const totalPenjualan1 = produkData.map(product => parseFloat(product.total_penjualan_1));
-            const totalPenjualan2 = produkData.map(product => parseFloat(product.total_penjualan_2));
+    // --- FUNGSI HELPER ---
+    const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+    const formatNumber = (angka) => new Intl.NumberFormat('id-ID').format(angka);
+    const showLoading = () => $('#loading-overlay').css('display', 'flex');
+    const hideLoading = () => $('#loading-overlay').hide();
 
-            const ctx = document.getElementById('salesChart').getContext('2d');
+    // --- FUNGSI UTAMA UNTUK UPDATE UI ---
 
-            // Hancurkan instance chart yang ada sebelum membuat yang baru
-            if (myChart) {
-                myChart.destroy();
-            }
+    /**
+     * Memperbarui 3 kartu ringkasan di bagian atas.
+     */
+    function updateSummaryCards(produkData) {
+        let total1 = produkData.reduce((sum, item) => sum + (parseFloat(item.penjualan_periode_1) || 0), 0);
+        let total2 = produkData.reduce((sum, item) => sum + (parseFloat(item.penjualan_periode_2) || 0), 0);
+        let selisih = total2 - total1;
+        let persentase = total1 !== 0 ? (selisih / total1) * 100 : (total2 > 0 ? 100 : 0);
+        
+        $('#totalPenjualanPeriode1').text(formatRupiah(total1));
+        $('#totalPenjualanPeriode2').text(formatRupiah(total2));
+        $('#selisihPenjualan').text(`${selisih > 0 ? '+' : ''}${formatRupiah(selisih)} (${persentase.toFixed(2)}%)`);
 
-            myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Total Penjualan Periode 1',
-                        data: totalPenjualan1,
-                        backgroundColor: 'rgba(54, 162, 235, 0.8)', // Biru
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }, {
-                        label: 'Total Penjualan Periode 2',
-                        data: totalPenjualan2,
-                        backgroundColor: 'rgba(255, 159, 64, 0.8)', // Oranye
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        borderWidth: 1
-                    }]
+        // Ubah warna dan ikon berdasarkan kenaikan/penurunan
+        const iconBg = $('#selisihIconBg');
+        const icon = $('#selisihIcon');
+        if (selisih >= 0) {
+            iconBg.css({'background-color': '#e8f5e9', 'color': '#198754'});
+            icon.html('<path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>'); // Panah ke atas
+        } else {
+            iconBg.css({'background-color': '#fde7e9', 'color': '#dc3545'});
+            icon.html('<path d="M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6z"/>'); // Panah ke bawah
+        }
+    }
+
+    /**
+     * Membuat atau memperbarui chart penjualan.
+     */
+    function createOrUpdateChart(produkData) {
+        const top10Data = produkData.slice(0, 10);
+        const labels = top10Data.map(p => p.produk.length > 30 ? p.produk.substring(0, 30) + '...' : p.produk);
+        const data1 = top10Data.map(p => parseFloat(p.penjualan_periode_1));
+        const data2 = top10Data.map(p => parseFloat(p.penjualan_periode_2));
+
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        if (myChart) {
+            myChart.destroy();
+        }
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Penjualan Periode 1', data: data1, backgroundColor: 'rgba(54, 162, 235, 0.7)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 1, borderRadius: 5 },
+                    { label: 'Penjualan Periode 2', data: data2, backgroundColor: 'rgba(255, 159, 64, 0.7)', borderColor: 'rgba(255, 159, 64, 1)', borderWidth: 1, borderRadius: 5 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: value => formatNumber(value) } }
                 },
-                options: {
-                    // indexAxis: 'y', // Uncomment baris ini jika nama produk terlalu panjang dan ingin grafik menjadi horizontal
-                    scales: {
-                        x: {
-                            ticks: {
-                                // Fungsi untuk memotong nama produk jika terlalu panjang
-                                callback: function(value) {
-                                    const label = this.getLabelForValue(value);
-                                    if (label.length > 20) {
-                                        return label.substring(0, 20) + '...';
-                                    }
-                                    return label;
-                                }
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    // Format angka menjadi lebih ringkas (misal: 1jt, 1k)
-                                    if (value >= 1000000) return (value / 1000000) + 'jt';
-                                    if (value >= 1000) return (value / 1000) + 'k';
-                                    return value;
-                                }
-                            }
+                plugins: {
+                    title: { display: true, text: 'Top 10 Produk Berdasarkan Total Penjualan', font: { size: 16, weight: 'bold' } },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `${context.dataset.label}: ${formatRupiah(context.raw)}`,
+                            title: (tooltipItems) => top10Data[tooltipItems[0].dataIndex].produk // Nama lengkap di tooltip
                         }
-                    },
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: '10 Top Produk Berdasarkan Total Penjualan'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                // Menampilkan nama produk lengkap di tooltip
-                                title: function(tooltipItems) {
-                                    return labels[tooltipItems[0].dataIndex];
-                                }
-                            }
-                        }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false
+                    }
                 }
-            });
-        }
-
-        function updateTotalPenjualanKategori(produkData) {
-            let totalPenjualan1 = 0;
-            let totalPenjualan2 = 0;
-            let totalPesanan = 0;
-            if (produkData && produkData.length) {
-                totalPenjualan1 = produkData.reduce((sum, item) => {
-                    // Penjumlahan kedua periode, bisa disesuaikan jika hanya salah satu periode
-                    return sum + (parseFloat(item.total_penjualan_1) || 0);
-                }, 0);
-                totalPenjualan2 = produkData.reduce((sum, item) => {
-                    // Penjumlahan kedua periode, bisa disesuaikan jika hanya salah satu periode
-                    return sum + (parseFloat(item.total_penjualan_2) || 0);
-                }, 0);
             }
-            //tambahkan selisih penjualan dan persentase selisih penjualan
-            let selisihPenjualan = totalPenjualan2 - totalPenjualan1;
-            let persentaseSelisih = (selisihPenjualan / totalPenjualan1) * 100;
-            document.getElementById('selisihPenjualan').textContent = selisihPenjualan.toLocaleString('id-ID');
-            document.getElementById('statusPerubahan').textContent = persentaseSelisih > 0 ? '+' + persentaseSelisih
-                .toFixed(2) + '%' : persentaseSelisih.toFixed(2) + '%';
+        });
+    }
+    
+    /**
+     * Memuat ulang data ke dalam tabel #productCodesTable menggunakan API DataTables.
+     */
+    function updateProductCodesTable(data) {
+        productCodesTableInstance.clear();
+        const tableData = data.map((item, index) => [
+            index + 1,
+            `<span class="${item.status == 'tidak_ada' ? 'text-danger fw-bold' : ''}">${item.kode_produk}</span>`,
+            item.nama_produk,
+            `<button class="btn btn-danger btn-sm" onclick="deleteProductCode('${item.id}')">Hapus</button>`
+        ]);
+        productCodesTableInstance.rows.add(tableData).draw();
+    }
 
+    /**
+     * Memuat ulang data ke dalam tabel #compareTable menggunakan API DataTables.
+     */
+    function updateCompareTable(data) {
+        compareTableInstance.clear();
+        const tableData = data.map((item, index) => {
+            const perubahanPesanan = parseFloat(item.persentase_perubahan_pesanan) || 0;
+            const perubahanPenjualan = parseFloat(item.persentase_perubahan_penjualan) || 0;
+            
+            const pesananClass = perubahanPesanan > 0 ? 'text-success' : (perubahanPesanan < 0 ? 'text-danger' : '');
+            const penjualanClass = perubahanPenjualan > 0 ? 'text-success' : (perubahanPenjualan < 0 ? 'text-danger' : '');
+            
+            return [
+                index + 1,
+                item.sku || '',
+                item.produk || '',
+                formatNumber(item.pesanan_siap_dikirim_1) || 0,
+                formatNumber(item.pesanan_siap_dikirim_2) || 0,
+                `<span class="${pesananClass}">${perubahanPesanan.toFixed(2)}%</span>`,
+                formatRupiah(item.penjualan_periode_1) || 'Rp 0',
+                formatRupiah(item.penjualan_periode_2) || 'Rp 0',
+                `<span class="${penjualanClass}">${perubahanPenjualan.toFixed(2)}%</span>`,
+                item.aov || '0'
+            ];
+        });
+        compareTableInstance.rows.add(tableData).draw();
+    }
 
-            // Format angka dengan pemisah ribuan
-            document.getElementById('totalPenjualanPeriode1').textContent = totalPenjualan1.toLocaleString('id-ID');
-            document.getElementById('totalPenjualanPeriode2').textContent = totalPenjualan2.toLocaleString('id-ID');
-        }
+    // --- FUNGSI AJAX ---
 
-        /**
-         * Fungsi untuk memuat data produk (tabel) dan data penjualan (chart) dari server.
-         */
-        function loadData() {
-            $.ajax({
-                url: `/performa-produk/kategori/get-product-codes/${$('#kategori_id').val()}`,
-                method: "GET",
-                success: function(response) {
-                    // 1. Perbarui Tabel Produk
-                    if ($.fn.DataTable.isDataTable('#productCodesTable')) {
-                        $('#productCodesTable').DataTable().destroy();
-                    }
-                    let tbody = $('#productCodesTable tbody');
-                    tbody.empty();
-                    response.data.forEach(function(item, index) {
-                        tbody.append(`
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td class="${item.status == 'tidak_ada' ? 'text-danger fw-bold' : ''}">${item.kode_produk}</td>
-                            <td>${item.nama_produk}</td>
-                            <td>
-                                <button class="btn btn-danger btn-sm" onclick="deleteProductCode('${item.id}')">Delete</button>
-                            </td>
-                        </tr>
-                    `);
-                    });
-                    $('#productCodesTable').DataTable({
-                        destroy: true,
-                        pageLength: 5
-                    });
+    /**
+     * Fungsi utama untuk memuat semua data dari server.
+     */
+    function loadData() {
+        showLoading();
+        $.ajax({
+            url: `/performa-produk/kategori/get-product-codes/${kategoriId}`,
+            method: "GET",
+            success: function(response) {
+                updateSummaryCards(response.produkData || []);
+                createOrUpdateChart(response.produkData || []);
+                updateProductCodesTable(response.data || []);
+                updateCompareTable(response.produkData || []);
+            },
+            error: function(xhr) {
+                Swal.fire('Gagal!', 'Tidak dapat memuat data dari server.', 'error');
+            },
+            complete: function() {
+                hideLoading();
+            }
+        });
+    }
 
-
-                    // 2. Panggil fungsi untuk membuat/memperbarui chart dengan data yang relevan
-                    // Asumsi: response.sales_data berisi data untuk chart
-                    if (response.produkData) {
-                        updateTotalPenjualanKategori(response.produkData);
-                        createOrUpdateChart(response.produkData);
-                        compareTable(response.produkData)
-                    }
-                },
-                error: function(xhr) {
-                    alert('Gagal memuat data: ' + xhr.responseText);
-                }
-            });
-        }
-
-        function deleteProductCode(id) {
-            if (confirm('Anda yakin ingin menghapus kode produk ini?')) {
+    /**
+     * Fungsi untuk menghapus kode produk.
+     */
+    function deleteProductCode(id) {
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Kode produk ini akan dihapus dari analisis!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                showLoading();
                 $.ajax({
                     url: `/performa-produk/kategori/delete-product-code/${id}`,
-                    headers: {
-                        'X-CSRF-TOKEN': $('input[name="_token"]').val()
-                    },
                     method: "DELETE",
+                    headers: { 'X-CSRF-TOKEN': $('input[name="_token"]').val() },
                     success: function() {
-                        alert('Kode produk berhasil dihapus!');
-                        loadData(); // Muat ulang data tabel dan chart
+                        Swal.fire('Berhasil!', 'Kode produk telah dihapus.', 'success');
+                        loadData();
                     },
                     error: function(xhr) {
-                        alert('Gagal menghapus kode produk.');
+                        Swal.fire('Gagal!', 'Tidak dapat menghapus kode produk.', 'error');
+                        hideLoading();
                     }
                 });
             }
-        }
+        });
+    }
 
-        function compareTable(data) {
-          function formatAngka(angka) {
-                if (!angka || isNaN(angka)) return '0';
-                return parseFloat(angka).toLocaleString('id-ID');
-            }
-            const tableBody = document.getElementById('dataPerformaTable');
-            tableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi data baru
-            let persentasePerubahanPenjualan = 0;
-            let persentasePerubahanPenjualanDibuat = 0;
-            let persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang = 0;
-            let persentase_perubahan_total_pesanan = 0;
-            let persentase_perubahan_pengunjung_produk_kunjungan = 0;
-            let iiindex = 0;
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                persentasePerubahanPenjualan = parseFloat(item.persentase_perubahan_penjualan) || 0;
-                persentasePerubahanPenjualanDibuat = parseFloat(item.persentase_perubahan_penjualan_dibuat) || 0;
-                persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang = parseFloat(item
-                    .persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang) || 0;
-                persentase_perubahan_pengunjung_produk_kunjungan = parseFloat(item
-                    .persentase_perubahan_pengunjung_produk_kunjungan) || 0;
-                persentase_perubahan_total_pesanan = parseFloat(item.persentase_perubahan_total_pesanan) || 0;
-                row.innerHTML = `
-                <td>${iiindex+1}</td>
-                    <td class="text-start">${item.kode_produk || ''}</td>
-                    <td class="text-start"><a href="/performa-produk/compare/detail/${item.kode_produk}"> ${item.nama_produk || ''}</a></td>
-                    <td class="text-end">${formatAngka(item.pengunjung_produk_kunjungan_1) || 0}</td>
-                    <td class="text-end">${formatAngka(item.pengunjung_produk_kunjungan_2) || 0}</td>
-                    <td class="text-center ${persentase_perubahan_pengunjung_produk_kunjungan > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_pengunjung_produk_kunjungan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="text-end">${formatAngka(item.pengunjung_produk_menambahkan_ke_keranjang_1) || 0}</td>
-                    <td class="text-end">${formatAngka(item.pengunjung_produk_menambahkan_ke_keranjang_2) || 0}</td>
-                    <td class="text-center ${persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_pengunjung_produk_menambahkan_ke_keranjang.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="text-end">${formatAngka(item.total_pesanan_1) || 0}</td>
-                    <td class="text-end">${formatAngka(item.total_pesanan_2) || 0}</td>
-                    <td class="text-center ${persentase_perubahan_total_pesanan > 0 ? 'text-success' : 'text-danger' }">${persentase_perubahan_total_pesanan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="text-end">${formatAngka(item.total_penjualan_dibuat_1) || '0'}</td>
-                    <td class="text-end">${formatAngka(item.total_penjualan_dibuat_2) || '0'}</td>
-                    <td class="text-center ${persentasePerubahanPenjualanDibuat > 0 ? 'text-success' : 'text-danger' }">${persentasePerubahanPenjualanDibuat.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="text-end">${formatAngka(item.total_penjualan_1) || '0'}</td>
-                    <td class="text-end">${formatAngka(item.total_penjualan_2) || '0'}</td>
-                    <td class="text-center ${persentasePerubahanPenjualan > 0 ? 'text-success' : 'text-danger' }">${persentasePerubahanPenjualan.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="text-center">${formatAngka(item.selisih_pesanan_dibuat_ke_siap_dikirim)}</td>
-                    <td class="text-center">${item.aov}</td>
-                    <td class="text-center">${item.jumlah_pesanan_rata_rata_per_hari}</td>
-                `;
+    // --- INISIALISASI & EVENT LISTENERS ---
+    $(document).ready(function() {
+        // Inisialisasi DataTables saat dokumen siap
+        productCodesTableInstance = $('#productCodesTable').DataTable({
+            pageLength: 5,
+            lengthChange: false,
+            searching: false,
+            info: false
+        });
+        compareTableInstance = $('#compareTable').DataTable({
+            pageLength: 10,
+            lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "Semua"] ],
+            dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                 "<'row'<'col-sm-12'tr>>" +
+                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>" +
+                 "<'row'<'col-sm-12'B>>",
+            buttons: [{
+                extend: 'excelHtml5',
+                text: 'Export Excel',
+                className: 'btn btn-success btn-sm'
+            }]
+        });
 
-                iiindex++;
-                tableBody.appendChild(row);
-            });
+        // Panggil fungsi utama saat halaman pertama kali dimuat
+        loadData();
 
-            // Inisialisasi DataTable
-            $('#compareTable').DataTable({
-                dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                    "<'row'<'col-sm-12'tr>>" +
-                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'Bp>>",
-                buttons: [{
-                    extend: 'excelHtml5',
-                    text: 'Export to Excel',
-                    className: 'btn btn-success'
-                }],
-                pageLength: 10,
-                lengthMenu: [
-                    [10, 25, 50, 100, -1],
-                    [10, 25, 50, 100, "All"]
-                ],
-                destroy: true // Agar DataTable bisa diinisialisasi ulang tanpa error
-            });
-
-        
-        }
-
-        // --- Event Listeners ---
-        $(document).ready(function() {
-            // Panggil fungsi utama saat halaman pertama kali dimuat
-            loadData();
-
-            $('#productForm').on('submit', function(e) {
-                e.preventDefault();
-                $.ajax({
-                    url: "{{ route('performa_produk.createProductCode') }}",
-                    method: "POST",
-                    data: $(this).serialize(),
-                    headers: {
-                        'X-CSRF-TOKEN': $('input[name="_token"]').val()
-                    },
-                    success: function(response) {
-                        alert('Produk berhasil disimpan!');
-                        $('#productForm')[0].reset();
-                        loadData
-                            (); // Muat ulang data tabel dan chart setelah produk baru ditambahkan
-                    },
-                    error: function(xhr) {
-                        alert('Error: ' + xhr.responseText);
-                    }
-                });
+        // Event listener untuk form submit
+        $('#productForm').on('submit', function(e) {
+            e.preventDefault();
+            showLoading();
+            $.ajax({
+                url: "{{ route('performa_produk.createProductCode') }}",
+                method: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    Swal.fire('Berhasil!', 'Produk berhasil ditambahkan untuk dianalisis.', 'success');
+                    $('#productForm')[0].reset();
+                    loadData();
+                },
+                error: function(xhr) {
+                    const errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan.';
+                    Swal.fire('Gagal!', errorMsg, 'error');
+                    hideLoading();
+                }
             });
         });
-    </script>
+    });
+</script>
 @endpush

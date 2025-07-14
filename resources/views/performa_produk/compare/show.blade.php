@@ -429,9 +429,9 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-striped table-bordered align-middle text-center table-hover"
+                                <table class="table table-bordered align-middle text-center table-hover"
                                     id="produkVarianTable">
-                                    <thead class="table-primary align-middle">
+                                    <thead class="table-secondary align-middle">
                                         <tr class="text-center">
                                             <th scope="col">No</th>
                                             <th scope="col">Kode Produk</th>
@@ -636,20 +636,33 @@
 
                 // Inisialisasi DataTable
                 $('#produkVarianTable').DataTable({
-                    dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                        "<'row'<'col-sm-12'tr>>" +
-                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'Bp>>",
-                    buttons: [{
-                        extend: 'excelHtml5',
-                        text: 'Export to Excel',
-                        className: 'btn btn-success'
-                    }],
-                    pageLength: 10,
-                    lengthMenu: [
-                        [10, 25, 50, 100, -1],
-                        [10, 25, 50, 100, "All"]
-                    ],
-                    destroy: true // Agar DataTable bisa diinisialisasi ulang tanpa error
+                   layout: {
+                    // Top row: Length menu on the left, search box on the right
+                    topStart: {
+                        buttons: [{
+                            extend: 'colvis',
+                            className: 'btn btn-secondary' // Optional: style the button
+                        }]
+                    },
+                    topEnd: 'search',
+
+                    // Bottom row: Table info on the left, buttons and pagination on the right
+                    bottomStart: 'pageLength',
+                    bottomEnd: {
+                        buttons: [{
+                            extend: 'excelHtml5',
+                            text: 'Export to Excel',
+                            className: 'btn btn-success'
+                        }],
+                        paging: true // Make sure to include pagination here
+                    }
+                },
+                pageLength: 10,
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "All"]
+                ],
+                destroy: true // This is fine to keep
                 });
 
             }

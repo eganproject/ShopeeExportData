@@ -265,10 +265,9 @@
                         </div> --}}
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered align-middle text-center table-hover"
-                            id="compareTable">
-                            <thead class="table-primary align-middle">
-                                <tr class="text-center">
+                        <table class="table table-hover table-bordered align-middle" id="compareTable">
+                            <thead class="table-secondary">
+                                <tr>
                                     <th scope="col">No</th>
                                     <th scope="col">Kode Produk</th>
                                     <th scope="col" style="min-width: 300px;">Produk</th>
@@ -784,20 +783,35 @@
 
             // Inisialisasi DataTable
             $('#compareTable').DataTable({
-                dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                    "<'row'<'col-sm-12'tr>>" +
-                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'Bp>>",
-                buttons: [{
-                    extend: 'excelHtml5',
-                    text: 'Export to Excel',
-                    className: 'btn btn-success'
-                }],
+                // REMOVE the 'dom' and 'buttons' properties from here.
+
+                layout: {
+                    // Top row: Length menu on the left, search box on the right
+                    topStart: {
+                        buttons: [{
+                            extend: 'colvis',
+                            className: 'btn btn-secondary' // Optional: style the button
+                        }]
+                    },
+                    topEnd: 'search',
+
+                    // Bottom row: Table info on the left, buttons and pagination on the right
+                    bottomStart: 'pageLength',
+                    bottomEnd: {
+                        buttons: [{
+                            extend: 'excelHtml5',
+                            text: 'Export to Excel',
+                            className: 'btn btn-success'
+                        }],
+                        paging: true // Make sure to include pagination here
+                    }
+                },
                 pageLength: 10,
                 lengthMenu: [
                     [10, 25, 50, 100, -1],
                     [10, 25, 50, 100, "All"]
                 ],
-                destroy: true // Agar DataTable bisa diinisialisasi ulang tanpa error
+                destroy: true // This is fine to keep
             });
         }
 
@@ -893,7 +907,7 @@
                         },
                         title: {
                             display: true,
-                            text: 'Grafik 10 Penjualan Tertinggi', // Judul Chart
+                            text: 'Grafik 10 Penjualan Tertinggi 2 Periode', // Judul Chart
                             font: {
                                 size: 20
                             }
