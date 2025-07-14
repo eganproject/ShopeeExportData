@@ -17,6 +17,8 @@ Route::group(['prefix' => 'performa-produk'], function () {
     Route::post('/kategori/add-product', [KategoriProdukController::class, 'storeProduct'])->name('performa_produk.createProductCode');
     Route::delete('/kategori/delete-product-code/{id}', [KategoriProdukController::class, 'deleteProductCode'])->name('performa_produk.deleteProductCode');
     Route::get('/kategori/get', [KategoriProdukController::class, 'lists'])->name('performa_produk.lists');
+    Route::post('/kategori/detail/import-csv', [KategoriProdukController::class, 'importCsv'])->name('performa_produk.importCsv');
+    Route::post('/kategori/detail/delete/{id}', [KategoriProdukController::class, 'destroyAll'])->name('performa_produk.destroyall');
     Route::get('/kategori/detail/{id}', [KategoriProdukController::class, 'show'])->name('performa_produk.showCategori');
     Route::delete('/kategori/delete/{id}', [KategoriProdukController::class, 'destroy'])->name('performa_produk.destroyKategori');
     Route::post('/import', [PerformaProdukController::class, 'import'])->name('performa_produk.import');

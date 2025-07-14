@@ -35,6 +35,11 @@
                                         <p class="form-control-static" id="status_produk_1">
                                             {{ $count }}</p>
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">SKU Induk :</label>
+                                        <p class="form-control-static" id="sku_induk">
+                                            {{ $dataPerformaProduk[0]->sku_induk ?? 'N/A' }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

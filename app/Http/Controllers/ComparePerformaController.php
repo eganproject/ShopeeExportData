@@ -614,6 +614,7 @@ FROM (
 FROM (
 				SELECT
                 a.kode_produk,
+                a.sku_induk,
                 a.produk AS nama_produk,
                IFNULL(a.pengunjung_produk_kunjungan,0) AS pengunjung_produk_kunjungan_1,
 					IFNULL(b.pengunjung_produk_kunjungan,0) AS pengunjung_produk_kunjungan_2,
@@ -669,7 +670,7 @@ FROM (
 				SELECT
                 a.kode_produk,
                 CONCAT(a.nama_variasi, ' - ', a.produk) AS nama_produk,
-            	a.nama_variasi,
+            	CONCAT(a.nama_variasi,' (',a.kode_variasi_2,')') as nama_variasi,
 					IFNULL(a.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_1,
                 IFNULL(b.pengunjung_produk_menambahkan_ke_keranjang,0) AS pengunjung_produk_menambahkan_ke_keranjang_2,                
                 IFNULL(a.produk_pesanan_siap_dikirim,0) AS total_pesanan_1,
