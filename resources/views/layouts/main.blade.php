@@ -56,7 +56,7 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                     <li class="nav-item">
                         <a class="nav-link fw-semibold {{ request()->is('/') ? 'active text-primary' : '' }}"
-                            href="#">Dashboard</a>
+                            href="/">Dashboard</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle fw-semibold {{ request()->is('performa-produk') || request()->is('performa-produk/compare') || request()->is('performa-produk/kategori') ? 'active text-primary' : '' }}"
