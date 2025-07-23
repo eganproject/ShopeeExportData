@@ -59,7 +59,7 @@
                             href="/">Dashboard</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle fw-semibold {{ request()->is('performa-produk') || request()->is('performa-produk/compare') || request()->is('performa-produk/kategori') ? 'active text-primary' : '' }}"
+                        <a class="nav-link dropdown-toggle fw-semibold {{ request()->is('performa-produk') || request()->is('performa-produk/compare') || request()->is('performa-produk/kategori') || request()->is('performa-produk/compare-sales') || request()->is('performa-produk/compare-sales/kategori')   ? 'active text-primary' : '' }}"
                             href="#" id="produkDropdown" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             Produk
@@ -79,7 +79,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item {{ request()->is('performa-produk/compare-sales') ? 'active text-primary fw-bold' : '' }}"
+                                <a class="dropdown-item {{ request()->is('performa-produk/compare-sales') || request()->is('performa-produk/compare-sales/kategori') ? 'active text-primary fw-bold' : '' }}"
                                     href="/performa-produk/compare-sales">
                                     <i class="bi bi-bar-chart-steps me-2"></i>Comparative from Sales
                                 </a>
