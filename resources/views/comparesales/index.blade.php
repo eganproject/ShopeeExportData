@@ -196,7 +196,38 @@
             <a href="/performa-produk/compare-sales/kategori" class="btn btn-outline-primary btn-modern">Kategori</a>
         </div>
         <!-- Summary Cards, Charts, Tables (tetap seperti sebelumnya) -->
-        .
+
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card custom-card">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                            <i class="bi bi-cash-stack fs-2"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="fw-bold">Total Periode 1</h5>
+                            <p class="card-text fs-4" id="totalPeriode1">Rp 0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card custom-card">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                            <i class="bi bi-cash-stack fs-2"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="fw-bold">Total Periode 2</h5>
+                            <p class="card-text fs-4" id="totalPeriode2">Rp 0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="row g-4 mb-4">
             <div class="col-lg-6">
                 <div class="card custom-card">
@@ -380,7 +411,16 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(res) {
+                        console.log('res', res);
                         const ctx = document.getElementById(canvasId).getContext('2d');
+                        var total_periode = res.datasets.reduce((sum, dataset) => 
+                            sum + dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
+                        , 0);
+                        if (periode == 'periode_1') {
+                            $('#totalPeriode1').text('Rp ' + total_periode.toLocaleString());
+                        } else {
+                            $('#totalPeriode2').text('Rp ' + total_periode.toLocaleString());
+                        }
                         new Chart(ctx, {
                             type: 'pie',
                             data: {

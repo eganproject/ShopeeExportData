@@ -227,26 +227,52 @@ class CompareSalesController extends Controller
 
     public function kategori(Request $request)
     {
-        $kategori = DB::select("SELECT id, nama_kategori, SUM(pendapatan_per_1) AS pendapatan_per_1, SUM(pendapatan_per_1) AS pendapatan_per_2 FROM (
-                                    SELECT a.id, a.nama_kategori, b.product_code AS sku, IFNULL(c.nama_produk, '-') as nama_produk, IFNULL(c.pendapatan,0) AS pendapatan_per_1, IFNULL(d.pendapatan,0) AS pendapatan_per_2
-                                        FROM kategori_produks AS a
-                                        JOIN product_codes AS b ON a.id = b.kategori_id 
-                                        LEFT JOIN (
-                                    SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan
-                                    FROM multi_comparative_f_sales
-                                    GROUP BY sku
-                                    ) AS c ON b.product_code = c.sku
-                                        LEFT JOIN (
-                                    SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan
-                                    FROM multi_comparative_f_sales_twos
-                                    GROUP BY sku
-                                    ) AS d ON b.product_code = d.sku
-                                ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");
+        $kategori = DB::select("      SELECT id, nama_kategori, SUM(pendapatan_per_1) AS pendapatan_per_1, SUM(pendapatan_per_2) AS pendapatan_per_2, SUM(pendapatan_shopee_per_1) AS pendapatan_shopee_per_1,
+		SUM(pendapatan_tiktok_per_1) AS pendapatan_tiktok_per_1,SUM(pendapatan_shopee_per_2) AS pendapatan_shopee_per_2,
+		SUM(pendapatan_tiktok_per_2) AS pendapatan_tiktok_per_2
+		  FROM (
+			   SELECT *, ac.pendapatan_shopee_per_1 + pendapatan_tiktok_per_1 AS pendapatan_per_1, ac.pendapatan_shopee_per_2 + pendapatan_tiktok_per_2 AS pendapatan_per_2
+FROM (
+SELECT a.id, a.nama_kategori, b.product_code AS sku, 
+				IFNULL(c.nama_produk, '-') as nama_produk, 
+				IFNULL(c.pendapatan_shopee,0) AS pendapatan_shopee_per_1, 
+				IFNULL(d.pendapatan_shopee,0) AS pendapatan_shopee_per_2,
+				IFNULL(e.pendapatan_tiktok,0) AS pendapatan_tiktok_per_1, 
+				IFNULL(f.pendapatan_tiktok,0) AS pendapatan_tiktok_per_2
+                     FROM kategori_produks AS a
+                     JOIN product_codes AS b ON a.id = b.kategori_id 
+                     LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                                 FROM multi_comparative_f_sales
+                                 WHERE platform = 'Shopee'
+                                 GROUP BY sku
+                     ) AS c ON b.product_code = c.sku
+                     LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                              FROM multi_comparative_f_sales_twos
+                              WHERE platform = 'Shopee'
+                              GROUP BY sku
+                     ) AS d ON b.product_code = d.sku
+                     LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                                 FROM multi_comparative_f_sales
+                                 WHERE platform = 'Tiktok'
+                                 GROUP BY sku
+                     ) AS e ON b.product_code = e.sku
+                     LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                              FROM multi_comparative_f_sales_twos
+                              WHERE platform = 'Tiktok'
+                              GROUP BY sku
+                     ) AS f ON b.product_code = f.sku
+                     
+         ) AS ac
+      ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");
 
         if ($request->ajax()) {
             // Ekstrak labels & data
             $labels = array_column($kategori, 'nama_kategori');
-            $data   = array_map(function($item) {
+            $data   = array_map(function ($item) {
                 return $item->pendapatan_per_1 + $item->pendapatan_per_2;
             }, $kategori);
             return response()->json([
@@ -256,5 +282,52 @@ class CompareSalesController extends Controller
         }
 
         return view('comparesales.kategori', compact('kategori'));
+    }
+
+    public function show($id)
+    {
+        $kategori = DB::select("SELECT *, ac.pendapatan_shopee_per_1 + pendapatan_tiktok_per_1 AS pendapatan_per_1, ac.pendapatan_shopee_per_2 + pendapatan_tiktok_per_2 AS pendapatan_per_2
+        FROM (
+            SELECT a.id, a.nama_kategori, b.product_code AS sku, 
+				IFNULL(c.nama_produk, '-') as nama_produk, 
+				IFNULL(c.pendapatan_shopee,0) AS pendapatan_shopee_per_1, 
+				IFNULL(d.pendapatan_shopee,0) AS pendapatan_shopee_per_2,
+				IFNULL(e.pendapatan_tiktok,0) AS pendapatan_tiktok_per_1, 
+				IFNULL(f.pendapatan_tiktok,0) AS pendapatan_tiktok_per_2
+            FROM kategori_produks AS a
+            JOIN product_codes AS b ON a.id = b.kategori_id 
+            LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                                 FROM multi_comparative_f_sales
+                                 WHERE platform = 'Shopee'
+                                 GROUP BY sku
+            ) AS c ON b.product_code = c.sku
+            LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                              FROM multi_comparative_f_sales_twos
+                              WHERE platform = 'Shopee'
+                              GROUP BY sku
+            ) AS d ON b.product_code = d.sku
+            LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                                 FROM multi_comparative_f_sales
+                                 WHERE platform = 'Tiktok'
+                                 GROUP BY sku
+            ) AS e ON b.product_code = e.sku
+            LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                              FROM multi_comparative_f_sales_twos
+                              WHERE platform = 'Tiktok'
+                              GROUP BY sku
+            ) AS f ON b.product_code = f.sku
+                     
+        ) AS ac
+                     
+        WHERE ac.id = ?
+        ORDER BY pendapatan_per_1 desc
+        ", [$id]);
+
+
+        return view("comparesales.show", compact('kategori'));
     }
 }
