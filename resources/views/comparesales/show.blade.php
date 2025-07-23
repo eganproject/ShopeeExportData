@@ -15,7 +15,7 @@
                 <h1 class="display-5 fw-bold text-center text-primary mb-4">{{$kategori[0]->nama_kategori}}</h1>
                     <div class="card custom-card">
                         <div class="card-body">
-                            <h5 class="fw-semibold">Persentase Total per Platform</h5>
+                            <h5 class="fw-semibold mb-3 text-center">Persentase Total per Platform</h5>
                             <canvas id="piePlatform" style="max-height:250px;"></canvas>
                         </div>
                     </div>
@@ -24,7 +24,7 @@
             <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body">
-                        <h5 class="fw-semibold">Komposisi Pendapatan Periode 1</h5>
+                        <h5 class="fw-semibold mb-3 text-center">Komposisi Pendapatan Periode 1</h5>
                         <canvas id="pieP1" style="max-height:300px;"></canvas>
                     </div>
                 </div>
@@ -32,7 +32,7 @@
             <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body">
-                        <h5 class="fw-semibold">Komposisi Pendapatan Periode 2</h5>
+                        <h5 class="fw-semibold mb-3 text-center">Komposisi Pendapatan Periode 2</h5>
                         <canvas id="pieP2" style="max-height:300px;"></canvas>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
             <div class="col-12">
                 <div class="card custom-card">
                     <div class="card-body">
-                        <h5 class="fw-semibold">Top 10 SKU Berdasarkan Periode 2</h5>
+                        <h5 class="fw-semibold mb-3 text-center">Top 10 SKU Berdasarkan Periode</h5>
                         <canvas id="barTop10" style="max-height:400px;"></canvas>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
             <div class="col-12">
                 <div class="card custom-card">
                     <div class="card-body">
-                        <h5 class="fw-semibold mb-3">Detail Pendapatan per SKU</h5>
+                        <h5 class="fw-semibold mb-3 text-center">Detail Pendapatan per SKU</h5>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle" id="kategori-table" style="width:100%;">
                                 <thead class="table-light">
@@ -227,7 +227,7 @@
                     labels: ['Shopee', 'Tiktok'],
                     datasets: [{
                         data: [totalS, totalT],
-                        backgroundColor: ['#FF6384', '#36A2EB']
+                        backgroundColor: ['#f5552dff', '#1b1b1bff']
                     }]
                 },
                 options: {
@@ -238,13 +238,13 @@
                             labels: {
                                 generateLabels: () => [{
                                         text: `Shopee: Rp ${totalS.toLocaleString('id-ID', {minimumFractionDigits: 0, maximumFractionDigits: 0})} (${persentaseS.toFixed(2)}%)`,
-                                        fillStyle: '#FF6384',
+                                        fillStyle: '#f5552dff',
                                         hidden: false,
                                         index: 0
                                     },
                                     {
                                         text: `Tiktok: Rp ${totalT.toLocaleString('id-ID', {minimumFractionDigits: 0, maximumFractionDigits: 0})} (${persentaseT.toFixed(2)}%)`,
-                                        fillStyle: '#36A2EB',
+                                        fillStyle: '#1b1b1bff',
                                         hidden: false,
                                         index: 1
                                     }

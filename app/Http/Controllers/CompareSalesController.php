@@ -168,8 +168,8 @@ class CompareSalesController extends Controller
                     [
                         'label' => 'Jumlah Penjualan',
                         'data' => $data->pluck('jumlah_penjualan'),
-                        'backgroundColor' => ['rgba(54, 162, 235, 0.8)', 'rgba(255, 159, 64, 0.8)'],
-                        'borderColor' => ['rgba(54, 162, 235, 1)', 'rgba(255, 159, 64, 1)'],
+                        'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
+                        'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderWidth' => 1
                     ]
                 ]
@@ -188,8 +188,8 @@ class CompareSalesController extends Controller
                     [
                         'label' => 'Jumlah Penjualan',
                         'data' => $data->pluck('jumlah_penjualan'),
-                        'backgroundColor' => ['rgba(54, 162, 235, 0.8)', 'rgba(255, 159, 64, 0.8)'],
-                        'borderColor' => ['rgba(54, 162, 235, 1)', 'rgba(255, 159, 64, 1)'],
+                        'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
+                        'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderWidth' => 1
                     ]
                 ]
