@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PerformaProdukController;
 use App\Http\Controllers\ComparePerformaController;
+use App\Http\Controllers\CompareSalesController;
 use App\Http\Controllers\KategoriProdukController;
 
 Route::get('/', function () {
@@ -35,4 +36,10 @@ Route::group(['prefix' => 'performa-produk'], function () {
     Route::get('/compare/detail/{kode_produk}', [ComparePerformaController::class, 'show'])->name('comparePerforma.importTwo');
     Route::post('/compare/detail/getDataTable', [ComparePerformaController::class, 'getDataTable']);
     Route::get('/compare/detail/getDataTable/{kode_produk}', [ComparePerformaController::class, 'show'])->name('comparePerforma.importTwo');
+    Route::get('/compare-sales', [CompareSalesController::class, 'index'])->name('compareSales.index');
+    Route::post('/compare-sales/import', [CompareSalesController::class, 'import'])->name('compareSales.import');
+    Route::post('/compare-sales/reset', [CompareSalesController::class, 'reset'])->name('compareSales.reset');
+    Route::post('/compare-sales/chart', [CompareSalesController::class, 'chart'])->name('compareSales.chart');
+    Route::post('/compare-sales/top-sales', [CompareSalesController::class, 'getTop10Sales'])->name('compareSales.top-sales');
+    Route::post('/compare-sales/kategori', [CompareSalesController::class, 'kategori'])->name('compareSales.kategori');
 });

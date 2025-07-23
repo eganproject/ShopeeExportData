@@ -1,0 +1,226 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\MultiComparativeFSales;
+use App\Models\MultiComparativeFSalesTwo;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class CompareSalesController extends Controller
+{
+    public function index()
+    {
+        // Logic to fetch and display product performance data
+        return view('comparesales.index');
+    }
+
+    public function import(Request $request)
+    {
+
+        // 1. Validasi input
+        $request->validate([
+            'platform' => 'required|in:Shopee,Tiktok',
+            'file'     => 'required|mimes:csv,txt',
+            'periode_ke' => 'required|in:1,2',
+        ]);
+
+        $platform = $request->input('platform');
+        $path     = $request->file('file')->getRealPath();
+        $delimiter = ';';
+        $rowsToInsert = [];
+
+        // 2. Buka dan baca CSV
+        if (($handle = fopen($path, 'r')) !== false) {
+            $rowNumber = 0;
+            $headerRow = fgetcsv($handle, 0, $delimiter);
+            $colCount  = count($headerRow);
+
+            if ($platform === 'Shopee' && $colCount > 49) {
+                fclose($handle);
+                return back()->with('error', 'File CSV tidak sesuai format Shopee, mungkin anda upload file tiktok.');
+            }
+            if ($platform === 'Tiktok' && $colCount < 61) {
+                fclose($handle);
+                return back()->with('error', 'File CSV tidak sesuai format Tiktok,mungkin anda upload file shopee.');
+            }
+
+            // Reset pointer agar header terbaca lagi di loop
+            rewind($handle);
+
+            while (($row = fgetcsv($handle, 0, ';')) !== false) {
+                $rowNumber++;
+
+                if ($platform === 'Shopee') {
+                    // Mulai dari baris ke-2
+                    if ($rowNumber < 2) {
+                        continue;
+                    }
+
+                    // Kolom J (9), N (13), O (14), R (17)
+                    $rawName = $row[13] ?? '';
+
+                    // 1) Convert dari CP1252 ke UTF-8:
+                    $utf8Name = mb_convert_encoding($rawName, 'UTF-8', 'Windows-1252');
+
+                    // 2) (Opsional) Hilangkan karakter non-printable:
+                    $cleanName = preg_replace('/[^\P{C}\n]+/u', '', $utf8Name);
+
+
+                    $v1 = $row[9]  ?? null;
+                    $v2 =  $cleanName ?? null;
+                    $v3 = $row[14] ?? null;
+                    $rawR      = $row[17] ?? '';
+                    $cleanR    = str_replace('.', '', $rawR);
+                    $v4 = is_numeric($cleanR)
+                        ? (int) $cleanR
+                        : 0;
+                } else { // Tiktok
+                    // Mulai dari baris ke-3
+                    if ($rowNumber < 3) {
+                        continue;
+                    }
+                    // Kolom AB (27), H (7), G (6), P (15)
+                    $rawName = $row[7] ?? '';
+
+                    // 1) Convert dari CP1252 ke UTF-8:
+                    $utf8Name = mb_convert_encoding($rawName, 'UTF-8', 'Windows-1252');
+
+                    // 2) (Opsional) Hilangkan karakter non-printable:
+                    $cleanName = preg_replace('/[^\P{C}\n]+/u', '', $utf8Name);
+
+                    $rawDate = $row[27] ?? null;
+
+                    // Jika ada isinya, parse d/m/Y H:i:s → Y-m-d
+                    if ($rawDate) {
+                        try {
+                            $dateObj = Carbon::createFromFormat('d/m/Y H:i:s', $rawDate);
+                            $v1 = $dateObj->format('Y-m-d');      // untuk tipe DATE
+                            // $v1 = $dateObj->format('Y-m-d H:i:s'); // untuk DATETIME
+                        } catch (\Exception $e) {
+                            // kalau gagal parse, set null atau log error
+                            $v1 = null;
+                        }
+                    } else {
+                        $v1 = null;
+                    }
+                    $v2 = $cleanName  ?? null;
+                    $v3 = $row[6]  ?? null;
+                    $v4 = $row[15] ?? null;
+                }
+
+                // Tambahkan ke array
+                $rowsToInsert[] = [
+                    'tanggal'   => $v1,
+                    'nama_produk'   => $v2,
+                    'sku'   => $v3,
+                    'pendapatan'   => $v4,
+                    'platform'  => $platform,
+                ];
+            }
+
+            fclose($handle);
+        }
+
+        // 3. Bulk insert & hitung
+        $count = 0;
+        if (!empty($rowsToInsert)) {
+            // Gunakan transaction untuk safety
+            if ($request->periode_ke == 1) {
+                DB::transaction(function () use ($rowsToInsert, &$count) {
+                    MultiComparativeFSales::insert($rowsToInsert);
+                    $count = count($rowsToInsert);
+                });
+            } else {
+                DB::transaction(function () use ($rowsToInsert, &$count) {
+                    MultiComparativeFSalesTwo::insert($rowsToInsert);
+                    $count = count($rowsToInsert);
+                });
+            }
+        }
+
+        // 4. Redirect dengan info jumlah yang berhasil di-import
+        return redirect()
+            ->back()
+            ->with('success', "Berhasil memasukkan data sebanyak {$count} baris dari platform {$platform}.");
+    }
+
+    public function reset()
+    {
+        DB::table('multi_comparative_f_sales')->truncate();
+        DB::table('multi_comparative_f_sales_twos')->truncate();
+        return response()->json(['message' => 'Database berhasil direset!', 'success' => true]);
+    }
+
+    public function chart(Request $request)
+    {
+        if ($request->periode == 'periode_1') {
+            $data = DB::table('multi_comparative_f_sales')
+                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->groupBy('platform')
+                ->get();
+
+            $chartData = [
+                'labels' => $data->pluck('labels'),
+                'datasets' => [
+                    [
+                        'label' => 'Jumlah Penjualan',
+                        'data' => $data->pluck('jumlah_penjualan'),
+                        'backgroundColor' => ['rgba(54, 162, 235, 0.8)', 'rgba(255, 159, 64, 0.8)'],
+                        'borderColor' => ['rgba(54, 162, 235, 1)', 'rgba(255, 159, 64, 1)'],
+                        'borderWidth' => 1
+                    ]
+                ]
+            ];
+
+            return response()->json($chartData);
+        } else {
+            $data = DB::table('multi_comparative_f_sales_twos')
+                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->groupBy('platform')
+                ->get();
+
+            $chartData = [
+                'labels' => $data->pluck('labels'),
+                'datasets' => [
+                    [
+                        'label' => 'Jumlah Penjualan',
+                        'data' => $data->pluck('jumlah_penjualan'),
+                        'backgroundColor' => ['rgba(54, 162, 235, 0.8)', 'rgba(255, 159, 64, 0.8)'],
+                        'borderColor' => ['rgba(54, 162, 235, 1)', 'rgba(255, 159, 64, 1)'],
+                        'borderWidth' => 1
+                    ]
+                ]
+            ];
+
+            return response()->json($chartData);
+        }
+    }
+
+    public function getTop10Sales(Request $request)
+    {
+        if ($request->periode == 'periode_1') {
+
+            $rows = DB::table('multi_comparative_f_sales')
+                ->select('sku', DB::raw('SUM(pendapatan) as total'))
+                ->groupBy('sku')
+                ->orderByDesc('total')
+                ->limit(10)
+                ->get();
+        } else {
+
+            $rows = DB::table('multi_comparative_f_sales_twos')
+                ->select('sku', DB::raw('SUM(pendapatan) as total'))
+                ->groupBy('sku')
+                ->orderByDesc('total')
+                ->limit(10)
+                ->get();
+        }
+
+        return response()->json([
+            'labels' => $rows->pluck('sku'),
+            'data'   => $rows->pluck('total'),
+        ]);
+    }
+}

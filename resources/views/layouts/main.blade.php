@@ -79,6 +79,12 @@
                                 </a>
                             </li>
                             <li>
+                                <a class="dropdown-item {{ request()->is('performa-produk/compare-sales') ? 'active text-primary fw-bold' : '' }}"
+                                    href="/performa-produk/compare-sales">
+                                    <i class="bi bi-bar-chart-steps me-2"></i>Comparative from Sales
+                                </a>
+                            </li>
+                            <li>
                                 <a class="dropdown-item {{ request()->is('performa-produk/kategori') ? 'active text-primary fw-bold' : '' }}"
                                     href="/performa-produk/kategori">
                                     <i class="bi bi-tags me-2"></i>Kategori
