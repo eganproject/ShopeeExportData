@@ -41,5 +41,5 @@ Route::group(['prefix' => 'performa-produk'], function () {
     Route::post('/compare-sales/reset', [CompareSalesController::class, 'reset'])->name('compareSales.reset');
     Route::post('/compare-sales/chart', [CompareSalesController::class, 'chart'])->name('compareSales.chart');
     Route::post('/compare-sales/top-sales', [CompareSalesController::class, 'getTop10Sales'])->name('compareSales.top-sales');
-    Route::post('/compare-sales/kategori', [CompareSalesController::class, 'kategori'])->name('compareSales.kategori');
+    Route::get('/compare-sales/kategori', [CompareSalesController::class, 'kategori'])->name('compareSales.kategori');
 });

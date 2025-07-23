@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KategoriProduk;
 use App\Models\MultiComparativeFSales;
 use App\Models\MultiComparativeFSalesTwo;
 use Carbon\Carbon;
@@ -222,5 +223,38 @@ class CompareSalesController extends Controller
             'labels' => $rows->pluck('sku'),
             'data'   => $rows->pluck('total'),
         ]);
+    }
+
+    public function kategori(Request $request)
+    {
+        $kategori = DB::select("SELECT id, nama_kategori, SUM(pendapatan_per_1) AS pendapatan_per_1, SUM(pendapatan_per_1) AS pendapatan_per_2 FROM (
+                                    SELECT a.id, a.nama_kategori, b.product_code AS sku, IFNULL(c.nama_produk, '-') as nama_produk, IFNULL(c.pendapatan,0) AS pendapatan_per_1, IFNULL(d.pendapatan,0) AS pendapatan_per_2
+                                        FROM kategori_produks AS a
+                                        JOIN product_codes AS b ON a.id = b.kategori_id 
+                                        LEFT JOIN (
+                                    SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan
+                                    FROM multi_comparative_f_sales
+                                    GROUP BY sku
+                                    ) AS c ON b.product_code = c.sku
+                                        LEFT JOIN (
+                                    SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan
+                                    FROM multi_comparative_f_sales_twos
+                                    GROUP BY sku
+                                    ) AS d ON b.product_code = d.sku
+                                ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");
+
+        if ($request->ajax()) {
+            // Ekstrak labels & data
+            $labels = array_column($kategori, 'nama_kategori');
+            $data   = array_map(function($item) {
+                return $item->pendapatan_per_1 + $item->pendapatan_per_2;
+            }, $kategori);
+            return response()->json([
+                'labels' => $labels,
+                'data'   => $data,
+            ]);
+        }
+
+        return view('comparesales.kategori', compact('kategori'));
     }
 }
