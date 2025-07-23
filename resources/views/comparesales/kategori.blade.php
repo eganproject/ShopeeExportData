@@ -20,64 +20,99 @@
                 </div>
 
                 <div class="table-responsive">
-                    @php
-                        // Inisialisasi total per kolom
-                        $sum_s1 = $sum_t1 = $sum_tot1 = 0;
-                        $sum_s2 = $sum_t2 = $sum_tot2 = 0;
-                        $sum_diff = 0;
-                    @endphp
-                    <table class="table table-hover align-middle" id="kategori-table" style="width:100%;">
+                    <table class="table table-hover align-middle" id="kategori-table">
                         <thead>
                             <tr>
-                                <th rowspan="2">No</th>
-                                <th rowspan="2">Kategori</th>
+                                <th rowspan="2" class="text-center">No</th>
+                                <th rowspan="2" class="text-center">Kategori</th>
                                 <th colspan="3" class="text-center">Periode 1</th>
-                                <th rowspan="2">Selisih</th>
+                                <th rowspan="2" class="text-center">Selisih P1-P2</th>
                                 <th colspan="3" class="text-center">Periode 2</th>
+                                <th rowspan="2" class="text-center">Selisih P2-P3</th>
+                                <th colspan="3" class="text-center">Periode 3</th>
+                                <th rowspan="2" class="text-center">Selisih P3-P4</th>
+                                <th colspan="3" class="text-center">Periode 4</th>
                             </tr>
                             <tr>
-                                <th>Shopee</th>
-                                <th>Tiktok</th>
-                                <th>Jumlah</th>
-                                <th>Shopee</th>
-                                <th>Tiktok</th>
-                                <th>Jumlah</th>
+                                <th class="text-center">Shopee</th>
+                                <th class="text-center">Tiktok</th>
+                                <th class="text-center">Total</th>
+                                <th class="text-center">Shopee</th>
+                                <th class="text-center">Tiktok</th>
+                                <th class="text-center">Total</th>
+                                <th class="text-center">Shopee</th>
+                                <th class="text-center">Tiktok</th>
+                                <th class="text-center">Total</th>
+                                <th class="text-center">Shopee</th>
+                                <th class="text-center">Tiktok</th>
+                                <th class="text-center">Total</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($kategori as $index => $item)
+                            @php
+                                $sum = [
+                                    1 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
+                                    2 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
+                                    3 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
+                                    4 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
+                                ];
+                            @endphp
+                            @foreach ($kategori as $item)
                                 @php
+                                    // hitung per periode
                                     $s1 = $item->pendapatan_shopee_per_1 ?? 0;
                                     $t1 = $item->pendapatan_tiktok_per_1 ?? 0;
                                     $tot1 = $s1 + $t1;
                                     $s2 = $item->pendapatan_shopee_per_2 ?? 0;
                                     $t2 = $item->pendapatan_tiktok_per_2 ?? 0;
                                     $tot2 = $s2 + $t2;
-                                    $diff = $tot2 - $tot1;
-                                    $pct = $tot1 > 0 ? ($diff / $tot1) * 100 : 0;
-                                    // Akumulasi
-                                    $sum_s1 += $s1;
-                                    $sum_t1 += $t1;
-                                    $sum_tot1 += $tot1;
-                                    $sum_s2 += $s2;
-                                    $sum_t2 += $t2;
-                                    $sum_tot2 += $tot2;
-                                    $sum_diff += $diff;
+                                    $s3 = $item->pendapatan_shopee_per_3 ?? 0;
+                                    $t3 = $item->pendapatan_tiktok_per_3 ?? 0;
+                                    $tot3 = $s3 + $t3;
+                                    $s4 = $item->pendapatan_shopee_per_4 ?? 0;
+                                    $t4 = $item->pendapatan_tiktok_per_4 ?? 0;
+                                    $tot4 = $s4 + $t4;
+                                    // selisih
+                                    $d12 = $tot2 - $tot1;
+                                    $d23 = $tot3 - $tot2;
+                                    $d34 = $tot4 - $tot3;
+                                    // akumulasi
+                                    $sum[1]['s'] += $s1;
+                                    $sum[1]['t'] += $t1;
+                                    $sum[1]['tot'] += $tot1;
+                                    $sum[1]['diff'] += $d12;
+                                    $sum[2]['s'] += $s2;
+                                    $sum[2]['t'] += $t2;
+                                    $sum[2]['tot'] += $tot2;
+                                    $sum[2]['diff'] += $d23;
+                                    $sum[3]['s'] += $s3;
+                                    $sum[3]['t'] += $t3;
+                                    $sum[3]['tot'] += $tot3;
+                                    $sum[3]['diff'] += $d34;
+                                    $sum[4]['s'] += $s4;
+                                    $sum[4]['t'] += $t4;
+                                    $sum[4]['tot'] += $tot4;
                                 @endphp
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td><a href="/performa-produk/compare-sales/kategori/{{ $item->id }}"
                                             class="text-decoration-none">{{ $item->nama_kategori }}</a></td>
                                     <td>Rp {{ number_format($s1, 0, ',', '.') }}</td>
                                     <td>Rp {{ number_format($t1, 0, ',', '.') }}</td>
                                     <td>Rp {{ number_format($tot1, 0, ',', '.') }}</td>
                                     <td>
-                                        @if ($diff > 0)
-                                            <span class="text-success">▲ {{ number_format($pct, 2) }}%<br>(Rp
-                                                {{ number_format($diff, 0, ',', '.') }})</span>
-                                        @elseif($diff < 0)
-                                            <span class="text-danger">▼ {{ number_format(abs($pct), 2) }}%<br>(Rp
-                                                {{ number_format(abs($diff), 0, ',', '.') }})</span>
+                                        @if ($tot1 > 0)
+                                            @php $pct12 = ($d12 / $tot1) * 100; @endphp
+                                            <span
+                                                class="@if ($d12 > 0) text-success @elseif($d12 < 0) text-danger @endif">
+                                                @if ($d12 > 0)
+                                                    ▲
+                                                @elseif($d12 < 0)
+                                                    ▼
+                                                @endif
+                                                {{ number_format($pct12, 2) }}%
+                                                (Rp {{ number_format(abs($d12), 0, ',', '.') }})
+                                            </span>
                                         @else
                                             <span>—</span>
                                         @endif
@@ -85,20 +120,60 @@
                                     <td>Rp {{ number_format($s2, 0, ',', '.') }}</td>
                                     <td>Rp {{ number_format($t2, 0, ',', '.') }}</td>
                                     <td>Rp {{ number_format($tot2, 0, ',', '.') }}</td>
-
+                                    <td>
+                                        @if ($tot2 > 0)
+                                            @php $pct23 = ($d23 / $tot2) * 100; @endphp
+                                            <span
+                                                class="@if ($d23 > 0) text-success @elseif($d23 < 0) text-danger @endif">
+                                                @if ($d23 > 0)
+                                                    ▲
+                                                @elseif($d23 < 0)
+                                                    ▼
+                                                @endif
+                                                {{ number_format($pct23, 2) }}%
+                                                (Rp {{ number_format(abs($d23), 0, ',', '.') }})
+                                            </span>
+                                        @else
+                                            <span>—</span>
+                                        @endif
+                                    </td>
+                                    <td>Rp {{ number_format($s3, 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format($t3, 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format($tot3, 0, ',', '.') }}</td>
+                                    <td>
+                                        @if ($tot3 > 0)
+                                            @php $pct34 = ($d34 / $tot3) * 100; @endphp
+                                            <span
+                                                class="@if ($d34 > 0) text-success @elseif($d34 < 0) text-danger @endif">
+                                                @if ($d34 > 0)
+                                                    ▲
+                                                @elseif($d34 < 0)
+                                                    ▼
+                                                @endif
+                                                {{ number_format($pct34, 2) }}%
+                                                (Rp {{ number_format(abs($d34), 0, ',', '.') }})
+                                            </span>
+                                        @else
+                                            <span>—</span>
+                                        @endif
+                                    </td>
+                                    <td>Rp {{ number_format($s4, 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format($t4, 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format($tot4, 0, ',', '.') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                         <tfoot>
-                            <tr class="fw-bold">
+                            <tr class="fw-semibold">
                                 <td colspan="2" class="text-end">Total:</td>
-                                <td>Rp {{ number_format($sum_s1, 0, ',', '.') }}</td>
-                                <td>Rp {{ number_format($sum_t1, 0, ',', '.') }}</td>
-                                <td>Rp {{ number_format($sum_tot1, 0, ',', '.') }}</td>
-                                <td>Rp {{ number_format($sum_diff, 0, ',', '.') }}</td>
-                                <td>Rp {{ number_format($sum_s2, 0, ',', '.') }}</td>
-                                <td>Rp {{ number_format($sum_t2, 0, ',', '.') }}</td>
-                                <td>Rp {{ number_format($sum_tot2, 0, ',', '.') }}</td>
+                                @for ($p = 1; $p <= 4; $p++)
+                                    <td>Rp {{ number_format($sum[$p]['s'], 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format($sum[$p]['t'], 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format($sum[$p]['tot'], 0, ',', '.') }}</td>
+                                    @if ($p < 4)
+                                        <td>Rp {{ number_format($sum[$p]['diff'], 0, ',', '.') }}</td>
+                                    @endif
+                                @endfor
                             </tr>
                         </tfoot>
                     </table>

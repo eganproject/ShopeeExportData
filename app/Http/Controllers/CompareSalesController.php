@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\KategoriProduk;
 use App\Models\MultiComparativeFSales;
+use App\Models\MultiComparativeFSalesFour;
+use App\Models\MultiComparativeFSalesThree;
 use App\Models\MultiComparativeFSalesTwo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,7 +26,7 @@ class CompareSalesController extends Controller
         $request->validate([
             'platform' => 'required|in:Shopee,Tiktok',
             'file'     => 'required|mimes:csv,txt',
-            'periode_ke' => 'required|in:1,2',
+            'periode_ke' => 'required|in:1,2,3,4',
         ]);
 
         $platform = $request->input('platform');
@@ -133,9 +135,19 @@ class CompareSalesController extends Controller
                     MultiComparativeFSales::insert($rowsToInsert);
                     $count = count($rowsToInsert);
                 });
-            } else {
+            } elseif ($request->periode_ke == 2) {
                 DB::transaction(function () use ($rowsToInsert, &$count) {
                     MultiComparativeFSalesTwo::insert($rowsToInsert);
+                    $count = count($rowsToInsert);
+                });
+            } elseif ($request->periode_ke == 3) {
+                DB::transaction(function () use ($rowsToInsert, &$count) {
+                    MultiComparativeFSalesThree::insert($rowsToInsert);
+                    $count = count($rowsToInsert);
+                });
+            } else {
+                DB::transaction(function () use ($rowsToInsert, &$count) {
+                    MultiComparativeFSalesFour::insert($rowsToInsert);
                     $count = count($rowsToInsert);
                 });
             }
@@ -151,6 +163,8 @@ class CompareSalesController extends Controller
     {
         DB::table('multi_comparative_f_sales')->truncate();
         DB::table('multi_comparative_f_sales_twos')->truncate();
+        DB::table('multi_comparative_f_sales_threes')->truncate();
+        DB::table('multi_comparative_f_sales_fours')->truncate();
         return response()->json(['message' => 'Database berhasil direset!', 'success' => true]);
     }
 
@@ -176,8 +190,49 @@ class CompareSalesController extends Controller
             ];
 
             return response()->json($chartData);
-        } else {
+        } else if ($request->periode == 'periode_2') {
             $data = DB::table('multi_comparative_f_sales_twos')
+                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->groupBy('platform')
+                ->get();
+
+            $chartData = [
+                'labels' => $data->pluck('labels'),
+                'datasets' => [
+                    [
+                        'label' => 'Jumlah Penjualan',
+                        'data' => $data->pluck('jumlah_penjualan'),
+                        'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
+                        'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
+                        'borderWidth' => 1
+                    ]
+                ]
+            ];
+
+            return response()->json($chartData);
+        } else if ($request->periode == 'periode_3') {
+            $data = DB::table('multi_comparative_f_sales_threes')
+                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->groupBy('platform')
+                ->get();
+
+            $chartData = [
+                'labels' => $data->pluck('labels'),
+                'datasets' => [
+                    [
+                        'label' => 'Jumlah Penjualan',
+                        'data' => $data->pluck('jumlah_penjualan'),
+                        'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
+                        'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
+                        'borderWidth' => 1
+                    ]
+                ]
+            ];
+
+            return response()->json($chartData);
+        } else {
+
+            $data = DB::table('multi_comparative_f_sales_fours')
                 ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
                 ->groupBy('platform')
                 ->get();
@@ -209,9 +264,23 @@ class CompareSalesController extends Controller
                 ->orderByDesc('total')
                 ->limit(10)
                 ->get();
-        } else {
+        } else if ($request->periode == 'periode_2') {
 
             $rows = DB::table('multi_comparative_f_sales_twos')
+                ->select('sku', DB::raw('SUM(pendapatan) as total'))
+                ->groupBy('sku')
+                ->orderByDesc('total')
+                ->limit(10)
+                ->get();
+        } else if ($request->periode == 'periode_3') {
+            $rows = DB::table('multi_comparative_f_sales_threes')
+                ->select('sku', DB::raw('SUM(pendapatan) as total'))
+                ->groupBy('sku')
+                ->orderByDesc('total')
+                ->limit(10)
+                ->get();
+        } else {
+            $rows = DB::table('multi_comparative_f_sales_fours')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
                 ->groupBy('sku')
                 ->orderByDesc('total')
@@ -227,18 +296,24 @@ class CompareSalesController extends Controller
 
     public function kategori(Request $request)
     {
-        $kategori = DB::select("      SELECT id, nama_kategori, SUM(pendapatan_per_1) AS pendapatan_per_1, SUM(pendapatan_per_2) AS pendapatan_per_2, SUM(pendapatan_shopee_per_1) AS pendapatan_shopee_per_1,
+        $kategori = DB::select("      SELECT id, nama_kategori, SUM(pendapatan_per_1) AS pendapatan_per_1, SUM(pendapatan_per_2) AS pendapatan_per_2, SUM(pendapatan_per_3) AS pendapatan_per_3, SUM(pendapatan_per_4) AS pendapatan_per_4,SUM(pendapatan_shopee_per_1) AS pendapatan_shopee_per_1,
 		SUM(pendapatan_tiktok_per_1) AS pendapatan_tiktok_per_1,SUM(pendapatan_shopee_per_2) AS pendapatan_shopee_per_2,
-		SUM(pendapatan_tiktok_per_2) AS pendapatan_tiktok_per_2
+		SUM(pendapatan_tiktok_per_2) AS pendapatan_tiktok_per_2,SUM(pendapatan_shopee_per_3) AS pendapatan_shopee_per_3,	SUM(pendapatan_tiktok_per_3) AS pendapatan_tiktok_per_3,
+		SUM(pendapatan_shopee_per_4) AS pendapatan_shopee_per_4,	SUM(pendapatan_tiktok_per_4) AS pendapatan_tiktok_per_4
 		  FROM (
-			   SELECT *, ac.pendapatan_shopee_per_1 + pendapatan_tiktok_per_1 AS pendapatan_per_1, ac.pendapatan_shopee_per_2 + pendapatan_tiktok_per_2 AS pendapatan_per_2
+			   SELECT *, ac.pendapatan_shopee_per_1 + pendapatan_tiktok_per_1 AS pendapatan_per_1, ac.pendapatan_shopee_per_2 + pendapatan_tiktok_per_2 AS pendapatan_per_2,
+				ac.pendapatan_shopee_per_3 + pendapatan_tiktok_per_3 AS pendapatan_per_3,ac.pendapatan_shopee_per_4 + pendapatan_tiktok_per_4 AS pendapatan_per_4
 FROM (
 SELECT a.id, a.nama_kategori, b.product_code AS sku, 
 				IFNULL(c.nama_produk, '-') as nama_produk, 
 				IFNULL(c.pendapatan_shopee,0) AS pendapatan_shopee_per_1, 
-				IFNULL(d.pendapatan_shopee,0) AS pendapatan_shopee_per_2,
+				IFNULL(d.pendapatan_shopee,0) AS pendapatan_shopee_per_2, 
+				IFNULL(g.pendapatan_shopee,0) AS pendapatan_shopee_per_3,
+				IFNULL(i.pendapatan_shopee,0) AS pendapatan_shopee_per_4,
 				IFNULL(e.pendapatan_tiktok,0) AS pendapatan_tiktok_per_1, 
-				IFNULL(f.pendapatan_tiktok,0) AS pendapatan_tiktok_per_2
+				IFNULL(f.pendapatan_tiktok,0) AS pendapatan_tiktok_per_2, 
+				IFNULL(h.pendapatan_tiktok,0) AS pendapatan_tiktok_per_3, 
+				IFNULL(j.pendapatan_tiktok,0) AS pendapatan_tiktok_per_4
                      FROM kategori_produks AS a
                      JOIN product_codes AS b ON a.id = b.kategori_id 
                      LEFT JOIN (
@@ -265,6 +340,30 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
                               WHERE platform = 'Tiktok'
                               GROUP BY sku
                      ) AS f ON b.product_code = f.sku
+                         LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                              FROM multi_comparative_f_sales_threes
+                              WHERE platform = 'Shopee'
+                              GROUP BY sku
+                     ) AS g ON b.product_code = g.sku
+                      LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                              FROM multi_comparative_f_sales_threes
+                              WHERE platform = 'Tiktok'
+                              GROUP BY sku
+                     ) AS h ON b.product_code = h.sku
+                        LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                              FROM multi_comparative_f_sales_fours
+                              WHERE platform = 'Shopee'
+                              GROUP BY sku
+                     ) AS i ON b.product_code = i.sku
+                      LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                              FROM multi_comparative_f_sales_fours
+                              WHERE platform = 'Tiktok'
+                              GROUP BY sku
+                     ) AS j ON b.product_code = j.sku
                      
          ) AS ac
       ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");
@@ -273,7 +372,7 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
             // Ekstrak labels & data
             $labels = array_column($kategori, 'nama_kategori');
             $data   = array_map(function ($item) {
-                return $item->pendapatan_per_1 + $item->pendapatan_per_2;
+                return $item->pendapatan_per_1 + $item->pendapatan_per_2 + $item->pendapatan_per_3 + $item->pendapatan_per_4;
             }, $kategori);
             return response()->json([
                 'labels' => $labels,

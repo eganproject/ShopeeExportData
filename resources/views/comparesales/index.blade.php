@@ -167,6 +167,8 @@
                                     <option value="" disabled selected>-- Pilih Platform --</option>
                                     <option value="1">Periode 1</option>
                                     <option value="2">Periode 2</option>
+                                    <option value="3">Periode 3</option>
+                                    <option value="4">Periode 4</option>
                                 </select>
                             </div>
                             <div class="d-flex justify-content-center">
@@ -192,14 +194,14 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center mb-5">
             <a href="/performa-produk/compare-sales/kategori" class="btn btn-outline-primary btn-modern">Kategori</a>
         </div>
         <!-- Summary Cards, Charts, Tables (tetap seperti sebelumnya) -->
 
 
         <div class="row g-4 mb-4">
-            <div class="col-lg-6">
+            <div class="col-lg-3">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
                         <div class="icon-bg" style="background-color: #e7f3ff;">
@@ -212,7 +214,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-3">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
                         <div class="icon-bg" style="background-color: #e7f3ff;">
@@ -225,11 +227,37 @@
                     </div>
                 </div>
             </div>
+            <div class="col-lg-3">
+                <div class="card custom-card">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                            <i class="bi bi-cash-stack fs-2"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="fw-bold">Total Periode 3</h5>
+                            <p class="card-text fs-4" id="totalPeriode3">Rp 0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="card custom-card">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                            <i class="bi bi-cash-stack fs-2"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="fw-bold">Total Periode 4</h5>
+                            <p class="card-text fs-4" id="totalPeriode4">Rp 0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
         <div class="row g-4 mb-4">
-            <div class="col-lg-6">
+            <div class="col-lg-3">
                 <div class="card custom-card">
                     <div class="card-body p-4">
                         <h5 class="fw-bold">Distribusi Penjualan Periode 1</h5>
@@ -237,11 +265,27 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-3">
                 <div class="card custom-card">
                     <div class="card-body p-4">
                         <h5 class="fw-bold">Distribusi Penjualan Periode 2</h5>
                         <canvas id="piePeriodTwo"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="card custom-card">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold">Distribusi Penjualan Periode 3</h5>
+                        <canvas id="piePeriodThree"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="card custom-card">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold">Distribusi Penjualan Periode 4</h5>
+                        <canvas id="piePeriodFour"></canvas>
                     </div>
                 </div>
             </div>
@@ -262,6 +306,22 @@
                     <div class="card-body p-4">
                         <h5 class="fw-bold">10 Penjualan Teratas (Periode 2)</h5>
                         <canvas id="top10SalesChartP2" style="max-height:400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card custom-card">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold">10 Penjualan Teratas (Periode 3)</h5>
+                        <canvas id="top10SalesChartP3" style="max-height:400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card custom-card">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold">10 Penjualan Teratas (Periode 4)</h5>
+                        <canvas id="top10SalesChartP4" style="max-height:400px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -418,8 +478,12 @@
                         , 0);
                         if (periode == 'periode_1') {
                             $('#totalPeriode1').text('Rp ' + total_periode.toLocaleString());
-                        } else {
+                        } else if (periode == 'periode_2') {
                             $('#totalPeriode2').text('Rp ' + total_periode.toLocaleString());
+                        } else if (periode == 'periode_3') {
+                            $('#totalPeriode3').text('Rp ' + total_periode.toLocaleString());
+                        }else{
+                            $('#totalPeriode4').text('Rp ' + total_periode.toLocaleString());
                         }
                         new Chart(ctx, {
                             type: 'pie',
@@ -519,8 +583,12 @@
             // Render kedua chart
             renderPie('piePeriodOne', 'periode_1');
             renderPie('piePeriodTwo', 'periode_2');
+            renderPie('piePeriodThree', 'periode_3');
+            renderPie('piePeriodFour', 'periode_4');
             getTop10Sales('top10SalesChartP1', 'periode_1');
             getTop10Sales('top10SalesChartP2', 'periode_2')
+            getTop10Sales('top10SalesChartP3', 'periode_3')
+            getTop10Sales('top10SalesChartP4', 'periode_4')
 
         });
     </script>
