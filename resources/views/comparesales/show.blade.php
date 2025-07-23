@@ -12,11 +12,22 @@
             <a href="/performa-produk/compare-sales/kategori" class="btn btn-outline-secondary btn-modern">Kembali</a>
             <div class="row g-4 mb-4 d-flex justify-content-center">
                 <div class="col-lg-6">
-                <h1 class="display-5 fw-bold text-center text-primary mb-4">{{$kategori[0]->nama_kategori}}</h1>
+                    <h1 class="display-5 fw-bold text-center text-primary mb-4">{{ $kategori[0]->nama_kategori }}</h1>
                     <div class="card custom-card">
                         <div class="card-body">
                             <h5 class="fw-semibold mb-3 text-center">Persentase Total per Platform</h5>
                             <canvas id="piePlatform" style="max-height:250px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- Row 2: Bar Chart Top 10 SKU Periode 2 --}}
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card custom-card">
+                        <div class="card-body">
+                            <h5 class="fw-semibold mb-3 text-center">Top 10 SKU Berdasarkan Periode</h5>
+                            <canvas id="barTop10" style="max-height:400px;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -37,14 +48,19 @@
                     </div>
                 </div>
             </div>
-        </div>
-        {{-- Row 2: Bar Chart Top 10 SKU Periode 2 --}}
-        <div class="row g-4 mb-4">
-            <div class="col-12">
+            <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body">
-                        <h5 class="fw-semibold mb-3 text-center">Top 10 SKU Berdasarkan Periode</h5>
-                        <canvas id="barTop10" style="max-height:400px;"></canvas>
+                        <h5 class="fw-semibold mb-3 text-center">Komposisi Pendapatan Periode 3</h5>
+                        <canvas id="pieP3" style="max-height:300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <h5 class="fw-semibold mb-3 text-center">Komposisi Pendapatan Periode 4</h5>
+                        <canvas id="pieP4" style="max-height:300px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -62,10 +78,14 @@
                                     <tr>
                                         <th rowspan="2" class="text-center align-middle">No</th>
                                         <th rowspan="2" class="text-center align-middle">SKU</th>
-                                        <th rowspan="2" class="text-center align-middle">Produk</th>
+                                        <th style="min-width: 200px;" rowspan="2" class="text-center align-middle">Produk</th>
                                         <th colspan="3" class="text-center align-middle">Periode 1</th>
-                                        <th rowspan="2" class="text-center align-middle">Selisih (P1-P2)</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">Selisih (P1-P2)</th>
                                         <th colspan="3" class="text-center align-middle">Periode 2</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">Selisih (P2-P3)</th>
+                                        <th colspan="3" class="text-center align-middle">Periode 3</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">Selisih (P3-P4)</th>
+                                        <th colspan="3" class="text-center align-middle">Periode 4</th>
                                     </tr>
                                     <tr>
                                         <th>Shopee (P1)</th>
@@ -74,75 +94,121 @@
                                         <th>Shopee (P2)</th>
                                         <th>Tiktok (P2)</th>
                                         <th>Total (P2)</th>
+                                        <th>Shopee (P3)</th>
+                                        <th>Tiktok (P3)</th>
+                                        <th>Total (P3)</th>
+                                        <th>Shopee (P4)</th>
+                                        <th>Tiktok (P4)</th>
+                                        <th>Total (P4)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php
-                                        // Initialize totals
-                                        $total_s1 = 0;
-                                        $total_t1 = 0;
-                                        $total_tot1 = 0;
-                                        $total_s2 = 0;
-                                        $total_t2 = 0;
-                                        $total_tot2 = 0;
-                                        $total_diff = 0;
+                                        // Initialize accumulators for 4 periods and diffs
+                                        $sum = [
+                                            1 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
+                                            2 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
+                                            3 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
+                                            4 => ['s' => 0, 't' => 0, 'tot' => 0],
+                                        ];
                                     @endphp
-                                    @foreach ($kategori as $idx => $item)
+                                    @foreach ($kategori as $item)
                                         @php
-                                            $s1 = $item->pendapatan_shopee_per_1;
-                                            $t1 = $item->pendapatan_tiktok_per_1;
-                                            $tot1 = $item->pendapatan_per_1;
-                                            $s2 = $item->pendapatan_shopee_per_2;
-                                            $t2 = $item->pendapatan_tiktok_per_2;
-                                            $tot2 = $item->pendapatan_per_2;
-                                            $diff = $tot2 - $tot1;
-
+                                            // Periode 1
+                                            $s1 = $item->pendapatan_shopee_per_1 ?? 0;
+                                            $t1 = $item->pendapatan_tiktok_per_1 ?? 0;
+                                            $tot1 = $s1 + $t1;
+                                            // Periode 2
+                                            $s2 = $item->pendapatan_shopee_per_2 ?? 0;
+                                            $t2 = $item->pendapatan_tiktok_per_2 ?? 0;
+                                            $tot2 = $s2 + $t2;
+                                            // Periode 3
+                                            $s3 = $item->pendapatan_shopee_per_3 ?? 0;
+                                            $t3 = $item->pendapatan_tiktok_per_3 ?? 0;
+                                            $tot3 = $s3 + $t3;
+                                            // Periode 4
+                                            $s4 = $item->pendapatan_shopee_per_4 ?? 0;
+                                            $t4 = $item->pendapatan_tiktok_per_4 ?? 0;
+                                            $tot4 = $s4 + $t4;
+                                            // Diffs
+                                            $d12 = $tot2 - $tot1;
+                                            $d23 = $tot3 - $tot2;
+                                            $d34 = $tot4 - $tot3;
                                             // Accumulate
-                                            $total_s1 += $s1;
-                                            $total_t1 += $t1;
-                                            $total_tot1 += $tot1;
-                                            $total_s2 += $s2;
-                                            $total_t2 += $t2;
-                                            $total_tot2 += $tot2;
-                                            $total_diff += $diff;
+                                            $sum[1]['s'] += $s1;
+                                            $sum[1]['t'] += $t1;
+                                            $sum[1]['tot'] += $tot1;
+                                            $sum[1]['diff'] += $d12;
+                                            $sum[2]['s'] += $s2;
+                                            $sum[2]['t'] += $t2;
+                                            $sum[2]['tot'] += $tot2;
+                                            $sum[2]['diff'] += $d23;
+                                            $sum[3]['s'] += $s3;
+                                            $sum[3]['t'] += $t3;
+                                            $sum[3]['tot'] += $tot3;
+                                            $sum[3]['diff'] += $d34;
+                                            $sum[4]['s'] += $s4;
+                                            $sum[4]['t'] += $t4;
+                                            $sum[4]['tot'] += $tot4;
                                         @endphp
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $item->sku }}</td>
                                             <td>{{ $item->nama_produk }}</td>
+                                            <!-- Periode 1 -->
                                             <td>Rp {{ number_format($s1, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($t1, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($tot1, 0, ',', '.') }}</td>
                                             <td>
-                                                @if ($diff > 0)
-                                                    <span class="text-success">▲
-                                                        {{ number_format($tot1 > 0 ? ($diff / $tot1) * 100 : 0, 2) }}%<br>(Rp
-                                                        {{ number_format($diff, 0, ',', '.') }})</span>
-                                                @elseif ($diff < 0)
-                                                    <span class="text-danger">▼
-                                                        {{ number_format($tot1 > 0 ? abs($diff / $tot1) * 100 : 0, 2) }}%<br>(Rp
-                                                        {{ number_format(abs($diff), 0, ',', '.') }})</span>
-                                                @else
-                                                    <span>—</span>
-                                                @endif
+                                                @php $pct12 = $tot1>0 ? ($d12/$tot1)*100 : 0; @endphp
+                                                <span
+                                                    class="{{ $d12 > 0 ? 'text-success text-center' : ($d12 < 0 ? 'text-danger text-center' : '') }}">
+                                                    {{ $d12 > 0 ? '▲' : '▼' }} {{ number_format(abs($pct12), 2) }}%<br>
+                                                    (Rp {{ number_format(abs($d12), 0, ',', '.') }})
+                                                </span>
                                             </td>
+                                            <!-- Periode 2 -->
                                             <td>Rp {{ number_format($s2, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($t2, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($tot2, 0, ',', '.') }}</td>
-
+                                            <td>
+                                                @php $pct23 = $tot2>0 ? ($d23/$tot2)*100 : 0; @endphp
+                                                <span
+                                                    class="{{ $d23 > 0 ? 'text-success text-center' : ($d23 < 0 ? 'text-danger text-center' : '') }}">
+                                                    {{ $d23 > 0 ? '▲' : '▼' }} {{ number_format(abs($pct23), 2) }}%<br>
+                                                    (Rp {{ number_format(abs($d23), 0, ',', '.') }})
+                                                </span>
+                                            </td>
+                                            <!-- Periode 3 -->
+                                            <td>Rp {{ number_format($s3, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($t3, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($tot3, 0, ',', '.') }}</td>
+                                            <td>
+                                                @php $pct34 = $tot3>0 ? ($d34/$tot3)*100 : 0; @endphp
+                                                <span
+                                                    class="{{ $d34 > 0 ? 'text-success text-center' : ($d34 < 0 ? 'text-danger text-center' : '') }}">
+                                                    {{ $d34 > 0 ? '▲' : '▼' }} {{ number_format(abs($pct34), 2) }}%<br>
+                                                    (Rp {{ number_format(abs($d34), 0, ',', '.') }})
+                                                </span>
+                                            </td>
+                                            <!-- Periode 4 -->
+                                            <td>Rp {{ number_format($s4, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($t4, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($tot4, 0, ',', '.') }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
-                                    <tr class="fw-bold">
-                                        <td colspan="3" class="text-end">Total:</td>
-                                        <td>Rp {{ number_format($total_s1, 0, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($total_t1, 0, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($total_tot1, 0, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($total_diff, 0, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($total_s2, 0, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($total_t2, 0, ',', '.') }}</td>
-                                        <td>Rp {{ number_format($total_tot2, 0, ',', '.') }}</td>
+                                    <tr class="fw-semibold">
+                                        <td colspan="2" class="text-end">Total:</td>
+                                        @for ($p = 1; $p <= 4; $p++)
+                                            <td>Rp {{ number_format($sum[$p]['s'], 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($sum[$p]['t'], 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($sum[$p]['tot'], 0, ',', '.') }}</td>
+                                            @if ($p < 4)
+                                                <td>Rp {{ number_format($sum[$p]['diff'], 0, ',', '.') }}</td>
+                                            @endif
+                                        @endfor
                                     </tr>
                                 </tfoot>
                             </table>
@@ -171,6 +237,8 @@
             // Data P1 & P2
             const valuesP1 = data.map(i => i.pendapatan_per_1);
             const valuesP2 = data.map(i => i.pendapatan_per_2);
+            const valuesP3 = data.map(i => i.pendapatan_per_3);
+            const valuesP4 = data.map(i => i.pendapatan_per_4);
 
             // Pie Chart Periode 1
             new Chart(document.getElementById('pieP1'), {
@@ -210,12 +278,51 @@
                 }
             });
 
+            new Chart(document.getElementById('pieP3'), {
+                type: 'pie',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: valuesP3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            new Chart(document.getElementById('pieP4'), {
+                type: 'pie',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: valuesP4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
 
             // piechart platform
             const totalS = data.reduce((sum, i) => sum + parseFloat(i.pendapatan_shopee_per_1 || 0) + parseFloat(i
-                .pendapatan_shopee_per_2 || 0), 0);
+                .pendapatan_shopee_per_2 || 0) + parseFloat(i
+                .pendapatan_shopee_per_3 || 0) + parseFloat(i
+                .pendapatan_shopee_per_4 || 0), 0);
             const totalT = data.reduce((sum, i) => sum + parseFloat(i.pendapatan_tiktok_per_1 || 0) + parseFloat(i
-                .pendapatan_tiktok_per_2 || 0), 0);
+                .pendapatan_tiktok_per_2 || 0) + parseFloat(i
+                .pendapatan_tiktok_per_3 || 0) + parseFloat(i
+                .pendapatan_tiktok_per_4 || 0), 0);
 
             const total = totalS + totalT;
             const persentaseS = (totalS / total) * 100;
@@ -274,6 +381,18 @@
                             data: sortedAll.map(i => i.pendapatan_per_2),
                             backgroundColor: 'rgba(54, 162, 235, 0.8)',
                             borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: 'Pendapatan Periode 3',
+                            data: sortedAll.map(i => i.pendapatan_per_3),
+                            backgroundColor: 'rgba(10, 77, 190, 0.8)',
+                            borderColor: 'rgba(10, 77, 190, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: 'Pendapatan Periode 4',
+                            data: sortedAll.map(i => i.pendapatan_per_4),
+                            backgroundColor: 'rgba(50, 99, 190, 0.8)',
+                            borderColor: 'rgba(50, 99, 190, 1)',
                             borderWidth: 1
                         }
                     ]
