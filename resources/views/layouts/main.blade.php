@@ -59,7 +59,7 @@
                             href="/">Dashboard</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle fw-semibold {{ request()->is('performa-produk') || request()->is('performa-produk/compare') || request()->is('performa-produk/kategori') || request()->is('performa-produk/compare-sales') || request()->is('performa-produk/compare-sales/kategori')   ? 'active text-primary' : '' }}"
+                        <a class="nav-link dropdown-toggle fw-semibold {{ request()->is('performa-produk') || request()->is('performa-produk/compare') || request()->is('performa-produk/kategori') || request()->is('performa-produk/compare-sales') || request()->is('performa-produk/compare-sales/kategori') || request()->is('performa-produk/shops')    ? 'active text-primary' : '' }}"
                             href="#" id="produkDropdown" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             Produk
@@ -88,6 +88,12 @@
                                 <a class="dropdown-item {{ request()->is('performa-produk/kategori') ? 'active text-primary fw-bold' : '' }}"
                                     href="/performa-produk/kategori">
                                     <i class="bi bi-tags me-2"></i>Kategori
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->is('performa-produk/shops') ? 'active text-primary fw-bold' : '' }}"
+                                    href="/performa-produk/shops">
+                                    <i class="bi bi-shop me-2"></i>Shop
                                 </a>
                             </li>
                         </ul>

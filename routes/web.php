@@ -5,6 +5,7 @@ use App\Http\Controllers\PerformaProdukController;
 use App\Http\Controllers\ComparePerformaController;
 use App\Http\Controllers\CompareSalesController;
 use App\Http\Controllers\KategoriProdukController;
+use App\Http\Controllers\ShopController;
 
 Route::get('/', function () {
     return view('index');
@@ -43,4 +44,6 @@ Route::group(['prefix' => 'performa-produk'], function () {
     Route::post('/compare-sales/top-sales', [CompareSalesController::class, 'getTop10Sales'])->name('compareSales.top-sales');
     Route::get('/compare-sales/kategori', [CompareSalesController::class, 'kategori'])->name('compareSales.kategori');
     Route::get('/compare-sales/kategori/{id}', [CompareSalesController::class, 'show'])->name('compareSales.show');
+    Route::resource('/shops', ShopController::class);
+
 });

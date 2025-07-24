@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('sku');
             $table->decimal('pendapatan', 20, 2)->default(0);
             $table->string('platform');
+            $table->integer('shop_id');
             $table->timestamps();
         });
     }

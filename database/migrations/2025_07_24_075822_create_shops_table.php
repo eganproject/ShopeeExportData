@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('multi_comparative_f_sales_threes', function (Blueprint $table) {
+        Schema::create('shops', function (Blueprint $table) {
             $table->id();
-            $table->date('tanggal');
-            $table->string('nama_produk');
-            $table->string('sku');
-            $table->decimal('pendapatan', 20, 2)->default(0);
-            $table->string('platform');
-            $table->integer('shop_id');
+            $table->string('name');
+            $table->mediumText('description')->nullable();
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('multi_comparative_f_sales_threes');
+        Schema::dropIfExists('shops');
     }
 };
