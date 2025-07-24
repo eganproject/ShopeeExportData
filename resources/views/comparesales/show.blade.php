@@ -32,6 +32,18 @@
                     </div>
                 </div>
             </div>
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card custom-card">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3 text-center">Grafik Penjualan</h5>
+                            <div class="chart-container">
+                                <canvas id="revenueChart" style="height:400px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body">
@@ -78,13 +90,17 @@
                                     <tr>
                                         <th rowspan="2" class="text-center align-middle">No</th>
                                         <th rowspan="2" class="text-center align-middle">SKU</th>
-                                        <th style="min-width: 200px;" rowspan="2" class="text-center align-middle">Produk</th>
+                                        <th style="min-width: 200px;" rowspan="2" class="text-center align-middle">Produk
+                                        </th>
                                         <th colspan="3" class="text-center align-middle">Periode 1</th>
-                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">Selisih (P1-P2)</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P1-P2)</th>
                                         <th colspan="3" class="text-center align-middle">Periode 2</th>
-                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">Selisih (P2-P3)</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P2-P3)</th>
                                         <th colspan="3" class="text-center align-middle">Periode 3</th>
-                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">Selisih (P3-P4)</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P3-P4)</th>
                                         <th colspan="3" class="text-center align-middle">Periode 4</th>
                                     </tr>
                                     <tr>
@@ -450,6 +466,76 @@
                     }
                 }
             });
+
+            function grafikPenjualanChart() {
+                const chartLabels = {!! json_encode($labels) !!};
+                const chartData = {!! json_encode($data) !!};
+
+                const canvasElement = document.getElementById('revenueChart');
+
+                if (canvasElement) {
+                    const ctx = canvasElement.getContext('2d');
+
+                    // Membuat gradient untuk background chart
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 300); // Sesuaikan tinggi gradient jika perlu
+                    gradient.addColorStop(0, 'rgba(0, 123, 255, 0.6)'); // Warna biru Bootstrap
+                    gradient.addColorStop(1, 'rgba(0, 123, 255, 0.05)');
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{
+                                label: 'Pendapatan',
+                                data: chartData,
+                                fill: true,
+                                backgroundColor: gradient,
+                                borderColor: 'rgba(0, 123, 255, 1)', // Warna biru solid
+                                borderWidth: 2,
+                                tension: 0.4,
+                                pointBackgroundColor: 'rgba(0, 123, 255, 1)',
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: '#dee2e6' // Warna grid Bootstrap
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    align: 'end',
+                                    labels: {
+                                        boxWidth: 12,
+                                        font: {
+                                            size: 14
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Elemen canvas dengan ID "revenueChart" tidak ditemukan.');
+                }
+            }
+
+            grafikPenjualanChart();
+
         });
     </script>
 @endpush

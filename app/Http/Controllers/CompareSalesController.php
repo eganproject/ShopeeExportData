@@ -455,7 +455,72 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
         ORDER BY pendapatan_per_1 desc
         ", [$id]);
 
+           $sql = "
+            SELECT 
+                tanggal, 
+                SUM(total_pendapatan) as daily_revenue
+            FROM (
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales AS c ON b.product_code = c.sku
+                WHERE a.id = ?
+                GROUP BY c.tanggal
 
-        return view("comparesales.show", compact('kategori'));
+                UNION ALL 
+
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales_twos AS c ON b.product_code = c.sku
+                WHERE a.id = ?
+                GROUP BY c.tanggal
+
+                UNION ALL 
+
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales_threes AS c ON b.product_code = c.sku
+                WHERE a.id = ?
+                GROUP BY c.tanggal
+
+                UNION ALL 
+
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales_fours AS c ON b.product_code = c.sku
+                WHERE a.id = ?
+                GROUP BY c.tanggal
+            ) as combined_sales
+            GROUP BY tanggal
+            ORDER BY tanggal ASC
+        ";
+
+        // Menjalankan raw query dengan binding untuk keamanan (mencegah SQL Injection)
+        $results = DB::select($sql, [$id, $id, $id, $id]);
+
+        // Memproses hasil query untuk dijadikan format yang sesuai untuk Chart.js
+        $labels = [];
+        $data = [];
+
+        foreach ($results as $row) {
+            // Mengubah format tanggal 'YYYY-MM-DD' menjadi format 'DD Mmm' (e.g., '24 Jul') untuk label chart
+            $labels[] = Carbon::parse($row->tanggal)->format('d M');
+            $data[] = $row->daily_revenue;
+        }
+
+        
+
+        return view("comparesales.show", compact(['kategori', 'labels', 'data']));
     }
 }
