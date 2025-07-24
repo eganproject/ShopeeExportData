@@ -61,6 +61,10 @@ class CompareSalesController extends Controller
                         continue;
                     }
 
+                    if($row[1] == 'Batal' || $row[1] == 'Belum Bayar'){
+                        continue;
+                    }
+
                     // Kolom J (9), N (13), O (14), R (17)
                     $rawName = $row[13] ?? '';
 
@@ -82,6 +86,10 @@ class CompareSalesController extends Controller
                 } else { // Tiktok
                     // Mulai dari baris ke-3
                     if ($rowNumber < 3) {
+                        continue;
+                    }
+
+                    if($row[1] == 'Dibatalkan' || $row[1] == 'Belum dibayar'){
                         continue;
                     }
                     // Kolom AB (27), H (7), G (6), P (15)
