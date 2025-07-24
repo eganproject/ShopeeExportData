@@ -200,7 +200,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr class="fw-semibold">
-                                        <td colspan="2" class="text-end">Total:</td>
+                                        <td colspan="3" class="text-end">Total:</td>
                                         @for ($p = 1; $p <= 4; $p++)
                                             <td>Rp {{ number_format($sum[$p]['s'], 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($sum[$p]['t'], 0, ',', '.') }}</td>
