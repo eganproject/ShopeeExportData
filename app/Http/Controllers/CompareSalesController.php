@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\KategoriProduk;
+use App\Models\Shop;
 use App\Models\MultiComparativeFSales;
 use App\Models\MultiComparativeFSalesFour;
 use App\Models\MultiComparativeFSalesThree;
@@ -15,8 +16,9 @@ class CompareSalesController extends Controller
 {
     public function index()
     {
+        $shop = Shop::all();
         // Logic to fetch and display product performance data
-        return view('comparesales.index');
+        return view('comparesales.index', compact('shop'));
     }
 
     public function import(Request $request)
@@ -27,9 +29,11 @@ class CompareSalesController extends Controller
             'platform' => 'required|in:Shopee,Tiktok',
             'file'     => 'required|mimes:csv,txt',
             'periode_ke' => 'required|in:1,2,3,4',
+            'shop_id' => 'required',
         ]);
 
         $platform = $request->input('platform');
+        $shop_id = $request->input('shop_id');
         $path     = $request->file('file')->getRealPath();
         $delimiter = ';';
         $rowsToInsert = [];
@@ -128,6 +132,7 @@ class CompareSalesController extends Controller
                     'sku'   => $v3,
                     'pendapatan'   => $v4,
                     'platform'  => $platform,
+                    'shop_id'  => $shop_id,
                 ];
             }
 

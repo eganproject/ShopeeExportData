@@ -171,6 +171,15 @@
                                     <option value="4">Periode 4</option>
                                 </select>
                             </div>
+                            <div class="mb-3">
+                                <label for="shop_id" class="form-label fw-semibold">Toko</label>
+                                <select class="form-select" id="shop_id" name="shop_id" required>
+                                    <option value="" disabled selected>-- Pilih Toko --</option>
+                                    @foreach($shop as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="d-flex justify-content-center">
                                 <label for="csv-upload" class="custom-file-upload mt-3">
                                     <input type="file" id="csv-upload" name="file" accept=".csv" required />
@@ -341,10 +350,11 @@
                 var fileName = $(this).val().split('\\').pop();
                 $('#selected-file-name').text(fileName);
                 $('#upload-button').prop('disabled', !fileName || !$('#platform').val() || !$('#periode_ke')
+                    .val() || !$('#shop_id')
                     .val());
             });
 
-            $('#platform, #periode_ke').on('change', function() {
+            $('#platform, #periode_ke, #shop_id').on('change', function() {
                 $('#upload-button').prop('disabled', !$('#csv-upload').val() || !$('#platform').val() || !$(
                     '#periode_ke').val());
             });
@@ -404,10 +414,12 @@
             $('#upload-button').on('click', function() {
                 var platform = $('#platform').val();
                 var periode_ke = $('#periode_ke').val();
+                var shop = $('#shop_id option:selected').text();
                 Swal.fire({
                     title: 'Konfirmasi',
                     html: '<ul style="list-style: none; padding: 0;">' +
                         '<li>Apakah Anda yakin data ini dari:</li>' +
+                        '<li><strong>Toko :</strong> ' + shop + '</li>' +
                         '<li><strong>Platform:</strong> ' + platform + '</li>' +
                         '<li><strong>Periode Ke:</strong> ' + periode_ke + '</li>' +
                         '</ul>',

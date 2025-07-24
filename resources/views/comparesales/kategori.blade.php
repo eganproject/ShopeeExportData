@@ -18,7 +18,17 @@
                 <div class="mb-4">
                     <canvas id="kategoriPieChart" style="max-height: 300px;"></canvas>
                 </div>
-
+                <hr class="my-4 border border-2 border-dark rounded-pill">
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between gap-4">
+                        <div class="col-3">
+                            <label for="toko" class="form-label">Toko</label>
+                            <select class="form-select" aria-label="Default select example" id="toko">
+                                <option value="semua">Semua</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle" id="kategori-table">
                         <thead>
