@@ -12,7 +12,21 @@
             <a href="/performa-produk/compare-sales/kategori" class="btn btn-outline-secondary btn-modern">Kembali</a>
             <div class="row g-4 mb-4 d-flex justify-content-center">
                 <div class="col-lg-6">
-                    <h1 class="display-5 fw-bold text-center text-primary mb-4">{{ $kategori[0]->nama_kategori }}</h1>
+                    <h1 class="display-5 fw-bold text-center text-primary mb-4">{{ $kategori->nama_kategori }}</h1>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-center gap-4">
+                            <div class="col-3">
+                                <label for="toko" class="form-label">Toko</label>
+                                <select class="form-select" aria-label="Default select example" id="toko"
+                                    onchange="getData()">
+                                    <option value="semua">Semua</option>
+                                    @foreach ($shops as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card custom-card">
                         <div class="card-body">
                             <h5 class="fw-semibold mb-3 text-center">Persentase Total per Platform</h5>
@@ -119,113 +133,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        // Initialize accumulators for 4 periods and diffs
-                                        $sum = [
-                                            1 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
-                                            2 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
-                                            3 => ['s' => 0, 't' => 0, 'tot' => 0, 'diff' => 0],
-                                            4 => ['s' => 0, 't' => 0, 'tot' => 0],
-                                        ];
-                                    @endphp
-                                    @foreach ($kategori as $item)
-                                        @php
-                                            // Periode 1
-                                            $s1 = $item->pendapatan_shopee_per_1 ?? 0;
-                                            $t1 = $item->pendapatan_tiktok_per_1 ?? 0;
-                                            $tot1 = $s1 + $t1;
-                                            // Periode 2
-                                            $s2 = $item->pendapatan_shopee_per_2 ?? 0;
-                                            $t2 = $item->pendapatan_tiktok_per_2 ?? 0;
-                                            $tot2 = $s2 + $t2;
-                                            // Periode 3
-                                            $s3 = $item->pendapatan_shopee_per_3 ?? 0;
-                                            $t3 = $item->pendapatan_tiktok_per_3 ?? 0;
-                                            $tot3 = $s3 + $t3;
-                                            // Periode 4
-                                            $s4 = $item->pendapatan_shopee_per_4 ?? 0;
-                                            $t4 = $item->pendapatan_tiktok_per_4 ?? 0;
-                                            $tot4 = $s4 + $t4;
-                                            // Diffs
-                                            $d12 = $tot2 - $tot1;
-                                            $d23 = $tot3 - $tot2;
-                                            $d34 = $tot4 - $tot3;
-                                            // Accumulate
-                                            $sum[1]['s'] += $s1;
-                                            $sum[1]['t'] += $t1;
-                                            $sum[1]['tot'] += $tot1;
-                                            $sum[1]['diff'] += $d12;
-                                            $sum[2]['s'] += $s2;
-                                            $sum[2]['t'] += $t2;
-                                            $sum[2]['tot'] += $tot2;
-                                            $sum[2]['diff'] += $d23;
-                                            $sum[3]['s'] += $s3;
-                                            $sum[3]['t'] += $t3;
-                                            $sum[3]['tot'] += $tot3;
-                                            $sum[3]['diff'] += $d34;
-                                            $sum[4]['s'] += $s4;
-                                            $sum[4]['t'] += $t4;
-                                            $sum[4]['tot'] += $tot4;
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $item->sku }}</td>
-                                            <td>{{ $item->nama_produk }}</td>
-                                            <!-- Periode 1 -->
-                                            <td>Rp {{ number_format($s1, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($t1, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($tot1, 0, ',', '.') }}</td>
-                                            <td>
-                                                @php $pct12 = $tot1>0 ? ($d12/$tot1)*100 : 0; @endphp
-                                                <span
-                                                    class="{{ $d12 > 0 ? 'text-success text-center' : ($d12 < 0 ? 'text-danger text-center' : '') }}">
-                                                    {{ $d12 > 0 ? '▲' : '▼' }} {{ number_format(abs($pct12), 2) }}%<br>
-                                                    (Rp {{ number_format(abs($d12), 0, ',', '.') }})
-                                                </span>
-                                            </td>
-                                            <!-- Periode 2 -->
-                                            <td>Rp {{ number_format($s2, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($t2, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($tot2, 0, ',', '.') }}</td>
-                                            <td>
-                                                @php $pct23 = $tot2>0 ? ($d23/$tot2)*100 : 0; @endphp
-                                                <span
-                                                    class="{{ $d23 > 0 ? 'text-success text-center' : ($d23 < 0 ? 'text-danger text-center' : '') }}">
-                                                    {{ $d23 > 0 ? '▲' : '▼' }} {{ number_format(abs($pct23), 2) }}%<br>
-                                                    (Rp {{ number_format(abs($d23), 0, ',', '.') }})
-                                                </span>
-                                            </td>
-                                            <!-- Periode 3 -->
-                                            <td>Rp {{ number_format($s3, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($t3, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($tot3, 0, ',', '.') }}</td>
-                                            <td>
-                                                @php $pct34 = $tot3>0 ? ($d34/$tot3)*100 : 0; @endphp
-                                                <span
-                                                    class="{{ $d34 > 0 ? 'text-success text-center' : ($d34 < 0 ? 'text-danger text-center' : '') }}">
-                                                    {{ $d34 > 0 ? '▲' : '▼' }} {{ number_format(abs($pct34), 2) }}%<br>
-                                                    (Rp {{ number_format(abs($d34), 0, ',', '.') }})
-                                                </span>
-                                            </td>
-                                            <!-- Periode 4 -->
-                                            <td>Rp {{ number_format($s4, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($t4, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($tot4, 0, ',', '.') }}</td>
-                                        </tr>
-                                    @endforeach
+
                                 </tbody>
                                 <tfoot>
-                                    <tr class="fw-semibold">
-                                        <td colspan="3" class="text-end">Total:</td>
-                                        @for ($p = 1; $p <= 4; $p++)
-                                            <td>Rp {{ number_format($sum[$p]['s'], 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($sum[$p]['t'], 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($sum[$p]['tot'], 0, ',', '.') }}</td>
-                                            @if ($p < 4)
-                                                <td>Rp {{ number_format($sum[$p]['diff'], 0, ',', '.') }}</td>
-                                            @endif
-                                        @endfor
-                                    </tr>
+
                                 </tfoot>
                             </table>
                         </div>
@@ -244,9 +155,38 @@
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        $(function() {
-            // Data dari controller
-            const data = @json($kategori);
+        // Data dari controller
+
+        function getData() {
+            $.ajax({
+                url: '/performa-produk/compare-sales/kategori/detail-kategori/' + {{ $kategori->id }},
+                method: 'GET',
+                data: {
+                    id: {{ $kategori->id }},
+                    shop_id: $('#toko').val()
+                },
+                async: false,
+                success: function(response) {
+
+                    getChart(response.kategori);
+                    grafikPenjualanChart(response.labels, response.data);
+                    putTable(response.kategori)
+                },
+                error: function(xhr) {
+                    console.error('Error fetching data:', xhr);
+                }
+            });
+        }
+
+        function getChart(data) {
+
+            // Destroy existing charts if they exist
+            if (window.pieP1 && window.pieP1 instanceof Chart) pieP1.destroy();
+            if (window.pieP2 && window.pieP2 instanceof Chart) pieP2.destroy();
+            if (window.pieP3 && window.pieP3 instanceof Chart) pieP3.destroy();
+            if (window.pieP4 && window.pieP4 instanceof Chart) pieP4.destroy();
+            if (window.piePlatform && window.piePlatform instanceof Chart) piePlatform.destroy();
+            if (window.barTop10 && window.barTop10 instanceof Chart) barTop10.destroy();
 
             // Labels kategori
             const categories = data.map(i => i.sku);
@@ -257,7 +197,7 @@
             const valuesP4 = data.map(i => i.pendapatan_per_4);
 
             // Pie Chart Periode 1
-            new Chart(document.getElementById('pieP1'), {
+            window.pieP1 = new Chart(document.getElementById('pieP1'), {
                 type: 'pie',
                 data: {
                     labels: categories,
@@ -276,7 +216,7 @@
             });
 
             // Pie Chart Periode 2
-            new Chart(document.getElementById('pieP2'), {
+            window.pieP2 = new Chart(document.getElementById('pieP2'), {
                 type: 'pie',
                 data: {
                     labels: categories,
@@ -294,7 +234,7 @@
                 }
             });
 
-            new Chart(document.getElementById('pieP3'), {
+            window.pieP3 = new Chart(document.getElementById('pieP3'), {
                 type: 'pie',
                 data: {
                     labels: categories,
@@ -311,7 +251,7 @@
                     }
                 }
             });
-            new Chart(document.getElementById('pieP4'), {
+            window.pieP4 = new Chart(document.getElementById('pieP4'), {
                 type: 'pie',
                 data: {
                     labels: categories,
@@ -329,22 +269,23 @@
                 }
             });
 
-
             // piechart platform
-            const totalS = data.reduce((sum, i) => sum + parseFloat(i.pendapatan_shopee_per_1 || 0) + parseFloat(i
-                .pendapatan_shopee_per_2 || 0) + parseFloat(i
-                .pendapatan_shopee_per_3 || 0) + parseFloat(i
-                .pendapatan_shopee_per_4 || 0), 0);
-            const totalT = data.reduce((sum, i) => sum + parseFloat(i.pendapatan_tiktok_per_1 || 0) + parseFloat(i
-                .pendapatan_tiktok_per_2 || 0) + parseFloat(i
-                .pendapatan_tiktok_per_3 || 0) + parseFloat(i
-                .pendapatan_tiktok_per_4 || 0), 0);
+            const totalS = data.reduce((sum, i) => sum + parseFloat(i.pendapatan_shopee_per_1 || 0) +
+                parseFloat(i
+                    .pendapatan_shopee_per_2 || 0) + parseFloat(i
+                    .pendapatan_shopee_per_3 || 0) + parseFloat(i
+                    .pendapatan_shopee_per_4 || 0), 0);
+            const totalT = data.reduce((sum, i) => sum + parseFloat(i.pendapatan_tiktok_per_1 || 0) +
+                parseFloat(i
+                    .pendapatan_tiktok_per_2 || 0) + parseFloat(i
+                    .pendapatan_tiktok_per_3 || 0) + parseFloat(i
+                    .pendapatan_tiktok_per_4 || 0), 0);
 
             const total = totalS + totalT;
             const persentaseS = (totalS / total) * 100;
             const persentaseT = (totalT / total) * 100;
 
-            new Chart(document.getElementById('piePlatform'), {
+            window.piePlatform = new Chart(document.getElementById('piePlatform'), {
                 type: 'pie',
                 data: {
                     labels: ['Shopee', 'Tiktok'],
@@ -381,7 +322,7 @@
             // Bar Chart Top 10 SKU Berdasarkan Pendapatan Periode 1 & 2
             const sortedAll = [...data].sort((a, b) => (b.pendapatan_per_2 + b.pendapatan_per_1) - (a
                 .pendapatan_per_2 + a.pendapatan_per_1)).slice(0, 10);
-            new Chart(document.getElementById('barTop10'), {
+            window.barTop10 = new Chart(document.getElementById('barTop10'), {
                 type: 'bar',
                 data: {
                     labels: sortedAll.map(i => i.sku),
@@ -437,105 +378,234 @@
                     }
                 }
             });
+        }
+        // Inisialisasi DataTable
 
-            // Inisialisasi DataTable
-            $('#kategori-table').DataTable({
-                dom: 'Bfrtip',
-                buttons: [{
-                    extend: 'colvis',
-                    text: 'Tampilkan Kolom'
-                }],
-                responsive: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                paging: true,
-                columnDefs: [
-                    // Enable ordering only on Total columns
-                    {
-                        targets: '_all',
-                        orderable: false
-                    },
-                ],
-                language: {
-                    search: '_INPUT_',
-                    searchPlaceholder: 'Cari...',
-                    paginate: {
-                        previous: '&laquo;',
-                        next: '&raquo;'
-                    }
+        function grafikPenjualanChart(thislabels, thisdata) {
+            const chartLabels = thislabels;
+            const chartData = thisdata;
+
+            const canvasElement = document.getElementById('revenueChart');
+
+            if (canvasElement) {
+                const ctx = canvasElement.getContext('2d');
+
+                // Hancurkan chart lama jika ada
+                if (window.revenueChart && window.revenueChart instanceof Chart) {
+                    window.revenueChart.destroy();
                 }
-            });
 
-            function grafikPenjualanChart() {
-                const chartLabels = {!! json_encode($labels) !!};
-                const chartData = {!! json_encode($data) !!};
+                // Membuat gradient untuk background chart
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, 'rgba(0, 123, 255, 0.6)');
+                gradient.addColorStop(1, 'rgba(0, 123, 255, 0.05)');
 
-                const canvasElement = document.getElementById('revenueChart');
-
-                if (canvasElement) {
-                    const ctx = canvasElement.getContext('2d');
-
-                    // Membuat gradient untuk background chart
-                    const gradient = ctx.createLinearGradient(0, 0, 0, 300); // Sesuaikan tinggi gradient jika perlu
-                    gradient.addColorStop(0, 'rgba(0, 123, 255, 0.6)'); // Warna biru Bootstrap
-                    gradient.addColorStop(1, 'rgba(0, 123, 255, 0.05)');
-
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: chartLabels,
-                            datasets: [{
-                                label: 'Pendapatan',
-                                data: chartData,
-                                fill: true,
-                                backgroundColor: gradient,
-                                borderColor: 'rgba(0, 123, 255, 1)', // Warna biru solid
-                                borderWidth: 2,
-                                tension: 0.4,
-                                pointBackgroundColor: 'rgba(0, 123, 255, 1)',
-                                pointRadius: 5,
-                                pointHoverRadius: 7,
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    grid: {
-                                        color: '#dee2e6' // Warna grid Bootstrap
-                                    }
-                                },
-                                x: {
-                                    grid: {
-                                        display: false
-                                    }
+                window.revenueChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Pendapatan',
+                            data: chartData,
+                            fill: true,
+                            backgroundColor: gradient,
+                            borderColor: 'rgba(0, 123, 255, 1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointBackgroundColor: 'rgba(0, 123, 255, 1)',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#dee2e6'
                                 }
                             },
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top',
-                                    align: 'end',
-                                    labels: {
-                                        boxWidth: 12,
-                                        font: {
-                                            size: 14
-                                        }
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                align: 'end',
+                                labels: {
+                                    boxWidth: 12,
+                                    font: {
+                                        size: 14
                                     }
                                 }
                             }
                         }
-                    });
+                    }
+                });
+            } else {
+                console.error('Elemen canvas dengan ID "revenueChart" tidak ditemukan.');
+            }
+        }
+
+        function putTable(data) {
+            console.log(data)
+
+            $('#kategori-table tbody').empty();
+
+            function formatRupiah(value) {
+                return 'Rp ' + (value || 0).toLocaleString('id-ID', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).replace(/\B(?=(\d{3})+(?!\d))/g, '.').replace(/\.00$/, '');
+            }
+
+            function renderSelisih(diff, pct, total) {
+                if (total > 0) {
+                    let icon = diff > 0 ? '▲' : diff < 0 ? '▼' : '';
+                    let color = diff > 0 ? 'text-success' : diff < 0 ? 'text-danger' : '';
+                    return `<span class="${color}">
+                    ${icon} ${pct !== null ? pct.toFixed(2) : '0.00'}%
+                    (Rp ${Math.abs(diff).toLocaleString('id-ID')})
+                </span>`;
                 } else {
-                    console.error('Elemen canvas dengan ID "revenueChart" tidak ditemukan.');
+                    return '<span>—</span>';
                 }
             }
 
-            grafikPenjualanChart();
+            let sum = {
+                1: {
+                    s: 0,
+                    t: 0,
+                    tot: 0,
+                    diff: 0
+                },
+                2: {
+                    s: 0,
+                    t: 0,
+                    tot: 0,
+                    diff: 0
+                },
+                3: {
+                    s: 0,
+                    t: 0,
+                    tot: 0,
+                    diff: 0
+                },
+                4: {
+                    s: 0,
+                    t: 0,
+                    tot: 0
+                }
+            };
 
-        });
+            // Render data
+            $.each(data, function(index, item) {
+                // Periode 1
+                let s1 = item.pendapatan_shopee_per_1 || 0;
+                let t1 = item.pendapatan_tiktok_per_1 || 0;
+                let tot1 = item.pendapatan_per_1 || (s1 + t1);
+
+                // Periode 2
+                let s2 = item.pendapatan_shopee_per_2 || 0;
+                let t2 = item.pendapatan_tiktok_per_2 || 0;
+                let tot2 = item.pendapatan_per_2 || (s2 + t2);
+
+                // Periode 3
+                let s3 = item.pendapatan_shopee_per_3 || 0;
+                let t3 = item.pendapatan_tiktok_per_3 || 0;
+                let tot3 = item.pendapatan_per_3 || (s3 + t3);
+
+                // Periode 4
+                let s4 = item.pendapatan_shopee_per_4 || 0;
+                let t4 = item.pendapatan_tiktok_per_4 || 0;
+                let tot4 = item.pendapatan_per_4 || (s4 + t4);
+
+                // Selisih & Persen
+                let d12 = tot2 - tot1;
+                let d23 = tot3 - tot2;
+                let d34 = tot4 - tot3;
+                let pct12 = tot1 > 0 ? (d12 / tot1) * 100 : null;
+                let pct23 = tot2 > 0 ? (d23 / tot2) * 100 : null;
+                let pct34 = tot3 > 0 ? (d34 / tot3) * 100 : null;
+
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.sku}</td>
+                        <td>${item.nama_produk}</td>
+                        <td>${formatRupiah(s1)}</td>
+                        <td>${formatRupiah(t1)}</td>
+                        <td>${formatRupiah(tot1)}</td>
+                        <td>${renderSelisih(d12, pct12, tot1)}</td>
+                        <td>${formatRupiah(s2)}</td>
+                        <td>${formatRupiah(t2)}</td>
+                        <td>${formatRupiah(tot2)}</td>
+                        <td>${renderSelisih(d23, pct23, tot2)}</td>
+                        <td>${formatRupiah(s3)}</td>
+                        <td>${formatRupiah(t3)}</td>
+                        <td>${formatRupiah(tot3)}</td>
+                        <td>${renderSelisih(d34, pct34, tot3)}</td>
+                        <td>${formatRupiah(s4)}</td>
+                        <td>${formatRupiah(t4)}</td>
+                        <td>${formatRupiah(tot4)}</td>
+                    </tr>
+                `;
+
+                sum[1].s += parseFloat(s1) || 0;
+                sum[1].t += parseFloat(t1) || 0;
+                sum[1].tot += parseFloat(tot1) || 0;
+                sum[1].diff += parseFloat(d12) || 0;
+
+                sum[2].s += parseFloat(s2) || 0;
+                sum[2].t += parseFloat(t2) || 0;
+                sum[2].tot += parseFloat(tot2) || 0;
+                sum[2].diff += parseFloat(d23) || 0;
+
+                sum[3].s += parseFloat(s3) || 0;
+                sum[3].t += parseFloat(t3) || 0;
+                sum[3].tot += parseFloat(tot3) || 0;
+                sum[3].diff += parseFloat(d34) || 0;
+
+                sum[4].s += parseFloat(s4) || 0;
+                sum[4].t += parseFloat(t4) || 0;
+                sum[4].tot += parseFloat(tot4) || 0;
+
+                $('#kategori-table tbody').append(row);
+            });
+
+
+            let tfoot = `<tr class="fw-semibold">
+    <td colspan="3" class="text-end">Total:</td>`;
+            for (let p = 1; p <= 4; p++) {
+                tfoot += `<td>${formatRupiah(sum[p].s)}</td>
+              <td>${formatRupiah(sum[p].t)}</td>
+              <td>${formatRupiah(sum[p].tot)}</td>`;
+                if (p < 4) {
+                    tfoot += `<td>${formatRupiah(sum[p].diff)}</td>`;
+                }
+            }
+            tfoot += '</tr>';
+            $('#kategori-table tfoot').html(tfoot);
+
+
+            if ($.fn.DataTable.isDataTable('#kategori-table')) {
+                $('#kategori-table').DataTable().destroy();
+            }
+
+            $('#kategori-table').DataTable({
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                buttons: ["copy", "csv", "excel", "pdf", "print"]
+            }).buttons().container().appendTo('#kategori-table_wrapper .col-md-6:eq(0)');
+        }
+
+        getData();
     </script>
 @endpush
