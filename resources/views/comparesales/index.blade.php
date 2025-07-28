@@ -169,14 +169,15 @@
                                     <option value="2">Periode 2</option>
                                     <option value="3">Periode 3</option>
                                     <option value="4">Periode 4</option>
+                                    <option value="5">Periode 5</option>
                                 </select>
                             </div>
                             <div class="mb-3">
                                 <label for="shop_id" class="form-label fw-semibold">Toko</label>
                                 <select class="form-select" id="shop_id" name="shop_id" required>
                                     <option value="" disabled selected>-- Pilih Toko --</option>
-                                    @foreach($shop as $item)
-                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                    @foreach ($shop as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -210,7 +211,7 @@
 
 
         <div class="row g-4 mb-4">
-            <div class="col-lg-3">
+            <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
                         <div class="icon-bg" style="background-color: #e7f3ff;">
@@ -219,11 +220,13 @@
                         <div class="ms-3">
                             <h5 class="fw-bold">Total Periode 1</h5>
                             <p class="card-text fs-4" id="totalPeriode1">Rp 0</p>
+                            <button type="button" onclick="resetDataPeriode('sales')"
+                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
                         <div class="icon-bg" style="background-color: #e7f3ff;">
@@ -232,11 +235,13 @@
                         <div class="ms-3">
                             <h5 class="fw-bold">Total Periode 2</h5>
                             <p class="card-text fs-4" id="totalPeriode2">Rp 0</p>
+                            <button type="button" onclick="resetDataPeriode('sales_twos')"
+                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
                         <div class="icon-bg" style="background-color: #e7f3ff;">
@@ -245,11 +250,13 @@
                         <div class="ms-3">
                             <h5 class="fw-bold">Total Periode 3</h5>
                             <p class="card-text fs-4" id="totalPeriode3">Rp 0</p>
+                            <button type="button" onclick="resetDataPeriode('sales_threes')"
+                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
                         <div class="icon-bg" style="background-color: #e7f3ff;">
@@ -258,6 +265,23 @@
                         <div class="ms-3">
                             <h5 class="fw-bold">Total Periode 4</h5>
                             <p class="card-text fs-4" id="totalPeriode4">Rp 0</p>
+                            <button type="button" onclick="resetDataPeriode('sales_fours')"
+                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card custom-card">
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                            <i class="bi bi-cash-stack fs-2"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="fw-bold">Total Periode 5</h5>
+                            <p class="card-text fs-4" id="totalPeriode5">Rp 0</p>
+                            <button type="button" onclick="resetDataPeriode('sales_fives')"
+                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
                         </div>
                     </div>
                 </div>
@@ -266,7 +290,7 @@
 
 
         <div class="row g-4 mb-4">
-            <div class="col-lg-3">
+            <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body p-4">
                         <h5 class="fw-bold">Distribusi Penjualan Periode 1</h5>
@@ -274,7 +298,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body p-4">
                         <h5 class="fw-bold">Distribusi Penjualan Periode 2</h5>
@@ -282,7 +306,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body p-4">
                         <h5 class="fw-bold">Distribusi Penjualan Periode 3</h5>
@@ -290,11 +314,19 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body p-4">
                         <h5 class="fw-bold">Distribusi Penjualan Periode 4</h5>
                         <canvas id="piePeriodFour"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card custom-card">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold">Distribusi Penjualan Periode 5</h5>
+                        <canvas id="piePeriodFive"></canvas>
                     </div>
                 </div>
             </div>
@@ -331,6 +363,14 @@
                     <div class="card-body p-4">
                         <h5 class="fw-bold">10 Penjualan Teratas (Periode 4)</h5>
                         <canvas id="top10SalesChartP4" style="max-height:400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card custom-card">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold">10 Penjualan Teratas (Periode 5)</h5>
+                        <canvas id="top10SalesChartP5" style="max-height:400px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -485,17 +525,18 @@
                     success: function(res) {
                         console.log('res', res);
                         const ctx = document.getElementById(canvasId).getContext('2d');
-                        var total_periode = res.datasets.reduce((sum, dataset) => 
-                            sum + dataset.data.reduce((a, b) => Number(a) + Number(b), 0)
-                        , 0);
+                        var total_periode = res.datasets.reduce((sum, dataset) =>
+                            sum + dataset.data.reduce((a, b) => Number(a) + Number(b), 0), 0);
                         if (periode == 'periode_1') {
                             $('#totalPeriode1').text('Rp ' + total_periode.toLocaleString());
                         } else if (periode == 'periode_2') {
                             $('#totalPeriode2').text('Rp ' + total_periode.toLocaleString());
                         } else if (periode == 'periode_3') {
                             $('#totalPeriode3').text('Rp ' + total_periode.toLocaleString());
-                        }else{
+                        } else if (periode == 'periode_4') {
                             $('#totalPeriode4').text('Rp ' + total_periode.toLocaleString());
+                        } else if (periode == 'periode_5') {
+                            $('#totalPeriode5').text('Rp ' + total_periode.toLocaleString());
                         }
                         new Chart(ctx, {
                             type: 'pie',
@@ -597,11 +638,64 @@
             renderPie('piePeriodTwo', 'periode_2');
             renderPie('piePeriodThree', 'periode_3');
             renderPie('piePeriodFour', 'periode_4');
+            renderPie('piePeriodFive', 'periode_5');
             getTop10Sales('top10SalesChartP1', 'periode_1');
             getTop10Sales('top10SalesChartP2', 'periode_2')
             getTop10Sales('top10SalesChartP3', 'periode_3')
             getTop10Sales('top10SalesChartP4', 'periode_4')
+            getTop10Sales('top10SalesChartP5', 'periode_5')
 
         });
+
+        function resetDataPeriode(periode) {
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: `Apakah Anda yakin ingin mereset data periode ke ${periode} ?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Tidak'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/performa-produk/compare-sales/reset',
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            periode: periode
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Sukses',
+                                    text: response.message,
+                                    icon: 'success'
+                                });
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 2000);
+                            } else {
+                                Swal.fire({
+                                    title: 'Gagal',
+                                    text: response.message,
+                                    icon: 'error'
+                                });
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1500);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: 'Gagal',
+                                text: 'Terjadi kesalahan saat memanggil controller',
+                                icon: 'error'
+                            });
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        }
     </script>
 @endpush

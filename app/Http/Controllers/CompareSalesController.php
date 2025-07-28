@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\KategoriProduk;
+use App\Models\MultiComparativeFSalesFive;
 use App\Models\Shop;
 use App\Models\MultiComparativeFSales;
 use App\Models\MultiComparativeFSalesFour;
@@ -28,7 +29,7 @@ class CompareSalesController extends Controller
         $request->validate([
             'platform' => 'required|in:Shopee,Tiktok',
             'file' => 'required|mimes:csv,txt',
-            'periode_ke' => 'required|in:1,2,3,4',
+            'periode_ke' => 'required|in:1,2,3,4,5',
             'shop_id' => 'required',
         ]);
 
@@ -158,9 +159,14 @@ class CompareSalesController extends Controller
                     MultiComparativeFSalesThree::insert($rowsToInsert);
                     $count = count($rowsToInsert);
                 });
-            } else {
+            } elseif ($request->periode_ke == 4){
                 DB::transaction(function () use ($rowsToInsert, &$count) {
                     MultiComparativeFSalesFour::insert($rowsToInsert);
+                    $count = count($rowsToInsert);
+                });
+            }elseif ($request->periode_ke == 5){
+                DB::transaction(function () use ($rowsToInsert, &$count) {
+                    MultiComparativeFSalesFive::insert($rowsToInsert);
                     $count = count($rowsToInsert);
                 });
             }
@@ -172,12 +178,17 @@ class CompareSalesController extends Controller
             ->with('success', "Berhasil memasukkan data sebanyak {$count} baris dari platform {$platform}.");
     }
 
-    public function reset()
+    public function reset(Request $request)
     {
-        DB::table('multi_comparative_f_sales')->truncate();
-        DB::table('multi_comparative_f_sales_twos')->truncate();
-        DB::table('multi_comparative_f_sales_threes')->truncate();
-        DB::table('multi_comparative_f_sales_fours')->truncate();
+        if($request->periode) {
+            DB::table("multi_comparative_f_$request->periode")->truncate();
+        }else{
+            DB::table('multi_comparative_f_sales')->truncate();
+            DB::table('multi_comparative_f_sales_twos')->truncate();
+            DB::table('multi_comparative_f_sales_threes')->truncate();
+            DB::table('multi_comparative_f_sales_fours')->truncate();
+            DB::table('multi_comparative_f_sales_fives')->truncate();
+        }
         return response()->json(['message' => 'Database berhasil direset!', 'success' => true]);
     }
 
@@ -243,9 +254,30 @@ class CompareSalesController extends Controller
             ];
 
             return response()->json($chartData);
-        } else {
+        } else if ($request->periode == 'periode_4') {
 
             $data = DB::table('multi_comparative_f_sales_fours')
+                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->groupBy('platform')
+                ->get();
+
+            $chartData = [
+                'labels' => $data->pluck('labels'),
+                'datasets' => [
+                    [
+                        'label' => 'Jumlah Penjualan',
+                        'data' => $data->pluck('jumlah_penjualan'),
+                        'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
+                        'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
+                        'borderWidth' => 1
+                    ]
+                ]
+            ];
+
+            return response()->json($chartData);
+        } else if ($request->periode == 'periode_5') {
+
+            $data = DB::table('multi_comparative_f_sales_fives')
                 ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
                 ->groupBy('platform')
                 ->get();
@@ -570,7 +602,7 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
     public function getSubKategori(Request $request, $id)
     {
         $toko = $request->input('shop_id', 'semua');
-           $filterToko = $toko !== 'semua'
+        $filterToko = $toko !== 'semua'
             ? "AND shop_id = $toko"
             : "";
 
