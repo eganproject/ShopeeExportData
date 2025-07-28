@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama_kategori');
             $table->mediumText('deskripsi')->nullable();
             $table->enum('status', ['aktif', 'nonaktif']);
+            $table->integer('parent_id')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

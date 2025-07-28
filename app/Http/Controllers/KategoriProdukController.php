@@ -15,14 +15,21 @@ class KategoriProdukController extends Controller
      */
     public function index()
     {
-        return view('performa_produk.kategori');
+        $parent = KategoriProduk::all();
+        return view('performa_produk.kategori', compact('parent'));
     }
     /**
      * Show the form for creating a new resource.
      */
     public function lists()
     {
-        $kategori = KategoriProduk::query()->where('status', 'aktif')->get();
+        $kategori = DB::select("SELECT a.id, 
+CASE 
+WHEN a.parent_id <> 0 THEN b.nama_kategori
+ELSE 'Parent' END AS parent, a.nama_kategori, a.deskripsi, a.status 
+from kategori_produks AS a
+LEFT JOIN kategori_produks AS b ON a.parent_id = b.id
+");
         return response()->json(['categories' => $kategori], 200);
     }
 
@@ -32,6 +39,7 @@ class KategoriProdukController extends Controller
     public function store(Request $request)
     {
         KategoriProduk::create([
+            'parent_id' => $request->parent_id,
             'nama_kategori' => $request->nama_kategori,
             'status' => 'aktif'
         ]);
