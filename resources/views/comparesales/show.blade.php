@@ -58,35 +58,52 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <div class="card custom-card">
                     <div class="card-body">
-                        <h5 class="fw-semibold mb-3 text-center">Komposisi Pendapatan Periode 1</h5>
-                        <canvas id="pieP1" style="max-height:300px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body">
-                        <h5 class="fw-semibold mb-3 text-center">Komposisi Pendapatan Periode 2</h5>
-                        <canvas id="pieP2" style="max-height:300px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body">
-                        <h5 class="fw-semibold mb-3 text-center">Komposisi Pendapatan Periode 3</h5>
-                        <canvas id="pieP3" style="max-height:300px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body">
-                        <h5 class="fw-semibold mb-3 text-center">Komposisi Pendapatan Periode 4</h5>
-                        <canvas id="pieP4" style="max-height:300px;"></canvas>
+                        <h5 class="fw-semibold mb-3 text-center">Sub Kategori</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="subkategori-table" style="width:100%;">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th rowspan="2" class="text-center align-middle">No</th>
+                                        <th style="min-width: 200px;" rowspan="2" class="text-center align-middle">Sub
+                                            Kategori
+                                        </th>
+                                        <th colspan="3" class="text-center align-middle">Periode 1</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P1-P2)</th>
+                                        <th colspan="3" class="text-center align-middle">Periode 2</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P2-P3)</th>
+                                        <th colspan="3" class="text-center align-middle">Periode 3</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P3-P4)</th>
+                                        <th colspan="3" class="text-center align-middle">Periode 4</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Shopee (P1)</th>
+                                        <th>Tiktok (P1)</th>
+                                        <th>Total (P1)</th>
+                                        <th>Shopee (P2)</th>
+                                        <th>Tiktok (P2)</th>
+                                        <th>Total (P2)</th>
+                                        <th>Shopee (P3)</th>
+                                        <th>Tiktok (P3)</th>
+                                        <th>Total (P3)</th>
+                                        <th>Shopee (P4)</th>
+                                        <th>Tiktok (P4)</th>
+                                        <th>Total (P4)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                                <tfoot>
+
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,7 +187,26 @@
 
                     getChart(response.kategori);
                     grafikPenjualanChart(response.labels, response.data);
-                    putTable(response.kategori)
+                    putTable(response.kategori, 'kategori-table')
+                    getSubKategori();
+                },
+                error: function(xhr) {
+                    console.error('Error fetching data:', xhr);
+                }
+            });
+        }
+
+        function getSubKategori() {
+            $.ajax({
+                url: '/performa-produk/compare-sales/kategori/get-sub-kategori/' + {{ $kategori->id }},
+                method: 'GET',
+                data: {
+                    id: {{ $kategori->id }},
+                    shop_id: $('#toko').val()
+                },
+                async: false,
+                success: function(response) {
+                    putTable(response.subkategori, 'subkategori-table')
                 },
                 error: function(xhr) {
                     console.error('Error fetching data:', xhr);
@@ -180,11 +216,7 @@
 
         function getChart(data) {
 
-            // Destroy existing charts if they exist
-            if (window.pieP1 && window.pieP1 instanceof Chart) pieP1.destroy();
-            if (window.pieP2 && window.pieP2 instanceof Chart) pieP2.destroy();
-            if (window.pieP3 && window.pieP3 instanceof Chart) pieP3.destroy();
-            if (window.pieP4 && window.pieP4 instanceof Chart) pieP4.destroy();
+
             if (window.piePlatform && window.piePlatform instanceof Chart) piePlatform.destroy();
             if (window.barTop10 && window.barTop10 instanceof Chart) barTop10.destroy();
 
@@ -196,78 +228,7 @@
             const valuesP3 = data.map(i => i.pendapatan_per_3);
             const valuesP4 = data.map(i => i.pendapatan_per_4);
 
-            // Pie Chart Periode 1
-            window.pieP1 = new Chart(document.getElementById('pieP1'), {
-                type: 'pie',
-                data: {
-                    labels: categories,
-                    datasets: [{
-                        data: valuesP1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
 
-            // Pie Chart Periode 2
-            window.pieP2 = new Chart(document.getElementById('pieP2'), {
-                type: 'pie',
-                data: {
-                    labels: categories,
-                    datasets: [{
-                        data: valuesP2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-
-            window.pieP3 = new Chart(document.getElementById('pieP3'), {
-                type: 'pie',
-                data: {
-                    labels: categories,
-                    datasets: [{
-                        data: valuesP3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-            window.pieP4 = new Chart(document.getElementById('pieP4'), {
-                type: 'pie',
-                data: {
-                    labels: categories,
-                    datasets: [{
-                        data: valuesP4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
 
             // piechart platform
             const totalS = data.reduce((sum, i) => sum + parseFloat(i.pendapatan_shopee_per_1 || 0) +
@@ -453,10 +414,9 @@
             }
         }
 
-        function putTable(data) {
-            console.log(data)
+        function putTable(data, table) {
 
-            $('#kategori-table tbody').empty();
+            $(`#${table} tbody`).empty();
 
             function formatRupiah(value) {
                 return 'Rp ' + (value || 0).toLocaleString('id-ID', {
@@ -537,8 +497,8 @@
                 const row = `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${item.sku}</td>
-                        <td>${item.nama_produk}</td>
+                     ${table === 'kategori-table' ? '<td >'+item.sku+'</td>' : ''}   
+                        <td>${table === 'kategori-table' ? item.nama_produk : '<a href="/performa-produk/compare-sales/kategori/'+item.id+'">'+item.nama_kategori+'</a>'}</td>
                         <td>${formatRupiah(s1)}</td>
                         <td>${formatRupiah(t1)}</td>
                         <td>${formatRupiah(tot1)}</td>
@@ -576,12 +536,12 @@
                 sum[4].t += parseFloat(t4) || 0;
                 sum[4].tot += parseFloat(tot4) || 0;
 
-                $('#kategori-table tbody').append(row);
+                $(`#${table} tbody`).append(row);
             });
 
 
             let tfoot = `<tr class="fw-semibold">
-    <td colspan="3" class="text-end">Total:</td>`;
+    <td colspan="${table === 'kategori-table' ? 3 : 2}" class="text-end">Total:</td>`;
             for (let p = 1; p <= 4; p++) {
                 tfoot += `<td>${formatRupiah(sum[p].s)}</td>
               <td>${formatRupiah(sum[p].t)}</td>
@@ -591,19 +551,19 @@
                 }
             }
             tfoot += '</tr>';
-            $('#kategori-table tfoot').html(tfoot);
+            $(`#${table} tfoot`).html(tfoot);
 
 
-            if ($.fn.DataTable.isDataTable('#kategori-table')) {
-                $('#kategori-table').DataTable().destroy();
+            if ($.fn.DataTable.isDataTable(`#${table}`)) {
+                $(`#${table}`).DataTable().destroy();
             }
 
-            $('#kategori-table').DataTable({
+            $(`#${table}`).DataTable({
                 responsive: true,
                 lengthChange: false,
                 autoWidth: false,
                 buttons: ["copy", "csv", "excel", "pdf", "print"]
-            }).buttons().container().appendTo('#kategori-table_wrapper .col-md-6:eq(0)');
+            }).buttons().container().appendTo(`#${table}_wrapper .col-md-6:eq(0)`);
         }
 
         getData();

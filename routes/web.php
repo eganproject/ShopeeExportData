@@ -45,6 +45,7 @@ Route::group(['prefix' => 'performa-produk'], function () {
     Route::get('/compare-sales/kategori', [CompareSalesController::class, 'kategori'])->name('compareSales.kategori');
     Route::get('/compare-sales/kategori/{id}', [CompareSalesController::class, 'show'])->name('compareSales.show');
     Route::get('/compare-sales/kategori/detail-kategori/{id}', [CompareSalesController::class, 'getDetailKategori'])->name('compareSales.getDetailKategori');
+    Route::get('/compare-sales/kategori/get-sub-kategori/{id}', [CompareSalesController::class, 'getSubKategori'])->name('compareSales.getSubKategori');
     Route::resource('/shops', ShopController::class);
 
 });
