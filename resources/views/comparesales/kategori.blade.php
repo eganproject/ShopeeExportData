@@ -46,8 +46,13 @@
                                 <th colspan="3" class="text-center">Periode 3</th>
                                 <th rowspan="2" class="text-center">Selisih P3-P4</th>
                                 <th colspan="3" class="text-center">Periode 4</th>
+                                <th rowspan="2" class="text-center">Selisih P4-P5</th>
+                                <th colspan="3" class="text-center">Periode 5</th>
                             </tr>
                             <tr>
+                                <th class="text-center">Shopee</th>
+                                <th class="text-center">Tiktok</th>
+                                <th class="text-center">Total</th>
                                 <th class="text-center">Shopee</th>
                                 <th class="text-center">Tiktok</th>
                                 <th class="text-center">Total</th>
@@ -182,6 +187,11 @@
                     s: 0,
                     t: 0,
                     tot: 0
+                },
+                5: {
+                    s: 0,
+                    t: 0,
+                    tot: 0
                 }
             };
 
@@ -207,13 +217,19 @@
                 let t4 = item.pendapatan_tiktok_per_4 || 0;
                 let tot4 = item.pendapatan_per_4 || (s4 + t4);
 
+                let s5 = item.pendapatan_shopee_per_5 || 0;
+                let t5 = item.pendapatan_tiktok_per_5 || 0;
+                let tot5 = item.pendapatan_per_5 || (s5 + t5);
+
                 // Selisih & Persen
                 let d12 = tot2 - tot1;
                 let d23 = tot3 - tot2;
                 let d34 = tot4 - tot3;
+                let d45 = tot5 - tot4;
                 let pct12 = tot1 > 0 ? (d12 / tot1) * 100 : null;
                 let pct23 = tot2 > 0 ? (d23 / tot2) * 100 : null;
                 let pct34 = tot3 > 0 ? (d34 / tot3) * 100 : null;
+                let pct45 = tot4 > 0 ? (d45 / tot4) * 100 : null;
 
                 const row = `
                     <tr>
@@ -235,6 +251,10 @@
                         <td>${formatRupiah(s4)}</td>
                         <td>${formatRupiah(t4)}</td>
                         <td>${formatRupiah(tot4)}</td>
+                        <td>${renderSelisih(d45, pct45, tot4)}</td>
+                        <td>${formatRupiah(s5)}</td>
+                        <td>${formatRupiah(t5)}</td>
+                        <td>${formatRupiah(tot5)}</td>
                     </tr>
                 `;
 
@@ -256,6 +276,10 @@
                 sum[4].s += parseFloat(s4) || 0;
                 sum[4].t += parseFloat(t4) || 0;
                 sum[4].tot += parseFloat(tot4) || 0;
+                
+                sum[5].s += parseFloat(s5) || 0;
+                sum[5].t += parseFloat(t5) || 0;
+                sum[5].tot += parseFloat(tot5) || 0;
 
                 $('#kategori-table tbody').append(row);
             });
@@ -263,11 +287,11 @@
 
             let tfoot = `<tr class="fw-semibold">
     <td colspan="2" class="text-end">Total:</td>`;
-            for (let p = 1; p <= 4; p++) {
+            for (let p = 1; p <= 5; p++) {
                 tfoot += `<td>${formatRupiah(sum[p].s)}</td>
               <td>${formatRupiah(sum[p].t)}</td>
               <td>${formatRupiah(sum[p].tot)}</td>`;
-                if (p < 4) {
+                if (p < 5) {
                     tfoot += `<td>${formatRupiah(sum[p].diff)}</td>`;
                 }
             }

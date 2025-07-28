@@ -159,12 +159,12 @@ class CompareSalesController extends Controller
                     MultiComparativeFSalesThree::insert($rowsToInsert);
                     $count = count($rowsToInsert);
                 });
-            } elseif ($request->periode_ke == 4){
+            } elseif ($request->periode_ke == 4) {
                 DB::transaction(function () use ($rowsToInsert, &$count) {
                     MultiComparativeFSalesFour::insert($rowsToInsert);
                     $count = count($rowsToInsert);
                 });
-            }elseif ($request->periode_ke == 5){
+            } elseif ($request->periode_ke == 5) {
                 DB::transaction(function () use ($rowsToInsert, &$count) {
                     MultiComparativeFSalesFive::insert($rowsToInsert);
                     $count = count($rowsToInsert);
@@ -180,9 +180,9 @@ class CompareSalesController extends Controller
 
     public function reset(Request $request)
     {
-        if($request->periode) {
+        if ($request->periode) {
             DB::table("multi_comparative_f_$request->periode")->truncate();
-        }else{
+        } else {
             DB::table('multi_comparative_f_sales')->truncate();
             DB::table('multi_comparative_f_sales_twos')->truncate();
             DB::table('multi_comparative_f_sales_threes')->truncate();
@@ -352,13 +352,13 @@ class CompareSalesController extends Controller
                 ? "AND shop_id = $toko"
                 : "";
 
-            $kategori = DB::select("      SELECT id, nama_kategori, SUM(pendapatan_per_1) AS pendapatan_per_1, SUM(pendapatan_per_2) AS pendapatan_per_2, SUM(pendapatan_per_3) AS pendapatan_per_3, SUM(pendapatan_per_4) AS pendapatan_per_4,SUM(pendapatan_shopee_per_1) AS pendapatan_shopee_per_1,
+            $kategori = DB::select("      SELECT id, nama_kategori, SUM(pendapatan_per_1) AS pendapatan_per_1, SUM(pendapatan_per_2) AS pendapatan_per_2, SUM(pendapatan_per_3) AS pendapatan_per_3, SUM(pendapatan_per_4) AS pendapatan_per_4, SUM(pendapatan_per_5) AS pendapatan_per_5,SUM(pendapatan_shopee_per_1) AS pendapatan_shopee_per_1,
 		SUM(pendapatan_tiktok_per_1) AS pendapatan_tiktok_per_1,SUM(pendapatan_shopee_per_2) AS pendapatan_shopee_per_2,
 		SUM(pendapatan_tiktok_per_2) AS pendapatan_tiktok_per_2,SUM(pendapatan_shopee_per_3) AS pendapatan_shopee_per_3,	SUM(pendapatan_tiktok_per_3) AS pendapatan_tiktok_per_3,
-		SUM(pendapatan_shopee_per_4) AS pendapatan_shopee_per_4,	SUM(pendapatan_tiktok_per_4) AS pendapatan_tiktok_per_4
+		SUM(pendapatan_shopee_per_4) AS pendapatan_shopee_per_4,	SUM(pendapatan_tiktok_per_4) AS pendapatan_tiktok_per_4,SUM(pendapatan_shopee_per_5) AS pendapatan_shopee_per_5, SUM(pendapatan_tiktok_per_5) AS pendapatan_tiktok_per_5
 		  FROM (
 			   SELECT *, ac.pendapatan_shopee_per_1 + pendapatan_tiktok_per_1 AS pendapatan_per_1, ac.pendapatan_shopee_per_2 + pendapatan_tiktok_per_2 AS pendapatan_per_2,
-				ac.pendapatan_shopee_per_3 + pendapatan_tiktok_per_3 AS pendapatan_per_3,ac.pendapatan_shopee_per_4 + pendapatan_tiktok_per_4 AS pendapatan_per_4
+				ac.pendapatan_shopee_per_3 + pendapatan_tiktok_per_3 AS pendapatan_per_3,ac.pendapatan_shopee_per_4 + pendapatan_tiktok_per_4 AS pendapatan_per_4,ac.pendapatan_shopee_per_5 + pendapatan_tiktok_per_5 AS pendapatan_per_5
 FROM (
 SELECT a.id, a.nama_kategori, b.product_code AS sku, 
 				IFNULL(c.nama_produk, '-') as nama_produk, 
@@ -366,10 +366,12 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
 				IFNULL(d.pendapatan_shopee,0) AS pendapatan_shopee_per_2, 
 				IFNULL(g.pendapatan_shopee,0) AS pendapatan_shopee_per_3,
 				IFNULL(i.pendapatan_shopee,0) AS pendapatan_shopee_per_4,
+				IFNULL(k.pendapatan_shopee,0) AS pendapatan_shopee_per_5,
 				IFNULL(e.pendapatan_tiktok,0) AS pendapatan_tiktok_per_1, 
 				IFNULL(f.pendapatan_tiktok,0) AS pendapatan_tiktok_per_2, 
 				IFNULL(h.pendapatan_tiktok,0) AS pendapatan_tiktok_per_3, 
-				IFNULL(j.pendapatan_tiktok,0) AS pendapatan_tiktok_per_4
+				IFNULL(j.pendapatan_tiktok,0) AS pendapatan_tiktok_per_4,
+				IFNULL(l.pendapatan_tiktok,0) AS pendapatan_tiktok_per_5
                      FROM kategori_produks AS a
                      JOIN product_codes AS b ON a.id = b.kategori_id 
                      LEFT JOIN (
@@ -420,7 +422,19 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
                               WHERE platform = 'Tiktok' $filterToko
                               GROUP BY sku
                      ) AS j ON b.product_code = j.sku
-                     
+                          LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                              FROM multi_comparative_f_sales_fives
+                              WHERE platform = 'Shopee' $filterToko
+                              GROUP BY sku
+                     ) AS k ON b.product_code = k.sku
+                      LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                              FROM multi_comparative_f_sales_fives
+                              WHERE platform = 'Tiktok' $filterToko
+                              GROUP BY sku
+                     ) AS l ON b.product_code = l.sku
+                     WHERE a.parent_id = 0
          ) AS ac
       ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");
             // Ekstrak labels & data
@@ -459,7 +473,8 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
             : "";
 
         $kategori = DB::select("SELECT *, ac.pendapatan_shopee_per_1 + pendapatan_tiktok_per_1 AS pendapatan_per_1, ac.pendapatan_shopee_per_2 + pendapatan_tiktok_per_2 AS pendapatan_per_2,
-				ac.pendapatan_shopee_per_3 + pendapatan_tiktok_per_3 AS pendapatan_per_3,ac.pendapatan_shopee_per_4 + pendapatan_tiktok_per_4 AS pendapatan_per_4
+				ac.pendapatan_shopee_per_3 + pendapatan_tiktok_per_3 AS pendapatan_per_3,ac.pendapatan_shopee_per_4 + pendapatan_tiktok_per_4 AS pendapatan_per_4,
+                ac.pendapatan_shopee_per_5 + pendapatan_tiktok_per_5 AS pendapatan_per_5
         FROM (
         SELECT a.id, a.nama_kategori, b.product_code AS sku, 
 				IFNULL(c.nama_produk, '-') as nama_produk, 
@@ -467,10 +482,12 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
 				IFNULL(d.pendapatan_shopee,0) AS pendapatan_shopee_per_2, 
 				IFNULL(g.pendapatan_shopee,0) AS pendapatan_shopee_per_3,
 				IFNULL(i.pendapatan_shopee,0) AS pendapatan_shopee_per_4,
+				IFNULL(k.pendapatan_shopee,0) AS pendapatan_shopee_per_5,
 				IFNULL(e.pendapatan_tiktok,0) AS pendapatan_tiktok_per_1, 
 				IFNULL(f.pendapatan_tiktok,0) AS pendapatan_tiktok_per_2, 
 				IFNULL(h.pendapatan_tiktok,0) AS pendapatan_tiktok_per_3, 
-				IFNULL(j.pendapatan_tiktok,0) AS pendapatan_tiktok_per_4
+				IFNULL(j.pendapatan_tiktok,0) AS pendapatan_tiktok_per_4,
+				IFNULL(l.pendapatan_tiktok,0) AS pendapatan_tiktok_per_5
                      FROM kategori_produks AS a
                      JOIN product_codes AS b ON a.id = b.kategori_id 
                      LEFT JOIN (
@@ -521,6 +538,18 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
                               WHERE platform = 'Tiktok' $filterToko
                               GROUP BY sku
                      ) AS j ON b.product_code = j.sku
+                         LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                              FROM multi_comparative_f_sales_fives
+                              WHERE platform = 'Shopee' $filterToko
+                              GROUP BY sku
+                     ) AS k ON b.product_code = k.sku
+                      LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                              FROM multi_comparative_f_sales_fives
+                              WHERE platform = 'Tiktok' $filterToko
+                              GROUP BY sku
+                     ) AS l ON b.product_code = l.sku
                      
          ) AS ac
                      
@@ -579,13 +608,24 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
                 JOIN multi_comparative_f_sales_fours AS c ON b.product_code = c.sku $filterToko2 
                 WHERE a.id = ?
                 GROUP BY c.tanggal
+                
+                UNION ALL 
+                
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales_fives AS c ON b.product_code = c.sku $filterToko2 
+                WHERE a.id = ?
+                GROUP BY c.tanggal
             ) as combined_sales
             GROUP BY tanggal
             ORDER BY tanggal ASC
         ";
 
         // Menjalankan raw query dengan binding untuk keamanan (mencegah SQL Injection)
-        $results = DB::select($sql, [$id, $id, $id, $id]);
+        $results = DB::select($sql, [$id, $id, $id, $id, $id]);
 
         // Memproses hasil query untuk dijadikan format yang sesuai untuk Chart.js
         $labels = [];
@@ -606,13 +646,13 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
             ? "AND shop_id = $toko"
             : "";
 
-        $kategori = DB::select("SELECT id, nama_kategori, SUM(pendapatan_per_1) AS pendapatan_per_1, SUM(pendapatan_per_2) AS pendapatan_per_2, SUM(pendapatan_per_3) AS pendapatan_per_3, SUM(pendapatan_per_4) AS pendapatan_per_4,SUM(pendapatan_shopee_per_1) AS pendapatan_shopee_per_1,
+        $kategori = DB::select("SELECT id, nama_kategori, SUM(pendapatan_per_1) AS pendapatan_per_1, SUM(pendapatan_per_2) AS pendapatan_per_2, SUM(pendapatan_per_3) AS pendapatan_per_3, SUM(pendapatan_per_4) AS pendapatan_per_4,SUM(pendapatan_per_5) AS pendapatan_per_5,SUM(pendapatan_shopee_per_1) AS pendapatan_shopee_per_1,
 		SUM(pendapatan_tiktok_per_1) AS pendapatan_tiktok_per_1,SUM(pendapatan_shopee_per_2) AS pendapatan_shopee_per_2,
 		SUM(pendapatan_tiktok_per_2) AS pendapatan_tiktok_per_2,SUM(pendapatan_shopee_per_3) AS pendapatan_shopee_per_3,	SUM(pendapatan_tiktok_per_3) AS pendapatan_tiktok_per_3,
-		SUM(pendapatan_shopee_per_4) AS pendapatan_shopee_per_4,	SUM(pendapatan_tiktok_per_4) AS pendapatan_tiktok_per_4
+		SUM(pendapatan_shopee_per_4) AS pendapatan_shopee_per_4,	SUM(pendapatan_tiktok_per_4) AS pendapatan_tiktok_per_4,SUM(pendapatan_shopee_per_5) AS pendapatan_shopee_per_5, SUM(pendapatan_tiktok_per_5) AS pendapatan_tiktok_per_5
 		  FROM (
 			   SELECT *, ac.pendapatan_shopee_per_1 + pendapatan_tiktok_per_1 AS pendapatan_per_1, ac.pendapatan_shopee_per_2 + pendapatan_tiktok_per_2 AS pendapatan_per_2,
-				ac.pendapatan_shopee_per_3 + pendapatan_tiktok_per_3 AS pendapatan_per_3,ac.pendapatan_shopee_per_4 + pendapatan_tiktok_per_4 AS pendapatan_per_4
+				ac.pendapatan_shopee_per_3 + pendapatan_tiktok_per_3 AS pendapatan_per_3,ac.pendapatan_shopee_per_4 + pendapatan_tiktok_per_4 AS pendapatan_per_4, ac.pendapatan_shopee_per_5 + pendapatan_tiktok_per_5 AS pendapatan_per_5
 FROM (
 SELECT a.id, a.nama_kategori, b.product_code AS sku, 
 				IFNULL(c.nama_produk, '-') as nama_produk, 
@@ -620,10 +660,12 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
 				IFNULL(d.pendapatan_shopee,0) AS pendapatan_shopee_per_2, 
 				IFNULL(g.pendapatan_shopee,0) AS pendapatan_shopee_per_3,
 				IFNULL(i.pendapatan_shopee,0) AS pendapatan_shopee_per_4,
+				IFNULL(k.pendapatan_shopee,0) AS pendapatan_shopee_per_5,
 				IFNULL(e.pendapatan_tiktok,0) AS pendapatan_tiktok_per_1, 
 				IFNULL(f.pendapatan_tiktok,0) AS pendapatan_tiktok_per_2, 
 				IFNULL(h.pendapatan_tiktok,0) AS pendapatan_tiktok_per_3, 
-				IFNULL(j.pendapatan_tiktok,0) AS pendapatan_tiktok_per_4
+				IFNULL(j.pendapatan_tiktok,0) AS pendapatan_tiktok_per_4,
+				IFNULL(l.pendapatan_tiktok,0) AS pendapatan_tiktok_per_5
                      FROM kategori_produks AS a
                      JOIN product_codes AS b ON a.id = b.kategori_id 
                      LEFT JOIN (
@@ -674,7 +716,20 @@ SELECT a.id, a.nama_kategori, b.product_code AS sku,
                               WHERE platform = 'Tiktok'  $filterToko
                               GROUP BY sku
                      ) AS j ON b.product_code = j.sku
+                           LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                              FROM multi_comparative_f_sales_fives
+                              WHERE platform = 'Shopee' $filterToko
+                              GROUP BY sku
+                     ) AS k ON b.product_code = k.sku
+                      LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                              FROM multi_comparative_f_sales_fives
+                              WHERE platform = 'Tiktok' $filterToko
+                              GROUP BY sku
+                     ) AS l ON b.product_code = l.sku
                      WHERE a.parent_id = $id
+                     
                      
          ) AS ac 
       ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");

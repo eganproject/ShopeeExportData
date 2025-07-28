@@ -80,6 +80,9 @@
                                         <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
                                             Selisih (P3-P4)</th>
                                         <th colspan="3" class="text-center align-middle">Periode 4</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P4-P5)</th>
+                                        <th colspan="3" class="text-center align-middle">Periode 5</th>
                                     </tr>
                                     <tr>
                                         <th>Shopee (P1)</th>
@@ -94,6 +97,9 @@
                                         <th>Shopee (P4)</th>
                                         <th>Tiktok (P4)</th>
                                         <th>Total (P4)</th>
+                                        <th>Shopee (P5)</th>
+                                        <th>Tiktok (P5)</th>
+                                        <th>Total (P5)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -133,6 +139,9 @@
                                         <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
                                             Selisih (P3-P4)</th>
                                         <th colspan="3" class="text-center align-middle">Periode 4</th>
+                                        <th rowspan="2" style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P4-P5)</th>
+                                        <th colspan="3" class="text-center align-middle">Periode 5</th>
                                     </tr>
                                     <tr>
                                         <th>Shopee (P1)</th>
@@ -147,6 +156,9 @@
                                         <th>Shopee (P4)</th>
                                         <th>Tiktok (P4)</th>
                                         <th>Total (P4)</th>
+                                        <th>Shopee (P5)</th>
+                                        <th>Tiktok (P5)</th>
+                                        <th>Total (P5)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -227,6 +239,7 @@
             const valuesP2 = data.map(i => i.pendapatan_per_2);
             const valuesP3 = data.map(i => i.pendapatan_per_3);
             const valuesP4 = data.map(i => i.pendapatan_per_4);
+            const valuesP5 = data.map(i => i.pendapatan_per_5);
 
 
 
@@ -235,12 +248,14 @@
                 parseFloat(i
                     .pendapatan_shopee_per_2 || 0) + parseFloat(i
                     .pendapatan_shopee_per_3 || 0) + parseFloat(i
-                    .pendapatan_shopee_per_4 || 0), 0);
+                    .pendapatan_shopee_per_4 || 0) + parseFloat(i
+                    .pendapatan_shopee_per_5 || 0), 0);
             const totalT = data.reduce((sum, i) => sum + parseFloat(i.pendapatan_tiktok_per_1 || 0) +
                 parseFloat(i
                     .pendapatan_tiktok_per_2 || 0) + parseFloat(i
                     .pendapatan_tiktok_per_3 || 0) + parseFloat(i
-                    .pendapatan_tiktok_per_4 || 0), 0);
+                    .pendapatan_tiktok_per_4 || 0) + parseFloat(i
+                    .pendapatan_tiktok_per_5 || 0), 0);
 
             const total = totalS + totalT;
             const persentaseS = (totalS / total) * 100;
@@ -309,6 +324,12 @@
                         }, {
                             label: 'Pendapatan Periode 4',
                             data: sortedAll.map(i => i.pendapatan_per_4),
+                            backgroundColor: 'rgba(50, 99, 190, 0.8)',
+                            borderColor: 'rgba(50, 99, 190, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: 'Pendapatan Periode 5',
+                            data: sortedAll.map(i => i.pendapatan_per_5),
                             backgroundColor: 'rgba(50, 99, 190, 0.8)',
                             borderColor: 'rgba(50, 99, 190, 1)',
                             borderWidth: 1
@@ -461,7 +482,13 @@
                     s: 0,
                     t: 0,
                     tot: 0
+                },
+                5: {
+                    s: 0,
+                    t: 0,
+                    tot: 0
                 }
+
             };
 
             // Render data
@@ -486,13 +513,20 @@
                 let t4 = item.pendapatan_tiktok_per_4 || 0;
                 let tot4 = item.pendapatan_per_4 || (s4 + t4);
 
+                // Periode 5
+                let s5 = item.pendapatan_shopee_per_5 || 0;
+                let t5 = item.pendapatan_tiktok_per_5 || 0;
+                let tot5 = item.pendapatan_per_5 || (s5 + t5);
+
                 // Selisih & Persen
                 let d12 = tot2 - tot1;
                 let d23 = tot3 - tot2;
                 let d34 = tot4 - tot3;
+                let d45 = tot5 - tot4;
                 let pct12 = tot1 > 0 ? (d12 / tot1) * 100 : null;
                 let pct23 = tot2 > 0 ? (d23 / tot2) * 100 : null;
                 let pct34 = tot3 > 0 ? (d34 / tot3) * 100 : null;
+                let pct45 = tot4 > 0 ? (d45 / tot4) * 100 : null;
 
                 const row = `
                     <tr>
@@ -514,6 +548,10 @@
                         <td>${formatRupiah(s4)}</td>
                         <td>${formatRupiah(t4)}</td>
                         <td>${formatRupiah(tot4)}</td>
+                        <td>${renderSelisih(d45, pct45, tot4)}</td>
+                        <td>${formatRupiah(s5)}</td>
+                        <td>${formatRupiah(t5)}</td>
+                        <td>${formatRupiah(tot5)}</td>
                     </tr>
                 `;
 
@@ -536,17 +574,21 @@
                 sum[4].t += parseFloat(t4) || 0;
                 sum[4].tot += parseFloat(tot4) || 0;
 
+                sum[5].s += parseFloat(s5) || 0;
+                sum[5].t += parseFloat(t5) || 0;
+                sum[5].tot += parseFloat(tot5) || 0;
+
                 $(`#${table} tbody`).append(row);
             });
 
 
             let tfoot = `<tr class="fw-semibold">
     <td colspan="${table === 'kategori-table' ? 3 : 2}" class="text-end">Total:</td>`;
-            for (let p = 1; p <= 4; p++) {
+            for (let p = 1; p <= 5; p++) {
                 tfoot += `<td>${formatRupiah(sum[p].s)}</td>
               <td>${formatRupiah(sum[p].t)}</td>
               <td>${formatRupiah(sum[p].tot)}</td>`;
-                if (p < 4) {
+                if (p < 5) {
                     tfoot += `<td>${formatRupiah(sum[p].diff)}</td>`;
                 }
             }
