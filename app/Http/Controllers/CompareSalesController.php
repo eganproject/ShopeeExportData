@@ -198,7 +198,8 @@ class CompareSalesController extends Controller
     {
         if ($request->periode == 'periode_1') {
             $data = DB::table('multi_comparative_f_sales')
-                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
+                SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
                 ->groupBy('platform')
                 ->get();
 
@@ -207,18 +208,21 @@ class CompareSalesController extends Controller
                 'datasets' => [
                     [
                         'label' => 'Jumlah Penjualan',
-                        'data' => $data->pluck('jumlah_penjualan'),
+                        'data' => $data->pluck('jumlah_penjualan_current'),
                         'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderWidth' => 1
                     ]
-                ]
+                ],
+                'jumlah_penjualan_current' => $data->pluck('jumlah_penjualan_current'),
+                'jumlah_penjualan_previous' => $data->pluck('jumlah_penjualan_previous'),
             ];
 
             return response()->json($chartData);
         } else if ($request->periode == 'periode_2') {
             $data = DB::table('multi_comparative_f_sales_twos')
-                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
+                SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
                 ->groupBy('platform')
                 ->get();
 
@@ -227,18 +231,21 @@ class CompareSalesController extends Controller
                 'datasets' => [
                     [
                         'label' => 'Jumlah Penjualan',
-                        'data' => $data->pluck('jumlah_penjualan'),
+                        'data' => $data->pluck('jumlah_penjualan_current'),
                         'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderWidth' => 1
                     ]
-                ]
+                ],
+                'jumlah_penjualan_current' => $data->pluck('jumlah_penjualan_current'),
+                'jumlah_penjualan_previous' => $data->pluck('jumlah_penjualan_previous'),
             ];
 
             return response()->json($chartData);
         } else if ($request->periode == 'periode_3') {
             $data = DB::table('multi_comparative_f_sales_threes')
-                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
+                SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
                 ->groupBy('platform')
                 ->get();
 
@@ -247,19 +254,22 @@ class CompareSalesController extends Controller
                 'datasets' => [
                     [
                         'label' => 'Jumlah Penjualan',
-                        'data' => $data->pluck('jumlah_penjualan'),
+                        'data' => $data->pluck('jumlah_penjualan_current'),
                         'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderWidth' => 1
                     ]
-                ]
+                ],
+                'jumlah_penjualan_current' => $data->pluck('jumlah_penjualan_current'),
+                'jumlah_penjualan_previous' => $data->pluck('jumlah_penjualan_previous'),
             ];
 
             return response()->json($chartData);
         } else if ($request->periode == 'periode_4') {
 
             $data = DB::table('multi_comparative_f_sales_fours')
-                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
+                SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
                 ->groupBy('platform')
                 ->get();
 
@@ -268,33 +278,39 @@ class CompareSalesController extends Controller
                 'datasets' => [
                     [
                         'label' => 'Jumlah Penjualan',
-                        'data' => $data->pluck('jumlah_penjualan'),
+                        'data' => $data->pluck('jumlah_penjualan_current'),
                         'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderWidth' => 1
                     ]
-                ]
+                ],
+                'jumlah_penjualan_current' => $data->pluck('jumlah_penjualan_current'),
+                'jumlah_penjualan_previous' => $data->pluck('jumlah_penjualan_previous'),
             ];
 
             return response()->json($chartData);
         } else if ($request->periode == 'periode_5') {
 
             $data = DB::table('multi_comparative_f_sales_fives')
-                ->selectRaw('SUM(pendapatan) AS jumlah_penjualan, platform as labels')
+                ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
+                SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
                 ->groupBy('platform')
                 ->get();
 
+            // dd($data);
             $chartData = [
                 'labels' => $data->pluck('labels'),
                 'datasets' => [
                     [
                         'label' => 'Jumlah Penjualan',
-                        'data' => $data->pluck('jumlah_penjualan'),
+                        'data' => $data->pluck('jumlah_penjualan_current'),
                         'backgroundColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderColor' => ['rgba(230, 84, 0, 0.8)', 'rgba(41, 41, 41, 0.8)'],
                         'borderWidth' => 1
                     ]
-                ]
+                ],
+                'jumlah_penjualan_current' => $data->pluck('jumlah_penjualan_current'),
+                'jumlah_penjualan_previous' => $data->pluck('jumlah_penjualan_previous'),
             ];
 
             return response()->json($chartData);
@@ -307,6 +323,7 @@ class CompareSalesController extends Controller
 
             $rows = DB::table('multi_comparative_f_sales')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
+                ->where('month_status', 'current')
                 ->groupBy('sku')
                 ->orderByDesc('total')
                 ->limit(10)
@@ -315,6 +332,7 @@ class CompareSalesController extends Controller
 
             $rows = DB::table('multi_comparative_f_sales_twos')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
+                ->where('month_status', 'current')
                 ->groupBy('sku')
                 ->orderByDesc('total')
                 ->limit(10)
@@ -322,13 +340,23 @@ class CompareSalesController extends Controller
         } else if ($request->periode == 'periode_3') {
             $rows = DB::table('multi_comparative_f_sales_threes')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
+                ->where('month_status', 'current')
                 ->groupBy('sku')
                 ->orderByDesc('total')
                 ->limit(10)
                 ->get();
-        } else {
+        } else if ($request->periode == 'periode_4') {
             $rows = DB::table('multi_comparative_f_sales_fours')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
+                ->where('month_status', 'current')
+                ->groupBy('sku')
+                ->orderByDesc('total')
+                ->limit(10)
+                ->get();
+        } else if ($request->periode == 'periode_5') {
+            $rows = DB::table('multi_comparative_f_sales_fives')
+                ->select('sku', DB::raw('SUM(pendapatan) as total'))
+                ->where('month_status', 'current')
                 ->groupBy('sku')
                 ->orderByDesc('total')
                 ->limit(10)
@@ -819,7 +847,7 @@ class CompareSalesController extends Controller
     public function getSubKategori(Request $request, $id)
     {
         $toko = $request->input('shop_id', 'semua');
-       
+
         $filterToko = $toko !== 'semua'
             ? "AND shop_id = $toko"
             : "";
@@ -1011,7 +1039,7 @@ class CompareSalesController extends Controller
                      WHERE a.parent_id = $id
          ) AS ac
       ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");
-     
+
 
         return response()->json(["subkategori" => $kategori]);
     }

@@ -221,12 +221,13 @@
             <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
-                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                        <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
                         <div class="ms-3">
                             <h5 class="fw-bold">Total Periode 1</h5>
                             <p class="card-text fs-4" id="totalPeriode1">Rp 0</p>
+                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode1">Rp 0</p>
                             <button type="button" onclick="resetDataPeriode('sales')"
                                 class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
                         </div>
@@ -236,12 +237,13 @@
             <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
-                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                          <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
                         <div class="ms-3">
                             <h5 class="fw-bold">Total Periode 2</h5>
                             <p class="card-text fs-4" id="totalPeriode2">Rp 0</p>
+                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode2">Rp 0</p>
                             <button type="button" onclick="resetDataPeriode('sales_twos')"
                                 class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
                         </div>
@@ -251,12 +253,13 @@
             <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
-                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                          <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
                         <div class="ms-3">
                             <h5 class="fw-bold">Total Periode 3</h5>
                             <p class="card-text fs-4" id="totalPeriode3">Rp 0</p>
+                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode3">Rp 0</p>
                             <button type="button" onclick="resetDataPeriode('sales_threes')"
                                 class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
                         </div>
@@ -266,12 +269,13 @@
             <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
-                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                          <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
                         <div class="ms-3">
                             <h5 class="fw-bold">Total Periode 4</h5>
                             <p class="card-text fs-4" id="totalPeriode4">Rp 0</p>
+                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode4">Rp 0</p>
                             <button type="button" onclick="resetDataPeriode('sales_fours')"
                                 class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
                         </div>
@@ -281,12 +285,13 @@
             <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
-                        <div class="icon-bg" style="background-color: #e7f3ff;">
+                          <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
                         <div class="ms-3">
                             <h5 class="fw-bold">Total Periode 5</h5>
                             <p class="card-text fs-4" id="totalPeriode5">Rp 0</p>
+                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode5">Rp 0</p>
                             <button type="button" onclick="resetDataPeriode('sales_fives')"
                                 class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
                         </div>
@@ -534,18 +539,23 @@
                     success: function(res) {
                         console.log('res', res);
                         const ctx = document.getElementById(canvasId).getContext('2d');
-                        var total_periode = res.datasets.reduce((sum, dataset) =>
-                            sum + dataset.data.reduce((a, b) => Number(a) + Number(b), 0), 0);
+                        var periode_current = res.jumlah_penjualan_current.reduce((a, b) => Number(a) + Number(b), 0);
+                        var periode_previous = res.jumlah_penjualan_previous.reduce((a, b) => Number(a) + Number(b), 0);
                         if (periode == 'periode_1') {
-                            $('#totalPeriode1').text('Rp ' + total_periode.toLocaleString());
+                            $('#totalPeriode1').text('Rp ' + periode_current.toLocaleString());
+                            $('#prev_totalPeriode1').text('Rp ' + periode_previous.toLocaleString());
                         } else if (periode == 'periode_2') {
-                            $('#totalPeriode2').text('Rp ' + total_periode.toLocaleString());
+                            $('#totalPeriode2').text('Rp ' + periode_current.toLocaleString());
+                              $('#prev_totalPeriode2').text('Rp ' + periode_previous.toLocaleString());
                         } else if (periode == 'periode_3') {
-                            $('#totalPeriode3').text('Rp ' + total_periode.toLocaleString());
+                            $('#totalPeriode3').text('Rp ' + periode_current.toLocaleString());
+                              $('#prev_totalPeriode3').text('Rp ' + periode_previous.toLocaleString());
                         } else if (periode == 'periode_4') {
-                            $('#totalPeriode4').text('Rp ' + total_periode.toLocaleString());
+                            $('#totalPeriode4').text('Rp ' + periode_current.toLocaleString());
+                              $('#prev_totalPeriode4').text('Rp ' + periode_previous.toLocaleString());
                         } else if (periode == 'periode_5') {
-                            $('#totalPeriode5').text('Rp ' + total_periode.toLocaleString());
+                            $('#totalPeriode5').text('Rp ' + periode_current.toLocaleString());
+                              $('#prev_totalPeriode5').text('Rp ' + periode_previous.toLocaleString());
                         }
                         new Chart(ctx, {
                             type: 'pie',
@@ -584,6 +594,9 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(res) {
+                        if(periode == 'periode_5'){
+                            console.log('res : ', res)
+                        }
                         const ctx = document.getElementById(canvasId).getContext('2d');
                         new Chart(ctx, {
                             type: 'bar', // bar chart untuk top 10
