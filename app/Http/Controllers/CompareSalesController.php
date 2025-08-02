@@ -592,7 +592,7 @@ class CompareSalesController extends Controller
         $shops = Shop::all();
         $kategori = KategoriProduk::find($id);
 
-        return view("comparesales.show", compact(['kategori', 'shops']));
+        return view("comparesales.show_1", compact(['kategori', 'shops']));
     }
 
     function getDetailKategori(Request $request, $id)
