@@ -19,12 +19,16 @@
                     <canvas id="kategoriPieChart" style="max-height: 300px;"></canvas>
                 </div>
                 <hr class="my-4 border border-2 border-dark rounded-pill">
-                <div class="row mb-4">
+                <h1 class="fw-bold mb-0 text-center" id="namaToko">Nama Toko</h1>
+                <h5 class="text-muted text-center" id="namaChannel">Channel</h5>
+
+                <hr>
+                <div class="row m-4">
                     <div class="col-lg-4 d-flex justify-content-between align-items-center  gap-4">
                         <label for="toko" class="form-label">Toko</label>
                         <select class="form-select" aria-label="Default select example" id="toko"
                             onchange="getDataHere()">
-                            <option value="semua">Semua</option>
+                            <option value="semua">Semua Toko</option>
                             @foreach ($shops as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                             @endforeach
@@ -35,7 +39,7 @@
                         <label for="channel" class="form-label">Channel</label>
                         <select class="form-select" aria-label="Default select example" id="channel"
                             onchange="changeChannel()">
-                            <option value="semua">Semua</option>
+                            <option value="semua">Semua Channel</option>
                             <option value="shopee">Shopee</option>
                             <option value="tiktok">Tiktok</option>
 
@@ -157,6 +161,12 @@
 
 
         function generateTable() {
+            var tokoName = $('#toko option:selected').text()
+            var channelName = $('#channel option:selected').text()
+            
+            $('#namaToko').text(tokoName)
+            $('#namaChannel').text(channelName)
+            
             var channel = $('#channel').val()
 
             var data = window.cachedKategoriData;
@@ -223,10 +233,10 @@
                 },
             };
 
-            
+
             //         // Render data
             $.each(data, function(index, item) {
-                
+
                 // Periode 1
                 let prev_p1 = channel == 'semua' ? item.prev_pendapatan_per_1 : channel == 'shopee' ? item
                     .prev_pendapatan_shopee_per_1 : item.prev_pendapatan_tiktok_per_1;
