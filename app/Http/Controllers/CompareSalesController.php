@@ -582,7 +582,7 @@ class CompareSalesController extends Controller
         }
 
         $shops = Shop::all();
-        return view('comparesales.kategori', compact('shops'));
+        return view('comparesales.kategori_1', compact('shops'));
     }
 
 
