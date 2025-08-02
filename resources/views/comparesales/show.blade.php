@@ -7,6 +7,44 @@
 
 @section('content')
     <div class="container-fluid">
+        {{-- <div class="col-lg-12">
+                <div class="card custom-card">
+                    <div class="card-body">
+                        <h5 class="fw-semibold mb-3 text-center">Kategori</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="subkategori-table" style="width:100%;">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th rowspan="2" class="text-center align-middle">No</th>
+                                        <th style="min-width: 200px;" rowspan="2" class="text-center align-middle">Sub
+                                            Kategori
+                                        </th>
+                                        <th  class="text-center align-middle">Periode 1</th>
+                                        <th  style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P1-P2)</th>
+                                        <th  class="text-center align-middle">Periode 2</th>
+                                        <th  style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P2-P3)</th>
+                                        <th  class="text-center align-middle">Periode 3</th>
+                                        <th  style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P3-P4)</th>
+                                        <th  class="text-center align-middle">Periode 4</th>
+                                        <th  style="min-width: 150px;" class="text-center align-middle">
+                                            Selisih (P4-P5)</th>
+                                        <th  class="text-center align-middle">Periode 5</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                                <tfoot>
+
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> --}}
         {{-- Row 1: Pie Charts Periode 1 & 2 --}}
         <div class="row g-4 mb-4">
             <a href="/performa-produk/compare-sales/kategori" class="btn btn-outline-secondary btn-modern">Kembali</a>
@@ -209,6 +247,7 @@
         }
 
         function getSubKategori() {
+            console.log()
             $.ajax({
                 url: '/performa-produk/compare-sales/kategori/get-sub-kategori/' + {{ $kategori->id }},
                 method: 'GET',
@@ -218,6 +257,7 @@
                 },
                 async: false,
                 success: function(response) {
+
                     putTable(response.subkategori, 'subkategori-table')
                 },
                 error: function(xhr) {
@@ -436,7 +476,9 @@
         }
 
         function putTable(data, table) {
-
+            if ($.fn.DataTable.isDataTable(`#${table}`)) {
+                $(`#${table}`).DataTable().destroy();
+            }
             $(`#${table} tbody`).empty();
 
             function formatRupiah(value) {
@@ -493,6 +535,7 @@
 
             // Render data
             $.each(data, function(index, item) {
+
                 // Periode 1
                 let s1 = item.pendapatan_shopee_per_1 || 0;
                 let t1 = item.pendapatan_tiktok_per_1 || 0;
@@ -555,6 +598,7 @@
                     </tr>
                 `;
 
+
                 sum[1].s += parseFloat(s1) || 0;
                 sum[1].t += parseFloat(t1) || 0;
                 sum[1].tot += parseFloat(tot1) || 0;
@@ -596,9 +640,7 @@
             $(`#${table} tfoot`).html(tfoot);
 
 
-            if ($.fn.DataTable.isDataTable(`#${table}`)) {
-                $(`#${table}`).DataTable().destroy();
-            }
+
 
             $(`#${table}`).DataTable({
                 responsive: true,

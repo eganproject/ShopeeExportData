@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('pendapatan', 20, 2)->default(0);
             $table->string('platform');
             $table->integer('shop_id');
+            $table->enum('month_status',['current','previous'])->default('current');
             $table->timestamps();
         });
     }

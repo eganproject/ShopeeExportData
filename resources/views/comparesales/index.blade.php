@@ -181,6 +181,13 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="mb-3">
+                                <label for="month_status" class="form-label fw-semibold">Status Periode</label>
+                                <select class="form-select" id="month_status" name="month_status" required>
+                                   <option value="current">Saat Ini</option>
+                                   <option value="previous">Sebelumnya</option>
+                                </select>
+                            </div>
                             <div class="d-flex justify-content-center">
                                 <label for="csv-upload" class="custom-file-upload mt-3">
                                     <input type="file" id="csv-upload" name="file" accept=".csv" required />
@@ -455,6 +462,7 @@
                 var platform = $('#platform').val();
                 var periode_ke = $('#periode_ke').val();
                 var shop = $('#shop_id option:selected').text();
+                var shop = $('#month_status option:selected').text();
                 Swal.fire({
                     title: 'Konfirmasi',
                     html: '<ul style="list-style: none; padding: 0;">' +
@@ -462,6 +470,7 @@
                         '<li><strong>Toko :</strong> ' + shop + '</li>' +
                         '<li><strong>Platform:</strong> ' + platform + '</li>' +
                         '<li><strong>Periode Ke:</strong> ' + periode_ke + '</li>' +
+                        '<li><strong>Status Bulan:</strong> ' + periode_ke + '</li>' +
                         '</ul>',
                     icon: 'question',
                     showCancelButton: true,
