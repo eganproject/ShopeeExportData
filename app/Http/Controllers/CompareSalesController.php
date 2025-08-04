@@ -314,7 +314,9 @@ class CompareSalesController extends Controller
     public function reset(Request $request)
     {
         if ($request->periode) {
-            DB::table("multi_comparative_f_$request->periode")->truncate();
+            DB::table("multi_comparative_f_$request->periode")
+                ->where('month_status', $request->month_status)
+                ->delete();
         } else {
             DB::table('multi_comparative_f_sales')->truncate();
             DB::table('multi_comparative_f_sales_twos')->truncate();

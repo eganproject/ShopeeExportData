@@ -203,9 +203,9 @@
                             <div class="d-flex justify-content-center mt-4">
                                 <label for="csv-upload" class="custom-file-upload">
                                     <!--
-                                            CHANGE 1: Add the 'multiple' attribute to allow multiple file selection.
-                                            CHANGE 2: Change name from "file" to "file[]" to send files as an array.
-                                        -->
+                                                                CHANGE 1: Add the 'multiple' attribute to allow multiple file selection.
+                                                                CHANGE 2: Change name from "file" to "file[]" to send files as an array.
+                                                            -->
                                     <input type="file" id="csv-upload" name="file[]" accept=".csv" required multiple />
                                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
                                         fill="currentColor" class="bi bi-cloud-arrow-up-fill text-primary mb-2"
@@ -237,7 +237,8 @@
         <div class="row g-4 mb-4">
             <div class="col-lg-6">
                 <div class="card custom-card">
-                    <div class="card-body d-flex justify-content-center align-items-center">
+
+                    <div class="d-flex justify-content-center align-items-center m-4">
                         <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
@@ -245,15 +246,31 @@
                             <h5 class="fw-bold">Total Periode 1</h5>
                             <p class="card-text fs-4" id="totalPeriode1">Rp 0</p>
                             <p class="fs-7 text-end text-secondary" id="prev_totalPeriode1">Rp 0</p>
-                            <button type="button" onclick="resetDataPeriode('sales')"
-                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
+                        </div>
+
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row gap-2 m-4">
+                        <div class="mb-2 flex-grow-1">
+                            <button type="button" onclick="resetDataPeriode('sales', 'current')"
+                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                <i class="bi bi-trash fs-5 me-2"></i>
+                                Reset Data Periode saat ini
+                            </button>
+                        </div>
+                        <div class="mb-2 flex-grow-1">
+                            <button type="button" onclick="resetDataPeriode('sales', 'previous')"
+                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                <i class="bi bi-trash fs-5 me-2"></i>
+                                Reset Data Periode Sebelumnya
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="card custom-card">
-                    <div class="card-body d-flex justify-content-center align-items-center">
+
+                    <div class="d-flex justify-content-center align-items-center m-4">
                         <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
@@ -261,56 +278,125 @@
                             <h5 class="fw-bold">Total Periode 2</h5>
                             <p class="card-text fs-4" id="totalPeriode2">Rp 0</p>
                             <p class="fs-7 text-end text-secondary" id="prev_totalPeriode2">Rp 0</p>
-                            <button type="button" onclick="resetDataPeriode('sales_twos')"
-                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
+                        </div>
+
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row gap-2 m-4">
+                        <div class="mb-2 flex-grow-1">
+                            <button type="button" onclick="resetDataPeriode('sales_twos', 'current')"
+                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                <i class="bi bi-trash fs-5 me-2"></i>
+                                Reset Data Periode saat ini
+                            </button>
+                        </div>
+                        <div class="mb-2 flex-grow-1">
+                            <button type="button" onclick="resetDataPeriode('sales_twos', 'previous')"
+                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                <i class="bi bi-trash fs-5 me-2"></i>
+                                Reset Data Periode Sebelumnya
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="card custom-card">
-                    <div class="card-body d-flex justify-content-center align-items-center">
-                        <div class="mx-3">
-                            <i class="bi bi-cash-stack fs-2"></i>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="mx-3">
+                                <i class="bi bi-cash-stack fs-2"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold">Total Periode 3</h5>
+                                <p class="card-text fs-4" id="totalPeriode3">Rp 0</p>
+                                <p class="fs-7 text-end text-secondary" id="prev_totalPeriode3">Rp 0</p>
+                            </div>
+
                         </div>
-                        <div class="ms-3">
-                            <h5 class="fw-bold">Total Periode 3</h5>
-                            <p class="card-text fs-4" id="totalPeriode3">Rp 0</p>
-                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode3">Rp 0</p>
-                            <button type="button" onclick="resetDataPeriode('sales_threes')"
-                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
+                        <div class="d-flex flex-column flex-sm-row gap-2">
+                            <div class="mb-2 flex-grow-1">
+                                <button type="button" onclick="resetDataPeriode('sales_threes', 'current')"
+                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                    <i class="bi bi-trash fs-5 me-2"></i>
+                                    Reset Data Periode saat ini
+                                </button>
+                            </div>
+                            <div class="mb-2 flex-grow-1">
+                                <button type="button" onclick="resetDataPeriode('sales_threes', 'previous')"
+                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                    <i class="bi bi-trash fs-5 me-2"></i>
+                                    Reset Data Periode Sebelumnya
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="card custom-card">
-                    <div class="card-body d-flex justify-content-center align-items-center">
-                        <div class="mx-3">
-                            <i class="bi bi-cash-stack fs-2"></i>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center align-items-center">
+
+                            <div class="mx-3">
+                                <i class="bi bi-cash-stack fs-2"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold">Total Periode 4</h5>
+                                <p class="card-text fs-4" id="totalPeriode4">Rp 0</p>
+                                <p class="fs-7 text-end text-secondary" id="prev_totalPeriode4">Rp 0</p>
+                            </div>
+
                         </div>
-                        <div class="ms-3">
-                            <h5 class="fw-bold">Total Periode 4</h5>
-                            <p class="card-text fs-4" id="totalPeriode4">Rp 0</p>
-                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode4">Rp 0</p>
-                            <button type="button" onclick="resetDataPeriode('sales_fours')"
-                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
+                        <div class="d-flex flex-column flex-sm-row gap-2">
+                            <div class="mb-2 flex-grow-1">
+                                <button type="button" onclick="resetDataPeriode('sales_fours', 'current')"
+                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                    <i class="bi bi-trash fs-5 me-2"></i>
+                                    Reset Data Periode saat ini
+                                </button>
+                            </div>
+                            <div class="mb-2 flex-grow-1">
+                                <button type="button" onclick="resetDataPeriode('sales_fours', 'previous')"
+                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                    <i class="bi bi-trash fs-5 me-2"></i>
+                                    Reset Data Periode Sebelumnya
+                                </button>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="card custom-card">
-                    <div class="card-body d-flex justify-content-center align-items-center">
-                        <div class="mx-3">
-                            <i class="bi bi-cash-stack fs-2"></i>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center align-items-center">
+
+                            <div class="mx-3">
+                                <i class="bi bi-cash-stack fs-2"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold">Total Periode 5</h5>
+                                <p class="card-text fs-4" id="totalPeriode5">Rp 0</p>
+                                <p class="fs-7 text-end text-secondary" id="prev_totalPeriode5">Rp 0</p>
+                            </div>
+
                         </div>
-                        <div class="ms-3">
-                            <h5 class="fw-bold">Total Periode 5</h5>
-                            <p class="card-text fs-4" id="totalPeriode5">Rp 0</p>
-                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode5">Rp 0</p>
-                            <button type="button" onclick="resetDataPeriode('sales_fives')"
-                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2">Reset Data Periode ini</button>
+                        <div class="d-flex flex-column flex-sm-row gap-2">
+                            <div class="mb-2 flex-grow-1">
+                                <button type="button" onclick="resetDataPeriode('sales_fives', 'current')"
+                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                    <i class="bi bi-trash fs-5 me-2"></i>
+                                    Reset Data Periode saat ini
+                                </button>
+                            </div>
+                            <div class="mb-2 flex-grow-1">
+                                <button type="button" onclick="resetDataPeriode('sales_fives', 'previous')"
+                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
+                                    <i class="bi bi-trash fs-5 me-2"></i>
+                                    Reset Data Periode Sebelumnya
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -721,10 +807,10 @@
 
         });
 
-        function resetDataPeriode(periode) {
+        function resetDataPeriode(periode, month_status) {
             Swal.fire({
                 title: 'Konfirmasi',
-                text: `Apakah Anda yakin ingin mereset data periode ke ${periode} ?`,
+                text: `Apakah Anda yakin ingin mereset data periode ke ${periode} pada ${month_status} ?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Ya',
@@ -736,7 +822,8 @@
                         type: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
-                            periode: periode
+                            periode: periode,
+                            month_status: month_status
                         },
                         success: function(response) {
                             if (response.success) {

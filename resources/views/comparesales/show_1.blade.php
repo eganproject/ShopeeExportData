@@ -617,17 +617,14 @@
                 }).replace(/\B(?=(\d{3})+(?!\d))/g, '.').replace(/\.00$/, '');
             }
 
-            function renderSelisih(diff, pct, total) {
-                if (total > 0) {
-                    let icon = diff > 0 ? '▲' : diff < 0 ? '▼' : '';
-                    let color = diff > 0 ? 'text-success' : diff < 0 ? 'text-danger' : '';
-                    return `<span class="${color}">
+            function renderSelisih(diff, pct) {
+                
+                let icon = diff > 0 ? '▲' : diff < 0 ? '▼' : '';
+                let color = diff > 0 ? 'text-success' : diff < 0 ? 'text-danger' : '';
+                return `<span class="${color}">
                     ${icon} ${pct !== null ? pct.toFixed(2) : '0.00'}%
                     (Rp ${Math.abs(diff).toLocaleString('id-ID')})
                 </span>`;
-                } else {
-                    return '<span>—</span>';
-                }
             }
 
             let channel = $('#channel').val();
