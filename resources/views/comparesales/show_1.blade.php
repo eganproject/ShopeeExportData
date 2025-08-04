@@ -45,7 +45,9 @@
                     <hr class="my-4 border border-2 border-dark rounded-pill">
                     <div class="card custom-card">
                         <div class="card-body">
-                            <h5 class="fw-semibold mb-3 text-center">Persentase Total per Platform</h5>
+                            <h5 class="fw-semibold text-center">Persentase Total per Platform</h5>
+
+                            <p class="fw-bold mb-3 text-muted text-center">Current Period</p>
                             <canvas id="piePlatform" style="max-height:250px;"></canvas>
                         </div>
                     </div>
@@ -56,7 +58,8 @@
                 <div class="col-12">
                     <div class="card custom-card">
                         <div class="card-body">
-                            <h5 class="fw-semibold mb-3 text-center">Top 10 SKU Berdasarkan Periode</h5>
+                            <h5 class="fw-semibold text-center">Top 10 SKU Berdasarkan Periode</h5>
+                            <p class="fw-bold mb-3 text-muted text-center">Current Period</p>
                             <canvas id="barTop10" style="max-height:400px;"></canvas>
                         </div>
                     </div>
@@ -66,7 +69,8 @@
                 <div class="col-12">
                     <div class="card custom-card">
                         <div class="card-body">
-                            <h5 class="fw-bold mb-3 text-center">Grafik Penjualan</h5>
+                            <h5 class="fw-bold text-center">Grafik Penjualan</h5>
+                            <p class="fw-bold mb-3 text-muted text-center">Current Period</p>
                             <div class="chart-container">
                                 <canvas id="revenueChart" style="height:400px;"></canvas>
                             </div>
@@ -77,53 +81,71 @@
             <div class="col-lg-12">
                 <div class="card custom-card">
                     <div class="card-body">
-                        <h5 class="fw-semibold mb-3 text-center">Sub Kategori</h5>
+                        <h2 class="fw-semibold mb-3 text-center">Sub Kategori</h2>
+                        <h4 class="fw-bold mb-0 text-center" id="sub_namaToko">Nama Toko</h4>
+                        <h5 class="text-muted text-center" id="sub_namaChannel">Channel</h5>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle" id="subkategori-table" style="width:100%;">
                                 <thead>
                                     <tr>
                                         <th class="text-center">No</th>
-                                        <th class="text-center">Kategori</th>
-                                        <th class="text-center">Periode 4 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center" style="min-width: 150px;">Kategori</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 1 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p4-P1</th>
-                                        <th class="text-center">Periode 1 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center" style="min-width: 100px;">p4-P1</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 1 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p1-P1</th>
-                                        <th class="text-center">Periode 1 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">p1-P1</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">Periode 2 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">P1-P2</th>
-                                        <th class="text-center">Periode 2 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center" style="min-width: 100px;">P1-P2</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 2 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p2-P2</th>
-                                        <th class="text-center">Periode 2 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">p2-P2</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">Periode 3 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">P2-P3</th>
-                                        <th class="text-center">Periode 3 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center" style="min-width: 100px;">P2-P3</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 3 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p3-P3</th>
-                                        <th class="text-center">Periode 3 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">p3-P3</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">Periode 4 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">P3-P4</th>
-                                        <th class="text-center">Periode 4 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center" style="min-width: 100px;">P3-P4</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 4 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p4-P4</th>
+                                        <th class="text-center" style="min-width: 100px;">p4-P4</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -145,52 +167,71 @@
                 <div class="card custom-card">
                     <div class="card-body">
                         <h5 class="fw-semibold mb-3 text-center">Detail Pendapatan per SKU</h5>
+                        <h4 class="fw-bold mb-0 text-center" id="kat_namaToko">Nama Toko</h4>
+                        <h5 class="text-muted text-center" id="kat_namaChannel">Channel</h5>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle" id="kategori-table" style="width:100%;">
                                 <thead>
                                     <tr>
                                         <th class="text-center">No</th>
-                                        <th class="text-center">Kategori</th>
-                                        <th class="text-center">Periode 4 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center">SKU</th>
+                                        <th class="text-center" style="min-width: 200px;">Nama</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 1 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p4-P1</th>
-                                        <th class="text-center">Periode 1 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center" style="min-width: 100px;">p4-P1</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 1 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p1-P1</th>
-                                        <th class="text-center">Periode 1 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">p1-P1</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">Periode 2 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">P1-P2</th>
-                                        <th class="text-center">Periode 2 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center" style="min-width: 100px;">P1-P2</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 2 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p2-P2</th>
-                                        <th class="text-center">Periode 2 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">p2-P2</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">Periode 3 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">P2-P3</th>
-                                        <th class="text-center">Periode 3 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center" style="min-width: 100px;">P2-P3</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 3 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p3-P3</th>
-                                        <th class="text-center">Periode 3 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">p3-P3</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">Periode 4 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">P3-P4</th>
-                                        <th class="text-center">Periode 4 <br> <span class="text-warning">(-month)</span>
+                                        <th class="text-center" style="min-width: 100px;">P3-P4</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-warning">(-month)</span>
                                         </th>
-                                        <th class="text-center">Periode 4 <br> <span class="text-primary">(current)</span>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-primary">(current)</span>
                                         </th>
-                                        <th class="text-center">p4-P4</th>
+                                        <th class="text-center" style="min-width: 100px;">p4-P4</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -209,7 +250,7 @@
 @endsection
 
 @push('scripts')
-    {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap5.min.js"></script>
@@ -228,11 +269,47 @@
                 },
                 async: false,
                 success: function(response) {
-
-                    getChart(response.kategori);
+                    window.cachedKategoriData = response.kategori;
                     grafikPenjualanChart(response.labels, response.data);
-                    putTable(response.kategori, 'kategori-table')
                     getSubKategori();
+                    changeChannel()
+                },
+                error: function(xhr) {
+                    console.error('Error fetching data:', xhr);
+                }
+            });
+        }
+
+        function changeChannel() {
+            var tokoName = $('#toko option:selected').text()
+            var channelName = $('#channel option:selected').text()
+            $('#namaToko').text(tokoName)
+            $('#namaChannel').text(channelName)
+            $('#sub_namaToko').text(tokoName)
+            $('#sub_namaChannel').text(channelName)
+            $('#kat_namaToko').text(tokoName)
+            $('#kat_namaChannel').text(channelName)
+            getChart(window.cachedKategoriData)
+            putTable(window.cachedKategoriData, 'kategori-table')
+            putTable(window.cachedSubKategoriData, 'subkategori-table')
+
+            getDataGrafikChart()
+
+
+        }
+
+        function getDataGrafikChart() {
+            $.ajax({
+                url: '/performa-produk/compare-sales/kategori/get-data-grafik-chart/' + {{ $kategori->id }},
+                method: 'GET',
+                data: {
+                    id: {{ $kategori->id }},
+                    shop_id: $('#toko').val(),
+                    channel: $('#channel').val()
+                },
+                async: false,
+                success: function(response) {
+                    grafikPenjualanChart(response.labels, response.data);
                 },
                 error: function(xhr) {
                     console.error('Error fetching data:', xhr);
@@ -241,7 +318,7 @@
         }
 
         function getSubKategori() {
-            console.log()
+
             $.ajax({
                 url: '/performa-produk/compare-sales/kategori/get-sub-kategori/' + {{ $kategori->id }},
                 method: 'GET',
@@ -251,8 +328,7 @@
                 },
                 async: false,
                 success: function(response) {
-
-                    putTable(response.subkategori, 'subkategori-table')
+                    window.cachedSubKategoriData = response.subkategori;
                 },
                 error: function(xhr) {
                     console.error('Error fetching data:', xhr);
@@ -330,40 +406,99 @@
             });
 
             // Bar Chart Top 10 SKU Berdasarkan Pendapatan Periode 1 & 2
-            const sortedAll = [...data].sort((a, b) => (b.pendapatan_per_2 + b.pendapatan_per_1) - (a
-                .pendapatan_per_2 + a.pendapatan_per_1)).slice(0, 10);
+
+
+            var channel = $('#channel').val();
+            const sortedAll = [...data].sort((a, b) => {
+                const getPendapatan = (item) => {
+                    switch (channel) {
+                        case 'shopee':
+                            return item.pendapatan_shopee_per_2 + item.pendapatan_shopee_per_1;
+                        case 'tiktok':
+                            return item.pendapatan_tiktok_per_2 + item.pendapatan_tiktok_per_1;
+                        default:
+                            return item.pendapatan_per_2 + item.pendapatan_per_1;
+                    }
+                };
+                return getPendapatan(b) - getPendapatan(a);
+            }).slice(0, 10);
             window.barTop10 = new Chart(document.getElementById('barTop10'), {
                 type: 'bar',
                 data: {
                     labels: sortedAll.map(i => i.sku),
                     datasets: [{
                             label: 'Pendapatan Periode 1',
-                            data: sortedAll.map(i => i.pendapatan_per_1),
+                            data: sortedAll.map(i => {
+                                switch (channel) {
+                                    case 'shopee':
+                                        return i.pendapatan_shopee_per_1;
+                                    case 'tiktok':
+                                        return i.pendapatan_tiktok_per_1;
+                                    default:
+                                        return i.pendapatan_per_1;
+                                }
+                            }),
                             backgroundColor: 'rgba(255, 99, 132, 0.8)',
                             borderColor: 'rgba(255, 99, 132, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Pendapatan Periode 2',
-                            data: sortedAll.map(i => i.pendapatan_per_2),
+                            data: sortedAll.map(i => {
+                                switch (channel) {
+                                    case 'shopee':
+                                        return i.pendapatan_shopee_per_2;
+                                    case 'tiktok':
+                                        return i.pendapatan_tiktok_per_2;
+                                    default:
+                                        return i.pendapatan_per_2;
+                                }
+                            }),
                             backgroundColor: 'rgba(54, 162, 235, 0.8)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1
                         }, {
                             label: 'Pendapatan Periode 3',
-                            data: sortedAll.map(i => i.pendapatan_per_3),
+                            data: sortedAll.map(i => {
+                                switch (channel) {
+                                    case 'shopee':
+                                        return i.pendapatan_shopee_per_3;
+                                    case 'tiktok':
+                                        return i.pendapatan_tiktok_per_3;
+                                    default:
+                                        return i.pendapatan_per_3;
+                                }
+                            }),
                             backgroundColor: 'rgba(10, 77, 190, 0.8)',
                             borderColor: 'rgba(10, 77, 190, 1)',
                             borderWidth: 1
                         }, {
                             label: 'Pendapatan Periode 4',
-                            data: sortedAll.map(i => i.pendapatan_per_4),
+                            data: sortedAll.map(i => {
+                                switch (channel) {
+                                    case 'shopee':
+                                        return i.pendapatan_shopee_per_4;
+                                    case 'tiktok':
+                                        return i.pendapatan_tiktok_per_4;
+                                    default:
+                                        return i.pendapatan_per_4;
+                                }
+                            }),
                             backgroundColor: 'rgba(50, 99, 190, 0.8)',
                             borderColor: 'rgba(50, 99, 190, 1)',
                             borderWidth: 1
                         }, {
                             label: 'Pendapatan Periode 5',
-                            data: sortedAll.map(i => i.pendapatan_per_5),
+                            data: sortedAll.map(i => {
+                                switch (channel) {
+                                    case 'shopee':
+                                        return i.pendapatan_shopee_per_5;
+                                    case 'tiktok':
+                                        return i.pendapatan_tiktok_per_5;
+                                    default:
+                                        return i.pendapatan_per_5;
+                                }
+                            }),
                             backgroundColor: 'rgba(50, 99, 190, 0.8)',
                             borderColor: 'rgba(50, 99, 190, 1)',
                             borderWidth: 1
@@ -495,126 +630,164 @@
                 }
             }
 
+            let channel = $('#channel').val();
+
             let sum = {
                 1: {
-                    s: 0,
-                    t: 0,
-                    tot: 0,
+                    pa: 0,
+                    pb: 0,
                     diff: 0
                 },
                 2: {
-                    s: 0,
-                    t: 0,
-                    tot: 0,
+                    pa: 0,
+                    pb: 0,
                     diff: 0
                 },
                 3: {
-                    s: 0,
-                    t: 0,
-                    tot: 0,
+                    pa: 0,
+                    pb: 0,
                     diff: 0
                 },
                 4: {
-                    s: 0,
-                    t: 0,
-                    tot: 0
+                    pa: 0,
+                    pb: 0,
+                    diff: 0
                 },
                 5: {
-                    s: 0,
-                    t: 0,
-                    tot: 0
-                }
-
+                    pa: 0,
+                    pb: 0,
+                    diff: 0
+                },
+                6: {
+                    pa: 0,
+                    pb: 0,
+                    diff: 0
+                },
+                7: {
+                    pa: 0,
+                    pb: 0,
+                    diff: 0
+                },
+                8: {
+                    pa: 0,
+                    pb: 0,
+                    diff: 0
+                },
             };
 
             // Render data
             $.each(data, function(index, item) {
 
                 // Periode 1
-                let s1 = item.pendapatan_shopee_per_1 || 0;
-                let t1 = item.pendapatan_tiktok_per_1 || 0;
-                let tot1 = item.pendapatan_per_1 || (s1 + t1);
+                let prev_p1 = channel == 'semua' ? item.prev_pendapatan_per_1 : channel == 'shopee' ? item
+                    .prev_pendapatan_shopee_per_1 : item.prev_pendapatan_tiktok_per_1;
 
-                // Periode 2
-                let s2 = item.pendapatan_shopee_per_2 || 0;
-                let t2 = item.pendapatan_tiktok_per_2 || 0;
-                let tot2 = item.pendapatan_per_2 || (s2 + t2);
+                let prev_p2 = channel == 'semua' ? item.prev_pendapatan_per_2 : channel == 'shopee' ? item
+                    .prev_pendapatan_shopee_per_2 : item.prev_pendapatan_tiktok_per_2;
 
-                // Periode 3
-                let s3 = item.pendapatan_shopee_per_3 || 0;
-                let t3 = item.pendapatan_tiktok_per_3 || 0;
-                let tot3 = item.pendapatan_per_3 || (s3 + t3);
+                let prev_p3 = channel == 'semua' ? item.prev_pendapatan_per_3 : channel == 'shopee' ? item
+                    .prev_pendapatan_shopee_per_3 : item.prev_pendapatan_tiktok_per_3;
 
-                // Periode 4
-                let s4 = item.pendapatan_shopee_per_4 || 0;
-                let t4 = item.pendapatan_tiktok_per_4 || 0;
-                let tot4 = item.pendapatan_per_4 || (s4 + t4);
+                let prev_p4 = channel == 'semua' ? item.prev_pendapatan_per_4 : channel == 'shopee' ? item
+                    .prev_pendapatan_shopee_per_4 : item.prev_pendapatan_tiktok_per_4;
 
-                // Periode 5
-                let s5 = item.pendapatan_shopee_per_5 || 0;
-                let t5 = item.pendapatan_tiktok_per_5 || 0;
-                let tot5 = item.pendapatan_per_5 || (s5 + t5);
+                let p1 = channel == 'semua' ? item.pendapatan_per_1 : channel == 'shopee' ? item
+                    .pendapatan_shopee_per_1 : item.pendapatan_tiktok_per_1;
+
+                let p2 = channel == 'semua' ? item.pendapatan_per_2 : channel == 'shopee' ? item
+                    .pendapatan_shopee_per_2 : item.pendapatan_tiktok_per_2;
+
+                let p3 = channel == 'semua' ? item.pendapatan_per_3 : channel == 'shopee' ? item
+                    .pendapatan_shopee_per_3 : item.pendapatan_tiktok_per_3;
+
+                let p4 = channel == 'semua' ? item.pendapatan_per_4 : channel == 'shopee' ? item
+                    .pendapatan_shopee_per_4 : item.pendapatan_tiktok_per_4;
+
+
 
                 // Selisih & Persen
-                let d12 = tot2 - tot1;
-                let d23 = tot3 - tot2;
-                let d34 = tot4 - tot3;
-                let d45 = tot5 - tot4;
-                let pct12 = tot1 > 0 ? (d12 / tot1) * 100 : null;
-                let pct23 = tot2 > 0 ? (d23 / tot2) * 100 : null;
-                let pct34 = tot3 > 0 ? (d34 / tot3) * 100 : null;
-                let pct45 = tot4 > 0 ? (d45 / tot4) * 100 : null;
+                let d1 = p1 - prev_p4;
+                let d2 = p1 - prev_p1;
+                let d3 = p2 - p1;
+                let d4 = p2 - prev_p2;
+                let d5 = p3 - p2;
+                let d6 = p3 - prev_p3;
+                let d7 = p4 - p3;
+                let d8 = p4 - prev_p4;
+
+                let pct1 = prev_p4 > 0 ? (d1 / prev_p4) * 100 : (d1 !== 0 ? 100 : 0);
+                let pct2 = prev_p1 > 0 ? (d2 / prev_p1) * 100 : (d2 !== 0 ? 100 : 0);
+                let pct3 = p1 > 0 ? (d3 / p1) * 100 : (d3 !== 0 ? 100 : 0);
+                let pct4 = prev_p2 > 0 ? (d4 / prev_p2) * 100 : (d4 !== 0 ? 100 : 0);
+                let pct5 = p2 > 0 ? (d5 / p2) * 100 : (d5 !== 0 ? 100 : 0);
+                let pct6 = prev_p3 > 0 ? (d6 / prev_p3) * 100 : (d6 !== 0 ? 100 : 0);
+                let pct7 = p3 > 0 ? (d7 / p3) * 100 : (d7 !== 0 ? 100 : 0);
+                let pct8 = prev_p4 > 0 ? (d8 / prev_p4) * 100 : (d8 !== 0 ? 100 : 0);
 
                 const row = `
                     <tr>
                         <td>${index + 1}</td>
                      ${table === 'kategori-table' ? '<td >'+item.sku+'</td>' : ''}   
                         <td>${table === 'kategori-table' ? item.nama_produk : '<a href="/performa-produk/compare-sales/kategori/'+item.id+'">'+item.nama_kategori+'</a>'}</td>
-                        <td>${formatRupiah(s1)}</td>
-                        <td>${formatRupiah(t1)}</td>
-                        <td>${formatRupiah(tot1)}</td>
-                        <td>${renderSelisih(d12, pct12, tot1)}</td>
-                        <td>${formatRupiah(s2)}</td>
-                        <td>${formatRupiah(t2)}</td>
-                        <td>${formatRupiah(tot2)}</td>
-                        <td>${renderSelisih(d23, pct23, tot2)}</td>
-                        <td>${formatRupiah(s3)}</td>
-                        <td>${formatRupiah(t3)}</td>
-                        <td>${formatRupiah(tot3)}</td>
-                        <td>${renderSelisih(d34, pct34, tot3)}</td>
-                        <td>${formatRupiah(s4)}</td>
-                        <td>${formatRupiah(t4)}</td>
-                        <td>${formatRupiah(tot4)}</td>
-                        <td>${renderSelisih(d45, pct45, tot4)}</td>
-                        <td>${formatRupiah(s5)}</td>
-                        <td>${formatRupiah(t5)}</td>
-                        <td>${formatRupiah(tot5)}</td>
+                       <td>${formatRupiah(prev_p4)}</td>
+                            <td>${formatRupiah(p1)}</td>
+                            <td>${renderSelisih(d1, pct1)}</td>
+                            <td>${formatRupiah(prev_p1)}</td>
+                            <td>${formatRupiah(p1)}</td>
+                            <td>${renderSelisih(d2, pct2)}</td>
+                            <td>${formatRupiah(p1)}</td>
+                            <td>${formatRupiah(p2)}</td>
+                            <td>${renderSelisih(d3, pct3)}</td>
+                            <td>${formatRupiah(prev_p2)}</td>
+                            <td>${formatRupiah(p2)}</td>
+                            <td>${renderSelisih(d4, pct4)}</td>
+                            <td>${formatRupiah(p2)}</td>
+                            <td>${formatRupiah(p3)}</td>
+                            <td>${renderSelisih(d5, pct5)}</td>
+                            <td>${formatRupiah(prev_p3)}</td>
+                            <td>${formatRupiah(p3)}</td>
+                            <td>${renderSelisih(d6, pct6)}</td>
+                            <td>${formatRupiah(p3)}</td>
+                            <td>${formatRupiah(p4)}</td>
+                            <td>${renderSelisih(d7, pct7)}</td>
+                            <td>${formatRupiah(prev_p4)}</td>
+                            <td>${formatRupiah(p4)}</td>
+                            <td>${renderSelisih(d8, pct8)}</td>
                     </tr>
                 `;
 
 
-                sum[1].s += parseFloat(s1) || 0;
-                sum[1].t += parseFloat(t1) || 0;
-                sum[1].tot += parseFloat(tot1) || 0;
-                sum[1].diff += parseFloat(d12) || 0;
+                sum[1].pa += parseFloat(prev_p4) || 0;
+                sum[1].pb += parseFloat(p1) || 0;
+                sum[1].diff += parseFloat(d1) || 0;
 
-                sum[2].s += parseFloat(s2) || 0;
-                sum[2].t += parseFloat(t2) || 0;
-                sum[2].tot += parseFloat(tot2) || 0;
-                sum[2].diff += parseFloat(d23) || 0;
+                sum[2].pa += parseFloat(prev_p1) || 0;
+                sum[2].pb += parseFloat(p1) || 0;
+                sum[2].diff += parseFloat(d2) || 0;
 
-                sum[3].s += parseFloat(s3) || 0;
-                sum[3].t += parseFloat(t3) || 0;
-                sum[3].tot += parseFloat(tot3) || 0;
-                sum[3].diff += parseFloat(d34) || 0;
+                sum[3].pa += parseFloat(p1) || 0;
+                sum[3].pb += parseFloat(p2) || 0;
+                sum[3].diff += parseFloat(d3) || 0;
 
-                sum[4].s += parseFloat(s4) || 0;
-                sum[4].t += parseFloat(t4) || 0;
-                sum[4].tot += parseFloat(tot4) || 0;
+                sum[4].pa += parseFloat(prev_p2) || 0;
+                sum[4].pb += parseFloat(p2) || 0;
+                sum[4].diff += parseFloat(d4) || 0;
 
-                sum[5].s += parseFloat(s5) || 0;
-                sum[5].t += parseFloat(t5) || 0;
-                sum[5].tot += parseFloat(tot5) || 0;
+                sum[5].pa += parseFloat(p2) || 0;
+                sum[5].pb += parseFloat(p3) || 0;
+                sum[5].diff += parseFloat(d5) || 0;
+
+                sum[6].pa += parseFloat(prev_p3) || 0;
+                sum[6].pb += parseFloat(p3) || 0;
+                sum[6].diff += parseFloat(d6) || 0;
+
+                sum[7].pa += parseFloat(p3) || 0;
+                sum[7].pb += parseFloat(p4) || 0;
+                sum[7].diff += parseFloat(d7) || 0;
+
+                sum[8].pa += parseFloat(prev_p4) || 0;
+                sum[8].pb += parseFloat(p4) || 0;
+                sum[8].diff += parseFloat(d8) || 0;
 
                 $(`#${table} tbody`).append(row);
             });
@@ -622,11 +795,11 @@
 
             let tfoot = `<tr class="fw-semibold">
     <td colspan="${table === 'kategori-table' ? 3 : 2}" class="text-end">Total:</td>`;
-            for (let p = 1; p <= 5; p++) {
-                tfoot += `<td>${formatRupiah(sum[p].s)}</td>
-              <td>${formatRupiah(sum[p].t)}</td>
-              <td>${formatRupiah(sum[p].tot)}</td>`;
-                if (p < 5) {
+            for (let p = 1; p <= 8; p++) {
+                tfoot += `
+                  <td>${formatRupiah(sum[p].pa)}</td>
+                  <td>${formatRupiah(sum[p].pb)}</td>`;
+                if (p <= 8) {
                     tfoot += `<td>${formatRupiah(sum[p].diff)}</td>`;
                 }
             }
@@ -645,5 +818,5 @@
         }
 
         getData();
-    </script> --}}
+    </script>
 @endpush

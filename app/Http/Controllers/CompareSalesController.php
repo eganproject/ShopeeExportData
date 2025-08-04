@@ -571,13 +571,21 @@ class CompareSalesController extends Controller
       ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");
             // Ekstrak labels & data
             $labels = array_column($kategori, 'nama_kategori');
-            $data = array_map(function ($item) {
+            $dataTotal = array_map(function ($item) {
                 return $item->pendapatan_per_1 + $item->pendapatan_per_2 + $item->pendapatan_per_3 + $item->pendapatan_per_4;
+            }, $kategori);
+            $dataShopee = array_map(function ($item) {
+                return $item->pendapatan_shopee_per_1 + $item->pendapatan_shopee_per_2 + $item->pendapatan_shopee_per_3 + $item->pendapatan_shopee_per_4;
+            }, $kategori);
+            $dataTiktok = array_map(function ($item) {
+                return $item->pendapatan_tiktok_per_1 + $item->pendapatan_tiktok_per_2 + $item->pendapatan_tiktok_per_3 + $item->pendapatan_tiktok_per_4;
             }, $kategori);
             return response()->json([
                 'kategoriData' => $kategori,
                 'labels' => $labels,
-                'data' => $data,
+                'dataTotal' => $dataTotal,
+                'dataShopee' => $dataShopee,
+                'dataTiktok' => $dataTiktok,
             ]);
         }
 
@@ -778,7 +786,7 @@ class CompareSalesController extends Controller
                 FROM kategori_produks AS a
                 JOIN product_codes AS b ON a.id = b.kategori_id
                 JOIN multi_comparative_f_sales AS c ON b.product_code = c.sku $filterToko2 
-                WHERE a.id = ? 
+                WHERE a.id = ? AND month_status = 'current'
                 GROUP BY c.tanggal
 
                 UNION ALL 
@@ -789,7 +797,7 @@ class CompareSalesController extends Controller
                 FROM kategori_produks AS a
                 JOIN product_codes AS b ON a.id = b.kategori_id
                 JOIN multi_comparative_f_sales_twos AS c ON b.product_code = c.sku $filterToko2 
-                WHERE a.id = ?
+                WHERE a.id = ? AND month_status = 'current'
                 GROUP BY c.tanggal
 
                 UNION ALL 
@@ -800,7 +808,7 @@ class CompareSalesController extends Controller
                 FROM kategori_produks AS a
                 JOIN product_codes AS b ON a.id = b.kategori_id
                 JOIN multi_comparative_f_sales_threes AS c ON b.product_code = c.sku $filterToko2 
-                WHERE a.id = ?
+                WHERE a.id = ? AND month_status = 'current'
                 GROUP BY c.tanggal
 
                 UNION ALL 
@@ -811,7 +819,7 @@ class CompareSalesController extends Controller
                 FROM kategori_produks AS a
                 JOIN product_codes AS b ON a.id = b.kategori_id
                 JOIN multi_comparative_f_sales_fours AS c ON b.product_code = c.sku $filterToko2 
-                WHERE a.id = ?
+                WHERE a.id = ? AND month_status = 'current'
                 GROUP BY c.tanggal
                 
                 UNION ALL 
@@ -822,7 +830,7 @@ class CompareSalesController extends Controller
                 FROM kategori_produks AS a
                 JOIN product_codes AS b ON a.id = b.kategori_id
                 JOIN multi_comparative_f_sales_fives AS c ON b.product_code = c.sku $filterToko2 
-                WHERE a.id = ?
+                WHERE a.id = ? AND month_status = 'current'
                 GROUP BY c.tanggal
             ) as combined_sales
             GROUP BY tanggal
@@ -1042,5 +1050,96 @@ class CompareSalesController extends Controller
 
 
         return response()->json(["subkategori" => $kategori]);
+    }
+
+    public function getDataGrafikChart(Request $request, $id){
+        $toko = $request->input("shop_id", "semua");
+        $channel = $request->input("channel", "semua");
+       
+        
+        $filterPlatform = $channel !== 'semua'
+            ? "AND c.platform = '$channel'" : "";
+
+        $filterToko2 = $toko !== 'semua'
+            ? "AND c.shop_id = $toko"
+            : "";
+
+
+        $sql = "
+            SELECT 
+                tanggal, 
+                SUM(total_pendapatan) as daily_revenue
+            FROM (
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales AS c ON b.product_code = c.sku $filterToko2 $filterPlatform
+                WHERE a.id = ? AND month_status = 'current'
+                GROUP BY c.tanggal
+
+                UNION ALL 
+
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales_twos AS c ON b.product_code = c.sku $filterToko2 $filterPlatform
+                WHERE a.id = ? AND month_status = 'current'
+                GROUP BY c.tanggal
+
+                UNION ALL 
+
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales_threes AS c ON b.product_code = c.sku $filterToko2 $filterPlatform
+                WHERE a.id = ? AND month_status = 'current'
+                GROUP BY c.tanggal
+
+                UNION ALL 
+
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales_fours AS c ON b.product_code = c.sku $filterToko2 $filterPlatform
+                WHERE a.id = ? AND month_status = 'current'
+                GROUP BY c.tanggal
+                
+                UNION ALL 
+                
+                SELECT 
+                    c.tanggal, 
+                    SUM(c.pendapatan) AS total_pendapatan 
+                FROM kategori_produks AS a
+                JOIN product_codes AS b ON a.id = b.kategori_id
+                JOIN multi_comparative_f_sales_fives AS c ON b.product_code = c.sku $filterToko2 $filterPlatform
+                WHERE a.id = ? AND month_status = 'current'
+                GROUP BY c.tanggal
+            ) as combined_sales
+            GROUP BY tanggal
+            ORDER BY tanggal ASC
+        ";
+
+        // Menjalankan raw query dengan binding untuk keamanan (mencegah SQL Injection)
+        $results = DB::select($sql, [$id, $id, $id, $id, $id]);
+
+        // Memproses hasil query untuk dijadikan format yang sesuai untuk Chart.js
+        $labels = [];
+        $data = [];
+
+        foreach ($results as $row) {
+            // Mengubah format tanggal 'YYYY-MM-DD' menjadi format 'DD Mmm' (e.g., '24 Jul') untuk label chart
+            $labels[] = Carbon::parse($row->tanggal)->format('d M');
+            $data[] = $row->daily_revenue;
+        }
+
+        return response()->json(['labels' => $labels, 'data' => $data]);
     }
 }

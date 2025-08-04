@@ -52,31 +52,31 @@
                         <thead>
                             <tr>
                                 <th class="text-center">No</th>
-                                <th class="text-center">Kategori</th>
-                                <th class="text-center">Periode 4 <br> <span class="text-warning">(-month)</span></th>
-                                <th class="text-center">Periode 1 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">p4-P1</th>
-                                <th class="text-center">Periode 1 <br> <span class="text-warning">(-month)</span></th>
-                                <th class="text-center">Periode 1 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">p1-P1</th>
-                                <th class="text-center">Periode 1 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">Periode 2 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">P1-P2</th>
-                                <th class="text-center">Periode 2 <br> <span class="text-warning">(-month)</span></th>
-                                <th class="text-center">Periode 2 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">p2-P2</th>
-                                <th class="text-center">Periode 2 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">Periode 3 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">P2-P3</th>
-                                <th class="text-center">Periode 3 <br> <span class="text-warning">(-month)</span></th>
-                                <th class="text-center">Periode 3 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">p3-P3</th>
-                                <th class="text-center">Periode 3 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">Periode 4 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">P3-P4</th>
-                                <th class="text-center">Periode 4 <br> <span class="text-warning">(-month)</span></th>
-                                <th class="text-center">Periode 4 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center">p4-P4</th>
+                                <th class="text-center" style="min-width: 150px;">Kategori</th>
+                                <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span class="text-warning">(-month)</span></th>
+                                <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">p4-P1</th>
+                                <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span class="text-warning">(-month)</span></th>
+                                <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">p1-P1</th>
+                                <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">P1-P2</th>
+                                <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span class="text-warning">(-month)</span></th>
+                                <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">p2-P2</th>
+                                <th class="text-center" style="min-width: 100px;">Periode 2 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">P2-P3</th>
+                                <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span class="text-warning">(-month)</span></th>
+                                <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">p3-P3</th>
+                                <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">P3-P4</th>
+                                <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span class="text-warning">(-month)</span></th>
+                                <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span class="text-primary">(current)</span></th>
+                                <th class="text-center" style="min-width: 100px;">p4-P4</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -116,41 +116,14 @@
                 success: function(res) {
                     // generateTable(res.kategoriData)
                     window.cachedKategoriData = res.kategoriData;
+                    window.cachedLabels = res.labels;
+                    window.cachedDataTotal = res.dataTotal;
+                    window.cachedDataShopee = res.dataShopee;
+                    window.cachedDataTiktok = res.dataTiktok;
 
                     generateTable();
+                    genereatePie()
 
-                    if (window.myPieChart) {
-                        window.myPieChart.destroy();
-                    }
-
-                    const ctx = document.getElementById('kategoriPieChart').getContext('2d');
-                    const bgColors = res.labels.map(() => {
-                        const r = Math.floor(Math.random() * 200) + 55;
-                        const g = Math.floor(Math.random() * 200) + 55;
-                        const b = Math.floor(Math.random() * 200) + 55;
-                        return `rgba(${r},${g},${b},0.7)`;
-                    });
-                    window.myPieChart = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: res.labels,
-                            datasets: [{
-                                data: res.data,
-                                backgroundColor: bgColors,
-                                borderColor: bgColors.map(c => c.replace('0.7',
-                                    '1')),
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom'
-                                }
-                            }
-                        }
-                    });
                 },
                 error: function(err) {
                     console.error('Gagal memuat data pie chart:', err);
@@ -158,15 +131,58 @@
             });
         }
 
+        function genereatePie() {
+            if (window.myPieChart) {
+                window.myPieChart.destroy();
+            }
+
+            var channel = $('#channel').val();
+            var res = {
+                labels: window.cachedLabels,
+                data: channel == 'semua' ? window.cachedDataTotal : channel == 'shopee' ? window.cachedDataShopee :
+                    window.cachedDataTiktok
+            };
+
+            const ctx = document.getElementById('kategoriPieChart').getContext('2d');
+            const bgColors = res.labels.map(() => {
+                const r = Math.floor(Math.random() * 200) + 55;
+                const g = Math.floor(Math.random() * 200) + 55;
+                const b = Math.floor(Math.random() * 200) + 55;
+                return `rgba(${r},${g},${b},0.7)`;
+            });
+            window.myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: res.labels,
+                    datasets: [{
+                        data: res.data,
+                        backgroundColor: bgColors,
+                        borderColor: bgColors.map(c => c.replace('0.7',
+                            '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
 
 
         function generateTable() {
+            genereatePie()
             var tokoName = $('#toko option:selected').text()
             var channelName = $('#channel option:selected').text()
-            
+
             $('#namaToko').text(tokoName)
             $('#namaChannel').text(channelName)
-            
+
             var channel = $('#channel').val()
 
             var data = window.cachedKategoriData;
