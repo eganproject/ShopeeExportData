@@ -94,34 +94,46 @@
 
         /* Kustomisasi File Input */
         .custom-file-upload {
-            border: 2px dashed #dee2e6;
-            border-radius: 12px;
+            border: 2px dashed #0d6efd;
+            border-radius: .5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 2rem;
             text-align: center;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            width: 100%;
+            transition: background-color 0.2s ease-in-out;
         }
 
         .custom-file-upload:hover {
-            background-color: #f1f3f5;
+            background-color: #f8f9fa;
         }
 
-        .custom-file-upload input[type="file"] {
+        /* Hide the default file input */
+        #csv-upload {
             display: none;
         }
 
-        /* Loading Overlay */
+        .btn-modern {
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
         #loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
         }
     </style>
 @endpush
@@ -184,13 +196,17 @@
                             <div class="mb-3">
                                 <label for="month_status" class="form-label fw-semibold">Status Periode</label>
                                 <select class="form-select" id="month_status" name="month_status" required>
-                                   <option value="current">Saat Ini</option>
-                                   <option value="previous">Sebelumnya</option>
+                                    <option value="current">Saat Ini</option>
+                                    <option value="previous">Sebelumnya</option>
                                 </select>
                             </div>
-                            <div class="d-flex justify-content-center">
-                                <label for="csv-upload" class="custom-file-upload mt-3">
-                                    <input type="file" id="csv-upload" name="file" accept=".csv" required />
+                            <div class="d-flex justify-content-center mt-4">
+                                <label for="csv-upload" class="custom-file-upload">
+                                    <!--
+                                            CHANGE 1: Add the 'multiple' attribute to allow multiple file selection.
+                                            CHANGE 2: Change name from "file" to "file[]" to send files as an array.
+                                        -->
+                                    <input type="file" id="csv-upload" name="file[]" accept=".csv" required multiple />
                                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
                                         fill="currentColor" class="bi bi-cloud-arrow-up-fill text-primary mb-2"
                                         viewBox="0 0 16 16">
@@ -198,7 +214,8 @@
                                             d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2z" />
                                     </svg>
                                     <p class="fw-semibold mb-0">Klik untuk memilih file CSV</p>
-                                    <small id="selected-file-name" class="text-muted d-block mt-1"></small>
+                                    <small class="text-muted">(Bisa pilih lebih dari satu)</small>
+                                    <small id="selected-file-name" class="text-muted d-block mt-1 fw-bold"></small>
                                 </label>
                             </div>
 
@@ -237,7 +254,7 @@
             <div class="col-lg-6">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
-                          <div class="mx-3">
+                        <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
                         <div class="ms-3">
@@ -253,7 +270,7 @@
             <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
-                          <div class="mx-3">
+                        <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
                         <div class="ms-3">
@@ -269,7 +286,7 @@
             <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
-                          <div class="mx-3">
+                        <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
                         <div class="ms-3">
@@ -285,7 +302,7 @@
             <div class="col-lg-4">
                 <div class="card custom-card">
                     <div class="card-body d-flex justify-content-center align-items-center">
-                          <div class="mx-3">
+                        <div class="mx-3">
                             <i class="bi bi-cash-stack fs-2"></i>
                         </div>
                         <div class="ms-3">
@@ -391,6 +408,11 @@
             <!-- ... -->
         </div>
     </div>
+    <div id="loading-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -398,18 +420,70 @@
     <script>
         $(function() {
             // Aktifkan tombol jika file dan platform terpilih
+            function validateForm() {
+                const files = $('#csv-upload').prop('files');
+                const fileSelected = files && files.length > 0;
+                const platformSelected = $('#platform').val() !== null;
+                const periodeSelected = $('#periode_ke').val() !== null;
+                const shopSelected = $('#shop_id').val() !== null;
+
+                if (fileSelected && platformSelected && periodeSelected && shopSelected) {
+                    $('#upload-button').prop('disabled', false);
+                } else {
+                    $('#upload-button').prop('disabled', true);
+                }
+            }
+
+            // Event listener for file input change
             $('#csv-upload').on('change', function() {
-                var fileName = $(this).val().split('\\').pop();
-                $('#selected-file-name').text(fileName);
-                $('#upload-button').prop('disabled', !fileName || !$('#platform').val() || !$('#periode_ke')
-                    .val() || !$('#shop_id')
-                    .val());
+                const files = $(this).prop('files');
+                if (files.length > 0) {
+                    // Display the number of files selected instead of their names
+                    $('#selected-file-name').text(files.length + ' file dipilih');
+                } else {
+                    $('#selected-file-name').text('');
+                }
+                validateForm();
             });
 
-            $('#platform, #periode_ke, #shop_id').on('change', function() {
-                $('#upload-button').prop('disabled', !$('#csv-upload').val() || !$('#platform').val() || !$(
-                    '#periode_ke').val());
+            // Event listener for select dropdowns
+            $('#platform, #periode_ke, #shop_id, #month_status').on('change', function() {
+                validateForm();
             });
+
+            // Event listener for the upload button click
+            $('#upload-button').on('click', function() {
+                const platform = $('#platform').val();
+                const periode_ke = $('#periode_ke').val();
+                const shop = $('#shop_id option:selected').text();
+                const month_status = $('#month_status option:selected').text(); // Corrected variable name
+
+                Swal.fire({
+                    title: 'Konfirmasi Unggah',
+                    html: `<p class="mb-3">Apakah Anda yakin data yang akan diunggah sudah benar?</p>
+                           <ul class="list-group text-start">
+                               <li class="list-group-item"><strong>Toko:</strong> ${shop}</li>
+                               <li class="list-group-item"><strong>Platform:</strong> ${platform}</li>
+                               <li class="list-group-item"><strong>Periode Ke:</strong> ${periode_ke}</li>
+                               <li class="list-group-item"><strong>Status Bulan:</strong> ${month_status}</li>
+                               <li class="list-group-item"><strong>Jumlah File:</strong> ${$('#csv-upload').prop('files').length}</li>
+                           </ul>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0d6efd',
+                    cancelButtonColor: '#dc3545',
+                    confirmButtonText: 'Ya, Unggah!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#loading-overlay').css('display', 'flex');
+                        // Submit the form
+                        $('#importForm').submit();
+                    }
+                });
+            });
+
+
 
             // Reset form
             $('#reset-button').on('click', function() {
@@ -463,31 +537,7 @@
             });
 
             // Konfirmasi sebelum submit
-            $('#upload-button').on('click', function() {
-                var platform = $('#platform').val();
-                var periode_ke = $('#periode_ke').val();
-                var shop = $('#shop_id option:selected').text();
-                var shop = $('#month_status option:selected').text();
-                Swal.fire({
-                    title: 'Konfirmasi',
-                    html: '<ul style="list-style: none; padding: 0;">' +
-                        '<li>Apakah Anda yakin data ini dari:</li>' +
-                        '<li><strong>Toko :</strong> ' + shop + '</li>' +
-                        '<li><strong>Platform:</strong> ' + platform + '</li>' +
-                        '<li><strong>Periode Ke:</strong> ' + periode_ke + '</li>' +
-                        '<li><strong>Status Bulan:</strong> ' + periode_ke + '</li>' +
-                        '</ul>',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya',
-                    cancelButtonText: 'Tidak'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $('#loading-overlay').show();
-                        $('#importForm').submit();
-                    }
-                });
-            });
+
         });
     </script>
 
@@ -539,23 +589,25 @@
                     success: function(res) {
                         console.log('res', res);
                         const ctx = document.getElementById(canvasId).getContext('2d');
-                        var periode_current = res.jumlah_penjualan_current.reduce((a, b) => Number(a) + Number(b), 0);
-                        var periode_previous = res.jumlah_penjualan_previous.reduce((a, b) => Number(a) + Number(b), 0);
+                        var periode_current = res.jumlah_penjualan_current.reduce((a, b) => Number(a) +
+                            Number(b), 0);
+                        var periode_previous = res.jumlah_penjualan_previous.reduce((a, b) => Number(
+                            a) + Number(b), 0);
                         if (periode == 'periode_1') {
                             $('#totalPeriode1').text('Rp ' + periode_current.toLocaleString());
                             $('#prev_totalPeriode1').text('Rp ' + periode_previous.toLocaleString());
                         } else if (periode == 'periode_2') {
                             $('#totalPeriode2').text('Rp ' + periode_current.toLocaleString());
-                              $('#prev_totalPeriode2').text('Rp ' + periode_previous.toLocaleString());
+                            $('#prev_totalPeriode2').text('Rp ' + periode_previous.toLocaleString());
                         } else if (periode == 'periode_3') {
                             $('#totalPeriode3').text('Rp ' + periode_current.toLocaleString());
-                              $('#prev_totalPeriode3').text('Rp ' + periode_previous.toLocaleString());
+                            $('#prev_totalPeriode3').text('Rp ' + periode_previous.toLocaleString());
                         } else if (periode == 'periode_4') {
                             $('#totalPeriode4').text('Rp ' + periode_current.toLocaleString());
-                              $('#prev_totalPeriode4').text('Rp ' + periode_previous.toLocaleString());
+                            $('#prev_totalPeriode4').text('Rp ' + periode_previous.toLocaleString());
                         } else if (periode == 'periode_5') {
                             $('#totalPeriode5').text('Rp ' + periode_current.toLocaleString());
-                              $('#prev_totalPeriode5').text('Rp ' + periode_previous.toLocaleString());
+                            $('#prev_totalPeriode5').text('Rp ' + periode_previous.toLocaleString());
                         }
                         new Chart(ctx, {
                             type: 'pie',
@@ -594,7 +646,7 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(res) {
-                        if(periode == 'periode_5'){
+                        if (periode == 'periode_5') {
                             console.log('res : ', res)
                         }
                         const ctx = document.getElementById(canvasId).getContext('2d');

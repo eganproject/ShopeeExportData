@@ -180,6 +180,137 @@ class CompareSalesController extends Controller
             ->with('success', "Berhasil memasukkan data sebanyak {$count} baris dari platform {$platform}.");
     }
 
+    public function import2(Request $request){
+         
+        // 1. Validasi input
+        $request->validate([
+            'platform' => 'required|in:Shopee,Tiktok',
+            'periode_ke' => 'required|in:1,2,3,4,5',
+            'shop_id' => 'required',
+            'month_status' => 'required',
+            'file' => 'required|array', // Pastikan 'file' adalah sebuah array
+            'file.*' => 'required|mimes:csv,txt' // Validasi setiap file di dalam array
+        ]);
+
+        $platform = $request->input('platform');
+        $shop_id = $request->input('shop_id');
+        $month_status = $request->input('month_status');
+        $rowsToInsert = [];
+        $totalRowCount = 0;
+
+        // Lakukan perulangan untuk setiap file yang diunggah
+        foreach ($request->file('file') as $file) {
+            $path = $file->getRealPath();
+            $delimiter = ';';
+
+            // 2. Buka dan baca setiap file CSV
+            if (($handle = fopen($path, 'r')) !== false) {
+                $rowNumber = 0;
+                $headerRow = fgetcsv($handle, 0, $delimiter);
+                $colCount = count($headerRow);
+
+                // Cek format file berdasarkan jumlah kolom
+                if ($platform === 'Shopee' && $colCount > 49) {
+                    fclose($handle);
+                    // Lanjutkan ke file berikutnya jika format salah
+                    continue; 
+                }
+                if ($platform === 'Tiktok' && $colCount < 61) {
+                    fclose($handle);
+                    // Lanjutkan ke file berikutnya jika format salah
+                    continue;
+                }
+                
+                // Reset pointer agar header tidak ikut diproses
+                rewind($handle);
+
+                while (($row = fgetcsv($handle, 0, ';')) !== false) {
+                    $rowNumber++;
+
+                    if ($platform === 'Shopee') {
+                        if ($rowNumber < 2 || $row[1] == 'Batal' || $row[1] == 'Belum Bayar') {
+                            continue;
+                        }
+
+                        $rawName = $row[13] ?? '';
+                        $utf8Name = mb_convert_encoding($rawName, 'UTF-8', 'Windows-1252');
+                        $cleanName = preg_replace('/[^\P{C}\n]+/u', '', $utf8Name);
+
+                        $v1 = $row[9] ?? null;
+                        $v2 = $cleanName ?? null;
+                        $v3 = $row[14] ?? null;
+                        $rawR = $row[17] ?? '';
+                        $cleanR = str_replace('.', '', $rawR);
+                        $v4 = is_numeric($cleanR) ? (int) $cleanR : 0;
+
+                    } else { // Tiktok
+                        if ($rowNumber < 3 || $row[1] == 'Dibatalkan' || $row[1] == 'Belum dibayar') {
+                            continue;
+                        }
+                        
+                        $rawName = $row[7] ?? '';
+                        $utf8Name = mb_convert_encoding($rawName, 'UTF-8', 'Windows-1252');
+                        $cleanName = preg_replace('/[^\P{C}\n]+/u', '', $utf8Name);
+
+                        $rawDate = $row[27] ?? null;
+                        $v1 = null;
+                        if ($rawDate) {
+                            try {
+                                $v1 = Carbon::createFromFormat('d/m/Y H:i:s', $rawDate)->format('Y-m-d');
+                            } catch (\Exception $e) {
+                                $v1 = null;
+                            }
+                        }
+                        $v2 = $cleanName ?? null;
+                        $v3 = $row[6] ?? null;
+                        $v4 = $row[15] ?? null;
+                    }
+
+                    // Tambahkan data yang sudah bersih ke array utama
+                    $rowsToInsert[] = [
+                        'tanggal' => $v1,
+                        'nama_produk' => $v2,
+                        'sku' => $v3,
+                        'pendapatan' => $v4,
+                        'platform' => $platform,
+                        'shop_id' => $shop_id,
+                        'month_status' => $month_status,
+                    ];
+                }
+                fclose($handle);
+            }
+        } // Akhir dari loop foreach
+
+        // 3. Bulk insert setelah semua file diproses
+        if (!empty($rowsToInsert)) {
+            $modelClass = null;
+            switch ($request->periode_ke) {
+                case 1: $modelClass = \App\Models\MultiComparativeFSales::class; break;
+                case 2: $modelClass = \App\Models\MultiComparativeFSalesTwo::class; break;
+                case 3: $modelClass = \App\Models\MultiComparativeFSalesThree::class; break;
+                case 4: $modelClass = \App\Models\MultiComparativeFSalesFour::class; break;
+                case 5: $modelClass = \App\Models\MultiComparativeFSalesFive::class; break;
+            }
+
+            if ($modelClass) {
+                // Lakukan insert dalam satu transaksi besar
+                 DB::transaction(function () use ($modelClass, $rowsToInsert) {
+                    // Chunk data untuk menghindari error memory limit pada data yang sangat besar
+                    foreach (array_chunk($rowsToInsert, 500) as $chunk) {
+                        $modelClass::insert($chunk);
+                    }
+                });
+                $totalRowCount = count($rowsToInsert);
+            }
+        }
+
+        // 4. Redirect dengan info jumlah total yang berhasil di-import
+        return redirect()
+            ->back()
+            ->with('success', "Berhasil memasukkan data sebanyak {$totalRowCount} baris dari semua file untuk platform {$platform}.");
+    
+    }
+
     public function reset(Request $request)
     {
         if ($request->periode) {

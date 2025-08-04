@@ -38,7 +38,7 @@ Route::group(['prefix' => 'performa-produk'], function () {
     Route::post('/compare/detail/getDataTable', [ComparePerformaController::class, 'getDataTable']);
     Route::get('/compare/detail/getDataTable/{kode_produk}', [ComparePerformaController::class, 'show'])->name('comparePerforma.importTwo');
     Route::get('/compare-sales', [CompareSalesController::class, 'index'])->name('compareSales.index');
-    Route::post('/compare-sales/import', [CompareSalesController::class, 'import'])->name('compareSales.import');
+    Route::post('/compare-sales/import', [CompareSalesController::class, 'import2'])->name('compareSales.import');
     Route::post('/compare-sales/reset', [CompareSalesController::class, 'reset'])->name('compareSales.reset');
     Route::post('/compare-sales/chart', [CompareSalesController::class, 'chart'])->name('compareSales.chart');
     Route::post('/compare-sales/top-sales', [CompareSalesController::class, 'getTop10Sales'])->name('compareSales.top-sales');
