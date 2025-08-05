@@ -1275,4 +1275,13 @@ class CompareSalesController extends Controller
 
         return response()->json(['labels' => $labels, 'data' => $data]);
     }
+
+    public function twoPeriod(){
+        $shop = Shop::all();
+      return view('comparesales.twoperiod.index', compact('shop'));
+    }
+
+    public function getDataTwoPeriod(Request $request){
+        dd($request);
+    }
 }

@@ -228,8 +228,11 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex justify-content-center mb-5">
+        <div class="d-flex justify-content-center mb-2">
             <a href="/performa-produk/compare-sales/kategori" class="btn btn-outline-primary btn-modern">Kategori</a>
+        </div>
+        <div class="d-flex justify-content-center mb-5">
+            <a href="/performa-produk/compare-sales/twoperiod" class="btn btn-outline-success btn-modern">2 Periode</a>
         </div>
         <!-- Summary Cards, Charts, Tables (tetap seperti sebelumnya) -->
 
