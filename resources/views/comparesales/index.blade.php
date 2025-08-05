@@ -146,356 +146,473 @@
         </div>
     </div>
 
-    <div class="container-fluid">
-        <!-- Header Halaman -->
-        <div class="d-flex justify-content-center align-items-center mb-4">
-            <div>
-                <h3 class="mt-2 mb-0 fw-bold">Impor & Analisis Data Produk</h3>
-                <small class="text-muted">Unggah file CSV untuk melihat ringkasan Penjualan.</small>
-            </div>
-        </div>
+    <div class="w-100 d-flex justify-content-center mb-4">
+        <div class="text-center">
+            <h3 class="fw-bold text-center">Impor & Analisis Data Produk</h3>
+            <p class="text-muted text-center mb-3">Unggah file CSV untuk melihat ringkasan Penjualan.</p>
 
-        <!-- Bagian Impor dan Instruksi -->
-        <div class="d-flex justify-content-center g-4 mb-4">
-            <div class="col-lg-5">
-                <div class="card custom-card">
+            {{-- This Blade syntax will be processed by your backend (e.g., Laravel). --}}
+            {{-- The content inside will only show if the 'success' session variable exists. --}}
+            @if (session('success'))
+                <div class="card success-card border-2 rounded-4 text-start shadow-sm" style="max-width: 500px;">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold">Impor Data Analisis</h5>
-                        <form id="importForm" action="/performa-produk/compare-sales/import" method="POST"
-                            enctype="multipart/form-data">
-                            @csrf
-
-                            <div class="mb-3">
-                                <label for="platform" class="form-label fw-semibold">Pilih Platform</label>
-                                <select class="form-select" id="platform" name="platform" required>
-                                    <option value="" disabled selected>-- Pilih Platform --</option>
-                                    <option value="Shopee">Shopee</option>
-                                    <option value="Tiktok">Tiktok</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="periode_ke" class="form-label fw-semibold">Periode</label>
-                                <select class="form-select" id="periode_ke" name="periode_ke" required>
-                                    <option value="" disabled selected>-- Pilih Platform --</option>
-                                    <option value="1">Periode 1</option>
-                                    <option value="2">Periode 2</option>
-                                    <option value="3">Periode 3</option>
-                                    <option value="4">Periode 4</option>
-                                    <option value="5">Periode 5</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="shop_id" class="form-label fw-semibold">Toko</label>
-                                <select class="form-select" id="shop_id" name="shop_id" required>
-                                    <option value="" disabled selected>-- Pilih Toko --</option>
-                                    @foreach ($shop as $item)
-                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="month_status" class="form-label fw-semibold">Status Periode</label>
-                                <select class="form-select" id="month_status" name="month_status" required>
-                                    <option value="current">Saat Ini</option>
-                                    <option value="previous">Sebelumnya</option>
-                                </select>
-                            </div>
-                            <div class="d-flex justify-content-center mt-4">
-                                <label for="csv-upload" class="custom-file-upload">
-                                    <!--
-                                                                CHANGE 1: Add the 'multiple' attribute to allow multiple file selection.
-                                                                CHANGE 2: Change name from "file" to "file[]" to send files as an array.
-                                                            -->
-                                    <input type="file" id="csv-upload" name="file[]" accept=".csv" required multiple />
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
-                                        fill="currentColor" class="bi bi-cloud-arrow-up-fill text-primary mb-2"
-                                        viewBox="0 0 16 16">
-                                        <path
-                                            d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2z" />
-                                    </svg>
-                                    <p class="fw-semibold mb-0">Klik untuk memilih file CSV</p>
-                                    <small class="text-muted">(Bisa pilih lebih dari satu)</small>
-                                    <small id="selected-file-name" class="text-muted d-block mt-1 fw-bold"></small>
-                                </label>
-                            </div>
-
-                            <button type="button" id="upload-button" class="btn btn-primary btn-modern w-100 mt-3"
-                                disabled>Unggah & Proses</button>
-                            <button type="button" id="reset-button"
-                                class="btn btn-outline-danger btn-modern w-100 mt-2">Reset Semua Data</button>
-                        </form>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
+                            <h5 class="card-title fw-bold mb-0 text-success-emphasis">{{ session('success') }}</h5>
+                        </div>
+                        <ul class="list-group list-group-flush bg-transparent">
+                            <li
+                                class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-2">
+                                <span class="text-dark-emphasis"><i class="bi bi-shop me-2"></i><strong>Toko</strong></span>
+                                <span
+                                    class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle rounded-pill fs-6">{{ session('toko') }}</span>
+                            </li>
+                            <li
+                                class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-2">
+                                <span class="text-dark-emphasis"><i
+                                        class="bi bi-tags me-2"></i><strong>Platform</strong></span>
+                                <span class="text-dark-emphasis">{{ session('platform') }}</span>
+                            </li>
+                            <li
+                                class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-2">
+                                <span class="text-dark-emphasis"><i
+                                        class="bi bi-calendar-event me-2"></i><strong>Periode</strong></span>
+                                <span class="text-dark-emphasis">{{ session('periode') }}</span>
+                            </li>
+                            <li
+                                class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-2">
+                                <span class="text-dark-emphasis"><i
+                                        class="bi bi-hourglass-split me-2"></i><strong>Status Periode</strong></span>
+                                <span
+                                    class="text-dark-emphasis">{{ session('month_status') == 'current' ? 'Saat ini' : 'Sebelumnya' }}</span>
+                            </li>
+                        </ul>
                     </div>
+                </div>
+            @endif
+        </div>
+    </div>
+
+
+    <!-- Bagian Impor dan Instruksi -->
+    <div class="d-flex justify-content-center g-4 mb-4">
+        <div class="col-lg-5">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Impor Data Analisis</h5>
+                    <form id="importForm" action="/performa-produk/compare-sales/import" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+
+                        <div class="mb-3">
+                            <label for="platform" class="form-label fw-semibold">Pilih Platform</label>
+                            <select class="form-select" id="platform" name="platform" required>
+                                <option value="" disabled selected>-- Pilih Platform --</option>
+                                <option value="Shopee" {{ old('platform') == 'Shopee' ? 'selected' : '' }}>Shopee</option>
+                                <option value="Tiktok" {{ old('platform') == 'Tiktok' ? 'selected' : '' }}>Tiktok</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="periode_ke" class="form-label fw-semibold">Periode</label>
+                            <select class="form-select" id="periode_ke" name="periode_ke" required>
+                                <option value="" disabled selected>-- Pilih Platform --</option>
+                                <option value="1" {{ old('periode_ke') == '1' ? 'selected' : '' }}>Periode 1</option>
+                                <option value="2" {{ old('periode_ke') == '2' ? 'selected' : '' }}>Periode 2</option>
+                                <option value="3" {{ old('periode_ke') == '3' ? 'selected' : '' }}>Periode 3</option>
+                                <option value="4" {{ old('periode_ke') == '4' ? 'selected' : '' }}>Periode 4</option>
+                                <option value="5" {{ old('periode_ke') == '5' ? 'selected' : '' }}>Periode 5</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="shop_id" class="form-label fw-semibold">Toko</label>
+                            <select class="form-select" id="shop_id" name="shop_id" required>
+                                <option value="" disabled selected>-- Pilih Toko --</option>
+                                @foreach ($shop as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ old('shop_id') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="month_status" class="form-label fw-semibold">Status Periode</label>
+                            <select class="form-select" id="month_status" name="month_status" required>
+                                <option value="current">Saat Ini</option>
+                                <option value="previous">Sebelumnya</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-center mt-4">
+                            <label for="csv-upload" class="custom-file-upload">
+                                <!--
+                                                                                            CHANGE 1: Add the 'multiple' attribute to allow multiple file selection.
+                                                                                            CHANGE 2: Change name from "file" to "file[]" to send files as an array.
+                                                                                        -->
+                                <input type="file" id="csv-upload" name="file[]" accept=".csv" required multiple />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor"
+                                    class="bi bi-cloud-arrow-up-fill text-primary mb-2" viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2z" />
+                                </svg>
+                                <p class="fw-semibold mb-0">Klik untuk memilih file CSV</p>
+                                <small class="text-muted">(Bisa pilih lebih dari satu)</small>
+                                <small id="selected-file-name" class="text-muted d-block mt-1 fw-bold"></small>
+                            </label>
+                        </div>
+
+                        <button type="button" id="upload-button" class="btn btn-primary btn-modern w-100 mt-3"
+                            disabled>Unggah & Proses</button>
+                        <button type="button" id="reset-button"
+                            class="btn btn-outline-danger btn-modern w-100 mt-2">Reset
+                            Semua Data</button>
+                    </form>
                 </div>
             </div>
         </div>
-        <div class="d-flex justify-content-center mb-2">
-            <a href="/performa-produk/compare-sales/kategori" class="btn btn-outline-primary btn-modern">Kategori</a>
-        </div>
-        <div class="d-flex justify-content-center mb-5">
-            <a href="/performa-produk/compare-sales/twoperiod" class="btn btn-outline-success btn-modern">2 Periode</a>
-        </div>
-        <!-- Summary Cards, Charts, Tables (tetap seperti sebelumnya) -->
+    </div>
+    <!-- Summary Cards, Charts, Tables (tetap seperti sebelumnya) -->
+    <hr class="my-4" style="border-width: 4px;">
 
 
-        <div class="row g-4 mb-4">
-            <div class="col-lg-6">
-                <div class="card custom-card">
-
-                    <div class="d-flex justify-content-center align-items-center m-4">
-                        <div class="mx-3">
-                            <i class="bi bi-cash-stack fs-2"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h5 class="fw-bold">Total Periode 1</h5>
-                            <p class="card-text fs-4" id="totalPeriode1">Rp 0</p>
-                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode1">Rp 0</p>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-5 d-flex justify-content-center">
+            <div class="card shadow-lg border-0 rounded-4" style="max-width: 500px; width: 100%;">
+                <div class="card-body p-4">
+                    <!-- Top section with Icon and Totals -->
+                    <div class="d-flex align-items-start">
+                        <!-- Icon -->
+                        <div class="flex-shrink-0 me-3">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-cash-stack fs-3"></i>
+                            </div>
                         </div>
 
+                        <!-- Text Content -->
+                        <div class="flex-grow-1">
+                            <h5 class="text-muted mb-1">Total Periode 1</h5>
+                            <p class="h3 fw-bold text-dark mb-1" id="totalPeriode1">Rp 0</p>
+                            <p class="small text-secondary" id="prev_totalPeriode1">Previous: Rp 0</p>
+                        </div>
                     </div>
-                    <div class="d-flex flex-column flex-sm-row gap-2 m-4">
-                        <div class="mb-2 flex-grow-1">
+
+                    <!-- Divider -->
+                    <hr class="my-4">
+
+                    <!-- Action Buttons Section -->
+                    <div class="row g-2">
+                        <!-- Reset Current Period Button -->
+                        <div class="col-12 col-sm-6">
                             <button type="button" onclick="resetDataPeriode('sales', 'current')"
-                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                <i class="bi bi-trash fs-5 me-2"></i>
-                                Reset Data Periode saat ini
+                                class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash"></i>
+                                <span>Reset Periode Ini</span>
                             </button>
                         </div>
-                        <div class="mb-2 flex-grow-1">
+
+                        <!-- Reset Previous Period Button -->
+                        <div class="col-12 col-sm-6">
                             <button type="button" onclick="resetDataPeriode('sales', 'previous')"
-                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                <i class="bi bi-trash fs-5 me-2"></i>
-                                Reset Data Periode Sebelumnya
+                                class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash-fill"></i>
+                                <span>Reset Periode Lalu</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="card custom-card">
-
-                    <div class="d-flex justify-content-center align-items-center m-4">
-                        <div class="mx-3">
-                            <i class="bi bi-cash-stack fs-2"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h5 class="fw-bold">Total Periode 2</h5>
-                            <p class="card-text fs-4" id="totalPeriode2">Rp 0</p>
-                            <p class="fs-7 text-end text-secondary" id="prev_totalPeriode2">Rp 0</p>
-                        </div>
-
+        </div>
+        <div class="col-lg-2">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-white">
+                    <h5 class="text-center fw-bold m-2">Menu</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-center mb-2">
+                        <a href="/performa-produk/compare-sales/kategori"
+                            class="btn btn-outline-primary btn-modern">Kategori</a>
                     </div>
-                    <div class="d-flex flex-column flex-sm-row gap-2 m-4">
-                        <div class="mb-2 flex-grow-1">
+                    <div class="d-flex justify-content-center">
+                        <a href="/performa-produk/compare-sales/twoperiod" class="btn btn-outline-success btn-modern">2
+                            Periode</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 d-flex justify-content-center">
+            <div class="card shadow-lg border-0 rounded-4" style="max-width: 500px; width: 100%;">
+                <div class="card-body p-4">
+                    <!-- Top section with Icon and Totals -->
+                    <div class="d-flex align-items-start">
+                        <!-- Icon -->
+                        <div class="flex-shrink-0 me-3">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-cash-stack fs-3"></i>
+                            </div>
+                        </div>
+
+                        <!-- Text Content -->
+                        <div class="flex-grow-1">
+                            <h5 class="text-muted mb-1">Total Periode 2</h5>
+                            <p class="h3 fw-bold text-dark mb-1" id="totalPeriode2">Rp 0</p>
+                            <p class="small text-secondary" id="prev_totalPeriode2">Previous: Rp 0</p>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <hr class="my-4">
+
+                    <!-- Action Buttons Section -->
+                    <div class="row g-2">
+                        <!-- Reset Current Period Button -->
+                        <div class="col-12 col-sm-6">
                             <button type="button" onclick="resetDataPeriode('sales_twos', 'current')"
-                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                <i class="bi bi-trash fs-5 me-2"></i>
-                                Reset Data Periode saat ini
+                                class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash"></i>
+                                <span>Reset Periode Ini</span>
                             </button>
                         </div>
-                        <div class="mb-2 flex-grow-1">
+
+                        <!-- Reset Previous Period Button -->
+                        <div class="col-12 col-sm-6">
                             <button type="button" onclick="resetDataPeriode('sales_twos', 'previous')"
-                                class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                <i class="bi bi-trash fs-5 me-2"></i>
-                                Reset Data Periode Sebelumnya
+                                class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash-fill"></i>
+                                <span>Reset Periode Lalu</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="card custom-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-center align-items-center">
-                            <div class="mx-3">
-                                <i class="bi bi-cash-stack fs-2"></i>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-lg border-0 rounded-4" style="max-width: 500px; width: 100%;">
+                <div class="card-body p-4">
+                    <!-- Top section with Icon and Totals -->
+                    <div class="d-flex align-items-start">
+                        <!-- Icon -->
+                        <div class="flex-shrink-0 me-3">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-cash-stack fs-3"></i>
                             </div>
-                            <div class="ms-3">
-                                <h5 class="fw-bold">Total Periode 3</h5>
-                                <p class="card-text fs-4" id="totalPeriode3">Rp 0</p>
-                                <p class="fs-7 text-end text-secondary" id="prev_totalPeriode3">Rp 0</p>
-                            </div>
-
                         </div>
-                        <div class="d-flex flex-column flex-sm-row gap-2">
-                            <div class="mb-2 flex-grow-1">
-                                <button type="button" onclick="resetDataPeriode('sales_threes', 'current')"
-                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                    <i class="bi bi-trash fs-5 me-2"></i>
-                                    Reset Data Periode saat ini
-                                </button>
-                            </div>
-                            <div class="mb-2 flex-grow-1">
-                                <button type="button" onclick="resetDataPeriode('sales_threes', 'previous')"
-                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                    <i class="bi bi-trash fs-5 me-2"></i>
-                                    Reset Data Periode Sebelumnya
-                                </button>
-                            </div>
+
+                        <!-- Text Content -->
+                        <div class="flex-grow-1">
+                            <h5 class="text-muted mb-1">Total Periode 3</h5>
+                            <p class="h3 fw-bold text-dark mb-1" id="totalPeriode3">Rp 0</p>
+                            <p class="small text-secondary" id="prev_totalPeriode3">Previous: Rp 0</p>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card custom-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-center align-items-center">
 
-                            <div class="mx-3">
-                                <i class="bi bi-cash-stack fs-2"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h5 class="fw-bold">Total Periode 4</h5>
-                                <p class="card-text fs-4" id="totalPeriode4">Rp 0</p>
-                                <p class="fs-7 text-end text-secondary" id="prev_totalPeriode4">Rp 0</p>
-                            </div>
+                    <!-- Divider -->
+                    <hr class="my-4">
 
-                        </div>
-                        <div class="d-flex flex-column flex-sm-row gap-2">
-                            <div class="mb-2 flex-grow-1">
-                                <button type="button" onclick="resetDataPeriode('sales_fours', 'current')"
-                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                    <i class="bi bi-trash fs-5 me-2"></i>
-                                    Reset Data Periode saat ini
-                                </button>
-                            </div>
-                            <div class="mb-2 flex-grow-1">
-                                <button type="button" onclick="resetDataPeriode('sales_fours', 'previous')"
-                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                    <i class="bi bi-trash fs-5 me-2"></i>
-                                    Reset Data Periode Sebelumnya
-                                </button>
-                            </div>
+                    <!-- Action Buttons Section -->
+                    <div class="row g-2">
+                        <!-- Reset Current Period Button -->
+                        <div class="col-12 col-sm-6">
+                            <button type="button" onclick="resetDataPeriode('sales_threes', 'current')"
+                                class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash"></i>
+                                <span>Reset Periode Ini</span>
+                            </button>
                         </div>
 
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card custom-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-center align-items-center">
-
-                            <div class="mx-3">
-                                <i class="bi bi-cash-stack fs-2"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h5 class="fw-bold">Total Periode 5</h5>
-                                <p class="card-text fs-4" id="totalPeriode5">Rp 0</p>
-                                <p class="fs-7 text-end text-secondary" id="prev_totalPeriode5">Rp 0</p>
-                            </div>
-
-                        </div>
-                        <div class="d-flex flex-column flex-sm-row gap-2">
-                            <div class="mb-2 flex-grow-1">
-                                <button type="button" onclick="resetDataPeriode('sales_fives', 'current')"
-                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                    <i class="bi bi-trash fs-5 me-2"></i>
-                                    Reset Data Periode saat ini
-                                </button>
-                            </div>
-                            <div class="mb-2 flex-grow-1">
-                                <button type="button" onclick="resetDataPeriode('sales_fives', 'previous')"
-                                    class="btn btn-sm btn-outline-danger btn-modern w-100 mt-2 d-flex align-items-center">
-                                    <i class="bi bi-trash fs-5 me-2"></i>
-                                    Reset Data Periode Sebelumnya
-                                </button>
-                            </div>
+                        <!-- Reset Previous Period Button -->
+                        <div class="col-12 col-sm-6">
+                            <button type="button" onclick="resetDataPeriode('sales_threes', 'previous')"
+                                class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash-fill"></i>
+                                <span>Reset Periode Lalu</span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="col-lg-4">
+            <div class="card shadow-lg border-0 rounded-4" style="max-width: 500px; width: 100%;">
+                <div class="card-body p-4">
+                    <!-- Top section with Icon and Totals -->
+                    <div class="d-flex align-items-start">
+                        <!-- Icon -->
+                        <div class="flex-shrink-0 me-3">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-cash-stack fs-3"></i>
+                            </div>
+                        </div>
 
+                        <!-- Text Content -->
+                        <div class="flex-grow-1">
+                            <h5 class="text-muted mb-1">Total Periode 4</h5>
+                            <p class="h3 fw-bold text-dark mb-1" id="totalPeriode4">Rp 0</p>
+                            <p class="small text-secondary" id="prev_totalPeriode4">Previous: Rp 0</p>
+                        </div>
+                    </div>
 
-        <div class="row g-4 mb-4">
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">Distribusi Penjualan Periode 1</h5>
-                        <canvas id="piePeriodOne"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">Distribusi Penjualan Periode 2</h5>
-                        <canvas id="piePeriodTwo"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">Distribusi Penjualan Periode 3</h5>
-                        <canvas id="piePeriodThree"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">Distribusi Penjualan Periode 4</h5>
-                        <canvas id="piePeriodFour"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">Distribusi Penjualan Periode 5</h5>
-                        <canvas id="piePeriodFive"></canvas>
+                    <!-- Divider -->
+                    <hr class="my-4">
+
+                    <!-- Action Buttons Section -->
+                    <div class="row g-2">
+                        <!-- Reset Current Period Button -->
+                        <div class="col-12 col-sm-6">
+                            <button type="button" onclick="resetDataPeriode('sales_fours', 'current')"
+                                class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash"></i>
+                                <span>Reset Periode Ini</span>
+                            </button>
+                        </div>
+
+                        <!-- Reset Previous Period Button -->
+                        <div class="col-12 col-sm-6">
+                            <button type="button" onclick="resetDataPeriode('sales_fours', 'previous')"
+                                class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash-fill"></i>
+                                <span>Reset Periode Lalu</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="col-lg-4">
+            <div class="card shadow-lg border-0 rounded-4" style="max-width: 500px; width: 100%;">
+                <div class="card-body p-4">
+                    <!-- Top section with Icon and Totals -->
+                    <div class="d-flex align-items-start">
+                        <!-- Icon -->
+                        <div class="flex-shrink-0 me-3">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-cash-stack fs-3"></i>
+                            </div>
+                        </div>
 
-        {{-- Row kedua: Pie Chart Tiktok --}}
-        <div class="row g-4 mb-4">
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">10 Penjualan Teratas (Periode 1)</h5>
-                        <canvas id="top10SalesChartP1" style="max-height:400px;"></canvas>
+                        <!-- Text Content -->
+                        <div class="flex-grow-1">
+                            <h5 class="text-muted mb-1">Total Periode 5</h5>
+                            <p class="h3 fw-bold text-dark mb-1" id="totalPeriode5">Rp 0</p>
+                            <p class="small text-secondary" id="prev_totalPeriode5">Previous: Rp 0</p>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">10 Penjualan Teratas (Periode 2)</h5>
-                        <canvas id="top10SalesChartP2" style="max-height:400px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">10 Penjualan Teratas (Periode 3)</h5>
-                        <canvas id="top10SalesChartP3" style="max-height:400px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">10 Penjualan Teratas (Periode 4)</h5>
-                        <canvas id="top10SalesChartP4" style="max-height:400px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card custom-card">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold">10 Penjualan Teratas (Periode 5)</h5>
-                        <canvas id="top10SalesChartP5" style="max-height:400px;"></canvas>
+
+                    <!-- Divider -->
+                    <hr class="my-4">
+
+                    <!-- Action Buttons Section -->
+                    <div class="row g-2">
+                        <!-- Reset Current Period Button -->
+                        <div class="col-12 col-sm-6">
+                            <button type="button" onclick="resetDataPeriode('sales_fives', 'current')"
+                                class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash"></i>
+                                <span>Reset Periode Ini</span>
+                            </button>
+                        </div>
+
+                        <!-- Reset Previous Period Button -->
+                        <div class="col-12 col-sm-6">
+                            <button type="button" onclick="resetDataPeriode('sales_fives', 'previous')"
+                                class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+                                <i class="bi bi-trash-fill"></i>
+                                <span>Reset Periode Lalu</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row g-4">
-            <!-- ... -->
+    </div>
+
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Distribusi Penjualan Periode 1</h5>
+                    <canvas id="piePeriodOne"></canvas>
+                </div>
+            </div>
         </div>
+        <div class="col-lg-6">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Distribusi Penjualan Periode 2</h5>
+                    <canvas id="piePeriodTwo"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Distribusi Penjualan Periode 3</h5>
+                    <canvas id="piePeriodThree"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Distribusi Penjualan Periode 4</h5>
+                    <canvas id="piePeriodFour"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Distribusi Penjualan Periode 5</h5>
+                    <canvas id="piePeriodFive"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Row kedua: Pie Chart Tiktok --}}
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">10 Penjualan Teratas (Periode 1)</h5>
+                    <canvas id="top10SalesChartP1" style="max-height:400px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">10 Penjualan Teratas (Periode 2)</h5>
+                    <canvas id="top10SalesChartP2" style="max-height:400px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">10 Penjualan Teratas (Periode 3)</h5>
+                    <canvas id="top10SalesChartP3" style="max-height:400px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">10 Penjualan Teratas (Periode 4)</h5>
+                    <canvas id="top10SalesChartP4" style="max-height:400px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card custom-card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">10 Penjualan Teratas (Periode 5)</h5>
+                    <canvas id="top10SalesChartP5" style="max-height:400px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <!-- ... -->
+    </div>
     </div>
     <div id="loading-overlay">
         <div class="spinner-border text-light" role="status">
@@ -684,19 +801,24 @@
                             a) + Number(b), 0);
                         if (periode == 'periode_1') {
                             $('#totalPeriode1').text('Rp ' + periode_current.toLocaleString());
-                            $('#prev_totalPeriode1').text('Rp ' + periode_previous.toLocaleString());
+                            $('#prev_totalPeriode1').text('Previous: Rp ' + periode_previous
+                                .toLocaleString());
                         } else if (periode == 'periode_2') {
                             $('#totalPeriode2').text('Rp ' + periode_current.toLocaleString());
-                            $('#prev_totalPeriode2').text('Rp ' + periode_previous.toLocaleString());
+                            $('#prev_totalPeriode2').text('Previous: Rp ' + periode_previous
+                                .toLocaleString());
                         } else if (periode == 'periode_3') {
                             $('#totalPeriode3').text('Rp ' + periode_current.toLocaleString());
-                            $('#prev_totalPeriode3').text('Rp ' + periode_previous.toLocaleString());
+                            $('#prev_totalPeriode3').text('Previous: Rp ' + periode_previous
+                                .toLocaleString());
                         } else if (periode == 'periode_4') {
                             $('#totalPeriode4').text('Rp ' + periode_current.toLocaleString());
-                            $('#prev_totalPeriode4').text('Rp ' + periode_previous.toLocaleString());
+                            $('#prev_totalPeriode4').text('Previous: Rp ' + periode_previous
+                                .toLocaleString());
                         } else if (periode == 'periode_5') {
                             $('#totalPeriode5').text('Rp ' + periode_current.toLocaleString());
-                            $('#prev_totalPeriode5').text('Rp ' + periode_previous.toLocaleString());
+                            $('#prev_totalPeriode5').text('Previous: Rp ' + periode_previous
+                                .toLocaleString());
                         }
                         new Chart(ctx, {
                             type: 'pie',

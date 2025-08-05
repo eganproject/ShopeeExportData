@@ -307,7 +307,13 @@ class CompareSalesController extends Controller
         // 4. Redirect dengan info jumlah total yang berhasil di-import
         return redirect()
             ->back()
-            ->with('success', "Berhasil memasukkan data sebanyak {$totalRowCount} baris dari semua file untuk platform {$platform}.");
+            ->with([
+                'success' => "Berhasil memasukkan data sebanyak {$totalRowCount} baris dari semua file untuk platform {$platform}.",
+                'periode' => $request->periode_ke,
+                'month_status' => $request->month_status,
+                'platform' => $platform,
+                'toko' => Shop::where('id',$shop_id)->first()->name ?? 'Semua Toko',
+            ]);
     
     }
 
