@@ -1289,6 +1289,72 @@ class CompareSalesController extends Controller
     }
 
     public function getDataTwoPeriod(Request $request){
-        dd($request);
+        $periodeA = $request->periode1;
+        $periodeB = $request->periode2;
+
+        $periodeAArray = explode(' ', $periodeA);
+        $periodeBArray = explode(' ', $periodeB);
+
+        $AmonthlyStatus = $periodeAArray[0];
+        $Atable = $periodeAArray[1];
+        $BmonthlyStatus = $periodeBArray[0];
+        $Btable = $periodeBArray[1];
+
+        $toko = $request->input('shop_id', 'semua');
+
+            // jika nantinya butuh filter per toko, bisa ditambahkan di JOIN product_codes
+            $filterToko = $toko !== 'semua'
+                ? "AND shop_id = $toko"
+                : "";
+        
+
+        $kategori = DB::select("SELECT id, nama_kategori, 
+ 		SUM(pendapatan_per_1) AS pendapatan_per_1, 
+ 		SUM(pendapatan_per_2) AS pendapatan_per_2,
+		SUM(pendapatan_shopee_per_1) AS pendapatan_shopee_per_1,
+		SUM(pendapatan_tiktok_per_1) AS pendapatan_tiktok_per_1,
+		SUM(pendapatan_shopee_per_2) AS pendapatan_shopee_per_2,
+		SUM(pendapatan_tiktok_per_2) AS pendapatan_tiktok_per_2
+		  FROM (
+			   SELECT *, pendapatan_shopee_per_1 + pendapatan_tiktok_per_1 AS pendapatan_per_1, pendapatan_shopee_per_2 + pendapatan_tiktok_per_2 AS pendapatan_per_2
+				FROM (
+					SELECT a.id, a.nama_kategori, b.product_code AS sku, 
+					IFNULL(c.nama_produk, '-') as nama_produk, 
+					IFNULL(c.pendapatan_shopee,0) AS pendapatan_shopee_per_1, 
+					IFNULL(d.pendapatan_tiktok,0) AS pendapatan_tiktok_per_1, 
+					IFNULL(e.pendapatan_shopee,0) AS pendapatan_shopee_per_2, 
+					IFNULL(f.pendapatan_tiktok,0) AS pendapatan_tiktok_per_2
+				         FROM kategori_produks AS a
+                     LEFT JOIN product_codes AS b ON a.id = b.kategori_id 
+                     LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                                 FROM multi_comparative_f_$Atable
+                                 WHERE platform = 'Shopee' AND month_status = '$AmonthlyStatus'   $filterToko
+                                 GROUP BY sku
+                     ) AS c ON b.product_code = c.sku
+                     LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                              FROM multi_comparative_f_$Atable
+                              WHERE platform = 'Tiktok' AND month_status = '$AmonthlyStatus'   $filterToko
+                              GROUP BY sku
+                     ) AS d ON b.product_code = d.sku
+                     LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_shopee
+                                 FROM multi_comparative_f_$Btable
+                                 WHERE platform = 'Shopee' AND month_status = '$BmonthlyStatus'  $filterToko
+                                 GROUP BY sku
+                     ) AS e ON b.product_code = e.sku
+                     LEFT JOIN (
+                              SELECT sku, nama_produk,  SUM(pendapatan) AS pendapatan_tiktok
+                              FROM multi_comparative_f_$Btable
+                              WHERE platform = 'Tiktok' AND month_status = '$BmonthlyStatus'   $filterToko
+                              GROUP BY sku
+                     ) AS f ON b.product_code = f.sku    
+                     
+                     WHERE a.parent_id = 0
+         ) AS ac
+      ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");
+
+       return response()->json(['data' => $kategori], 200);
     }
 }

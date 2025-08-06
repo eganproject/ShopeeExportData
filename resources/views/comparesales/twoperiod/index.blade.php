@@ -15,27 +15,27 @@
                     <div class="col-md-6">
                         <label for="periode1" class="form-label">Periode A</label>
                         <select name="periode1" id="periode1" class="form-select">
-                            <option value="cur_1">Periode 1 (saat ini)</option>
-                            <option value="cur_2">Periode 2 (saat ini)</option>
-                            <option value="cur_3">Periode 3 (saat ini)</option>
-                            <option value="cur_4">Periode 4 (saat ini)</option>
-                            <option value="prev_1">Periode 1 (-prev)</option>
-                            <option value="prev_2">Periode 2 (-prev)</option>
-                            <option value="prev_3">Periode 3 (-prev)</option>
-                            <option value="prev_4">Periode 4 (-prev)</option>
+                            <option value="current sales">Periode 1 (saat ini)</option>
+                            <option value="current sales_twos">Periode 2 (saat ini)</option>
+                            <option value="current sales_threes">Periode 3 (saat ini)</option>
+                            <option value="current sales_fours">Periode 4 (saat ini)</option>
+                            <option value="previous sales">Periode 1 (-prev)</option>
+                            <option value="previous sales_twos">Periode 2 (-prev)</option>
+                            <option value="previous sales_threes">Periode 3 (-prev)</option>
+                            <option value="previous sales_fours">Periode 4 (-prev)</option>
                         </select>
                     </div>
                     <div class="col-md-6">
                         <label for="periode2" class="form-label">Periode B</label>
                         <select name="periode2" id="periode2" class="form-select">
-                            <option value="cur_1">Periode 1 (saat ini)</option>
-                            <option value="cur_2">Periode 2 (saat ini)</option>
-                            <option value="cur_3">Periode 3 (saat ini)</option>
-                            <option value="cur_4">Periode 4 (saat ini)</option>
-                            <option value="prev_1">Periode 1 (-prev)</option>
-                            <option value="prev_2">Periode 2 (-prev)</option>
-                            <option value="prev_3">Periode 3 (-prev)</option>
-                            <option value="prev_4">Periode 4 (-prev)</option>
+                            <option value="current sales">Periode 1 (saat ini)</option>
+                            <option value="current sales_twos">Periode 2 (saat ini)</option>
+                            <option value="current sales_threes">Periode 3 (saat ini)</option>
+                            <option value="current sales_fours">Periode 4 (saat ini)</option>
+                            <option value="previous sales">Periode 1 (-prev)</option>
+                            <option value="previous sales_twos">Periode 2 (-prev)</option>
+                            <option value="previous sales_threes">Periode 3 (-prev)</option>
+                            <option value="previous sales_fours">Periode 4 (-prev)</option>
                         </select>
                     </div>
                     <div class="col-md-6">
@@ -63,16 +63,15 @@
                 <div class="card-body">
                     <h5 class="fw-semibold mb-3 text-center">Detail Pendapatan per SKU</h5>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle" id="table-periode-1" style="width:100%;">
+                        <table class="table table-hover align-middle" id="tableComparative" style="width:100%;">
                             <thead class="table-light">
                                 <tr>
                                     <th rowspan="2" class="text-center align-middle">No</th>
-                                    <th rowspan="2" class="text-center align-middle">SKU</th>
-                                    <th style="min-width: 150px;" rowspan="2" class="text-center align-middle">Produk
+                                    <th style="min-width: 150px;" rowspan="2" class="text-center align-middle">Kategori
                                     </th>
                                     <th colspan="3" class="text-center align-middle">Period A</th>
-                                    <th rowspan="2" class="text-center align-middle">Selisih</th>
                                     <th colspan="3" class="text-center align-middle">Period B</th>
+                                    <th rowspan="2" class="text-center align-middle">Selisih</th>
                                 </tr>
                                 <tr>
                                     <th>Shopee</th>
@@ -146,7 +145,79 @@
                 type: 'POST',
                 data: $('#formInputNih').serialize(),
                 success: function(response) {
-                    $('#table-data tbody').html(response);
+                    var html = '';
+                    let totalShopee1 = 0,
+                        totalTiktok1 = 0,
+                        total1 = 0,
+                        totalShopee2 = 0,
+                        totalTiktok2 = 0,
+                        total2 = 0,
+                        totalSelisih = 0;
+
+                    var selisih = 0;
+                    //    looping untuk response.data
+                    //    lalu diisi ke dalam table
+                    for (let i = 0; i < response.data.length; i++) {
+                        selisih = 0;
+                        // carikan selisih dari pendapatan_per_1 dan pendapatan_per_2
+                        selisih = response.data[i].pendapatan_per_2 - response.data[i].pendapatan_per_1;
+
+
+                        html += '<tr>';
+                        html += '<td>' + (i + 1) + '</td>';
+                        html += '<td><a href="/performa-produk/compare-sales/kategori/' + response.data[i].id + '">' +
+                            response.data[i].nama_kategori + '</a></td>';
+                        html += '<td>' + parseInt(response.data[i].pendapatan_shopee_per_1).toLocaleString(
+                            'id-ID').replace(/,/g, '.') + '</td>';
+                        html += '<td>' + parseInt(response.data[i].pendapatan_tiktok_per_1).toLocaleString(
+                            'id-ID').replace(/,/g, '.') + '</td>';
+                        html += '<td>' + parseInt(response.data[i].pendapatan_per_1).toLocaleString('id-ID')
+                            .replace(/,/g, '.') + '</td>';
+                        html += '<td>' + parseInt(response.data[i].pendapatan_shopee_per_2).toLocaleString(
+                            'id-ID').replace(/,/g, '.') + '</td>';
+                        html += '<td>' + parseInt(response.data[i].pendapatan_tiktok_per_2).toLocaleString(
+                            'id-ID').replace(/,/g, '.') + '</td>';
+                        html += '<td>' + parseInt(response.data[i].pendapatan_per_2).toLocaleString('id-ID')
+                            .replace(/,/g, '.') + '</td>';
+                        html += '<td class="' + (selisih < 0 ? 'text-danger' : 'text-success') + '">' +
+                            parseInt(selisih).toLocaleString('id-ID').replace(/,/g, '.') + '</td>';
+                        html += '</tr>';
+
+
+                        // Calculate the sum for each column
+
+
+                        totalShopee1 += parseInt(response.data[i].pendapatan_shopee_per_1);
+                        totalTiktok1 += parseInt(response.data[i].pendapatan_tiktok_per_1);
+                        total1 += parseInt(response.data[i].pendapatan_per_1);
+                        totalShopee2 += parseInt(response.data[i].pendapatan_shopee_per_2);
+                        totalTiktok2 += parseInt(response.data[i].pendapatan_tiktok_per_2);
+                        total2 += parseInt(response.data[i].pendapatan_per_2);
+                        totalSelisih += response.data[i].pendapatan_per_2 - response.data[i]
+                            .pendapatan_per_1;
+
+
+                        // Append the totals to the footer
+
+
+
+                    }
+
+
+                    $('#tableComparative tbody').html(html);
+                    $('#tableComparative tfoot').html(`
+                    <tr>
+                        <th colspan="2" class="text-center">Total</th>
+                        <th>${totalShopee1.toLocaleString('id-ID').replace(/,/g, '.')}</th>
+                        <th>${totalTiktok1.toLocaleString('id-ID').replace(/,/g, '.')}</th>
+                        <th>${total1.toLocaleString('id-ID').replace(/,/g, '.')}</th>
+                        <th>${totalShopee2.toLocaleString('id-ID').replace(/,/g, '.')}</th>
+                        <th>${totalTiktok2.toLocaleString('id-ID').replace(/,/g, '.')}</th>
+                        <th>${total2.toLocaleString('id-ID').replace(/,/g, '.')}</th>
+                        <th class="${totalSelisih < 0 ? 'text-danger' : 'text-success'}">${totalSelisih.toLocaleString('id-ID').replace(/,/g, '.')}</th>
+                    </tr>
+                `);
+
                 }
             });
         }
