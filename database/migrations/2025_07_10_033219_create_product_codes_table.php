@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('kategori_id');
             $table->string('product_code');
+            $table->mediumText('keterangan')->nullable();
             $table->timestamps();
         });
     }

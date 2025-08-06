@@ -758,7 +758,8 @@ class CompareSalesController extends Controller
 				prev_pendapatan_shopee_per_3 + prev_pendapatan_tiktok_per_3 AS prev_pendapatan_per_3, prev_pendapatan_shopee_per_4 + prev_pendapatan_tiktok_per_4 AS prev_pendapatan_per_4,
 				prev_pendapatan_shopee_per_5 + prev_pendapatan_tiktok_per_5 AS prev_pendapatan_per_5
 				FROM (
-					SELECT a.id, a.nama_kategori, b.product_code AS sku, 
+					SELECT a.id, a.nama_kategori, 
+                    CASE WHEN b.keterangan IS NOT NULL THEN CONCAT(b.product_code, ' (', b.keterangan,')') ELSE b.product_code END AS sku, 
 					IFNULL(c.nama_produk, '-') as nama_produk, 
 					IFNULL(c.pendapatan_shopee,0) AS pendapatan_shopee_per_1, 
 					IFNULL(d.pendapatan_shopee,0) AS pendapatan_shopee_per_2, 

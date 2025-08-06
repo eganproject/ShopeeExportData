@@ -60,7 +60,10 @@ LEFT JOIN kategori_produks AS b ON a.parent_id = b.id
     public function getProductCodes($id)
     {
         $product = DB::select("
-        SELECT a.id,a.product_code AS kode_produk, IFNULL(IFNULL(CONCAT(b.produk,'-',b.nama_variasi),b.produk),'-') AS nama_produk, 
+        SELECT a.id,
+        CASE WHEN a.keterangan IS NOT NULL THEN CONCAT(a.product_code, ' - (', a.keterangan,')')
+        ELSE a.product_code END AS kode_produk, 
+        IFNULL(IFNULL(CONCAT(b.produk,'-',b.nama_variasi),b.produk),'-') AS nama_produk, 
         CASE WHEN b.produk IS NULL THEN 'tidak_ada'
         ELSE 'ada' END AS status
         FROM product_codes AS a
@@ -165,12 +168,15 @@ LEFT JOIN kategori_produks AS b ON a.parent_id = b.id
 
             $importedSkus = [];
             $line = 1;
-            while (($row = fgetcsv($fileHandle, 1000, ',')) !== false) {
+            $product_ket = [];
+            while (($row = fgetcsv($fileHandle, 1000, ';')) !== false) {
                 $line++;
                 // 3. Ambil data HANYA dari kolom pertama (indeks 0)
                 if (isset($row[0]) && !empty(trim($row[0]))) {
                     $sku = trim($row[0]);
+                    $ket = isset($row[1]) && !empty(trim($row[1])) ? trim($row[1]) : null;
                     $importedSkus[] = $sku;
+                    $product_ket[] = $ket;
                 }
             }
             fclose($fileHandle);
@@ -178,6 +184,8 @@ LEFT JOIN kategori_produks AS b ON a.parent_id = b.id
             if (empty($importedSkus)) {
                 return response()->json(['message' => 'File CSV kosong atau tidak memiliki data di kolom A.'], 400);
             }
+
+            
 
             // 4. Lakukan proses dengan SKU yang didapat
             // Contoh: Cari produk berdasarkan SKU dan hubungkan dengan kategori
@@ -188,7 +196,8 @@ LEFT JOIN kategori_produks AS b ON a.parent_id = b.id
             foreach ($importedSkus as $sku) {
                 ProductCode::create([
                     'kategori_id' => $kategoriId,
-                    'product_code' => $sku
+                    'product_code' => $sku,
+                    'keterangan' => array_shift($product_ket)
                 ]);
             }
 
