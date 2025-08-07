@@ -760,7 +760,7 @@ class CompareSalesController extends Controller
 				FROM (
 					SELECT a.id, a.nama_kategori, 
                     CASE WHEN b.keterangan IS NOT NULL THEN CONCAT(b.product_code, ' (', b.keterangan,')') ELSE b.product_code END AS sku, 
-					IFNULL(c.nama_produk, '-') as nama_produk, 
+					IFNULL(c.nama_produk, IFNULL(d.nama_produk,IFNULL(e.nama_produk, IFNULL(f.nama_produk, IFNULL(g.nama_produk, IFNULL(h.nama_produk, IFNULL(i.nama_produk, IFNULL(j.nama_produk, IFNULL(k.nama_produk, IFNULL(l.nama_produk, IFNULL(m.nama_produk, IFNULL(n.nama_produk, IFNULL(o.nama_produk, '-'))))))))))))) as nama_produk, 
 					IFNULL(c.pendapatan_shopee,0) AS pendapatan_shopee_per_1, 
 					IFNULL(d.pendapatan_shopee,0) AS pendapatan_shopee_per_2, 
 					IFNULL(g.pendapatan_shopee,0) AS pendapatan_shopee_per_3,
