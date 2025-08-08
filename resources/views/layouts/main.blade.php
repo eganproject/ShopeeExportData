@@ -81,7 +81,7 @@
                             <li>
                                 <a class="dropdown-item {{ request()->is('performa-produk/compare-sales') || request()->is('performa-produk/compare-sales/kategori') ? 'active text-primary fw-bold' : '' }}"
                                     href="/performa-produk/compare-sales">
-                                    <i class="bi bi-bar-chart-steps me-2"></i>Comparative from Sales
+                                    <i class="fa-regular fa-calendar-days me-2"></i>Comparative from Sales
                                 </a>
                             </li>
                             <li>

@@ -91,7 +91,7 @@
                         <div class="icon-circle mb-3">
                             <i class="bi bi-bar-chart-steps  fa-2x"></i>
                         </div>
-                        <h5 class="card-title">Comparative</h5>
+                        <h5 class="card-title">Comparative Performa Produk</h5>
                         <p class="card-text">Perbandingan 2 periode.</p>
                     </div>
                 </div>
@@ -107,6 +107,32 @@
                         </div>
                         <h5 class="card-title">Kategori</h5>
                         <p class="card-text">Lihat per Kategori.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <a href="/performa-produk/compare-sales" class="card-link">
+                <div class="card modern-card card-success-shadow">
+                    <div class="card-body text-center">
+                        <div class="icon-circle mb-3">
+                          <i class="fa-regular fa-calendar-days fa-2x"></i>
+                        </div>
+                        <h5 class="card-title">Comparative Sales</h5>
+                        <p class="card-text">Comparative 4 Periode dari Sales.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <a href="/performa-produk/compare-sales/twoperiod" class="card-link">
+                <div class="card modern-card card-warning-shadow">
+                    <div class="card-body text-center">
+                        <div class="icon-circle mb-3">
+                            <i class="fas fa-tags fa-2x"></i>
+                        </div>
+                        <h5 class="card-title">Comparative Sales 2 Periode</h5>
+                        <p class="card-text">Comparative 2 Periode dari Sales.</p>
                     </div>
                 </div>
             </a>
