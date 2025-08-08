@@ -19,7 +19,7 @@ class CompareSalesController extends Controller
     {
         $shop = Shop::all();
         // Logic to fetch and display product performance data
-        return view('comparesales.index', compact('shop'));
+        return view('comparesales.index_1', compact('shop'));
     }
 
     public function import(Request $request)
