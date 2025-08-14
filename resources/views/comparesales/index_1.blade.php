@@ -196,6 +196,15 @@
             color: white;
             transform: translateY(-3px);
         }
+        .btn-modern.btn-outline-warning {
+            border: 2px solid var(--warning-color);
+            color: var(--warning-color);
+        }
+        .btn-modern.btn-outline-warning:hover {
+            background-color: var(--warning-color);
+            color: white;
+            transform: translateY(-3px);
+        }
 
         /* =================================================================
         * 6. INDIKATOR & ANIMASI
@@ -468,6 +477,9 @@
                             <a href="/performa-produk/compare-sales/twoperiod" class="btn btn-light btn-modern w-100 border">
                                 <i class="fas fa-balance-scale text-success"></i> Bandingkan 2 Periode
                             </a>
+                            <button type="button" id="shuffle-button" class="btn btn-outline-warning btn-modern w-100">
+                                <i class="fas fa-solid fa-shuffle"></i> Hapus Periode sebelumnya dan Pindahkan Periode sekarang ke periode sebelumnya.
+                            </button>
                             <button type="button" id="reset-button" class="btn btn-outline-danger btn-modern w-100">
                                 <i class="fas fa-sync-alt"></i> Reset Semua Data
                             </button>
@@ -769,6 +781,36 @@
             getTop10Sales('top10SalesChartP3', 'periode_3');
             getTop10Sales('top10SalesChartP4', 'periode_4');
 
+
+            $('#shuffle-button').on('click', function() {
+                Swal.fire({
+                    title: 'Anda Yakin?',
+                    text: "Ini akan menghapus data previous(sebelumnya) kemudian memindahkan semua data current pada semua periode ke data sebelumnya. Aksi ini tidak dapat dibatalkan !",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, pindahkan!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#loading-overlay').css('display', 'flex');
+                        $.ajax({
+                            url: '/performa-produk/compare-sales/switch-data',
+                            type: 'POST',
+                            data: { _token: '{{ csrf_token() }}' },
+                            success: function(response) {
+                                Swal.fire('Berhasil!', response.message, 'success');
+                                setTimeout(() => window.location.reload(), 1500);
+                            },
+                            error: function(xhr) {
+                                Swal.fire('Gagal!', 'Terjadi kesalahan saat memindahkan data.', 'error');
+                                $('#loading-overlay').css('display', 'none');
+                            }
+                        });
+                    }
+                });
+            });
         });
     </script>
 @endpush

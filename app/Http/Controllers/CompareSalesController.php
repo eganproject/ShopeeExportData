@@ -1357,4 +1357,8 @@ class CompareSalesController extends Controller
 
        return response()->json(['data' => $kategori], 200);
     }
+
+    public function switchData(Request $request){
+        dd('ada');
+    }
 }
