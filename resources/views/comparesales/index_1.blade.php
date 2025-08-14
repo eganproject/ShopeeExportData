@@ -478,7 +478,7 @@
                                 <i class="fas fa-balance-scale text-success"></i> Bandingkan 2 Periode
                             </a>
                             <button type="button" id="shuffle-button" class="btn btn-outline-warning btn-modern w-100">
-                                <i class="fas fa-solid fa-shuffle"></i> Hapus Periode sebelumnya dan Pindahkan Periode sekarang ke periode sebelumnya.
+                                <i class="fas fa-solid fa-shuffle"></i> Pindah Periode.
                             </button>
                             <button type="button" id="reset-button" class="btn btn-outline-danger btn-modern w-100">
                                 <i class="fas fa-sync-alt"></i> Reset Semua Data
