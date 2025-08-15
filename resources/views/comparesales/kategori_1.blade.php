@@ -3,9 +3,29 @@
 {{-- Styles untuk DataTables dan Chart.js --}}
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <style>
+           #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 @endpush
 
 @section('content')
+   <div id="loadingOverlay">
+        <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
     <div class="container-fluid">
         <div class="card custom-card mb-4">
             <div class="card-body p-4">
@@ -105,6 +125,8 @@
         }
         // Load data untuk Pie Chart via AJAX
         function getDataHere() {
+            // Menampilkan loading overlay
+             $('#loadingOverlay').css('display', 'flex');
 
             $.ajax({
                 url: '/performa-produk/compare-sales/kategori',
@@ -122,11 +144,16 @@
                     window.cachedDataTiktok = res.dataTiktok;
 
                     generateTable();
-                    genereatePie()
+                    genereatePie();
 
+                    // Menghilangkan loading overlay
+                    $('#loadingOverlay').css('display', 'none');
                 },
                 error: function(err) {
                     console.error('Gagal memuat data pie chart:', err);
+
+                    // Menghilangkan loading overlay
+                    $('#loadingOverlay').css('display', 'none');
                 }
             });
         }
