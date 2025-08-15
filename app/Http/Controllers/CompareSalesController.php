@@ -180,8 +180,9 @@ class CompareSalesController extends Controller
             ->with('success', "Berhasil memasukkan data sebanyak {$count} baris dari platform {$platform}.");
     }
 
-    public function import2(Request $request){
-         
+    public function import2(Request $request)
+    {
+
         // 1. Validasi input
         $request->validate([
             'platform' => 'required|in:Shopee,Tiktok',
@@ -213,14 +214,14 @@ class CompareSalesController extends Controller
                 if ($platform === 'Shopee' && $colCount > 49) {
                     fclose($handle);
                     // Lanjutkan ke file berikutnya jika format salah
-                    continue; 
+                    continue;
                 }
                 if ($platform === 'Tiktok' && $colCount < 61) {
                     fclose($handle);
                     // Lanjutkan ke file berikutnya jika format salah
                     continue;
                 }
-                
+
                 // Reset pointer agar header tidak ikut diproses
                 rewind($handle);
 
@@ -247,7 +248,7 @@ class CompareSalesController extends Controller
                         if ($rowNumber < 3 || $row[1] == 'Dibatalkan' || $row[1] == 'Belum dibayar') {
                             continue;
                         }
-                        
+
                         $rawName = $row[7] ?? '';
                         $utf8Name = mb_convert_encoding($rawName, 'UTF-8', 'Windows-1252');
                         $cleanName = preg_replace('/[^\P{C}\n]+/u', '', $utf8Name);
@@ -285,16 +286,26 @@ class CompareSalesController extends Controller
         if (!empty($rowsToInsert)) {
             $modelClass = null;
             switch ($request->periode_ke) {
-                case 1: $modelClass = \App\Models\MultiComparativeFSales::class; break;
-                case 2: $modelClass = \App\Models\MultiComparativeFSalesTwo::class; break;
-                case 3: $modelClass = \App\Models\MultiComparativeFSalesThree::class; break;
-                case 4: $modelClass = \App\Models\MultiComparativeFSalesFour::class; break;
-                case 5: $modelClass = \App\Models\MultiComparativeFSalesFive::class; break;
+                case 1:
+                    $modelClass = \App\Models\MultiComparativeFSales::class;
+                    break;
+                case 2:
+                    $modelClass = \App\Models\MultiComparativeFSalesTwo::class;
+                    break;
+                case 3:
+                    $modelClass = \App\Models\MultiComparativeFSalesThree::class;
+                    break;
+                case 4:
+                    $modelClass = \App\Models\MultiComparativeFSalesFour::class;
+                    break;
+                case 5:
+                    $modelClass = \App\Models\MultiComparativeFSalesFive::class;
+                    break;
             }
 
             if ($modelClass) {
                 // Lakukan insert dalam satu transaksi besar
-                 DB::transaction(function () use ($modelClass, $rowsToInsert) {
+                DB::transaction(function () use ($modelClass, $rowsToInsert) {
                     // Chunk data untuk menghindari error memory limit pada data yang sangat besar
                     foreach (array_chunk($rowsToInsert, 500) as $chunk) {
                         $modelClass::insert($chunk);
@@ -312,9 +323,9 @@ class CompareSalesController extends Controller
                 'periode' => $request->periode_ke,
                 'month_status' => $request->month_status,
                 'platform' => $platform,
-                'toko' => Shop::where('id',$shop_id)->first()->name ?? 'Semua Toko',
+                'toko' => Shop::where('id', $shop_id)->first()->name ?? 'Semua Toko',
             ]);
-    
+
     }
 
     public function reset(Request $request)
@@ -1192,11 +1203,12 @@ class CompareSalesController extends Controller
         return response()->json(["subkategori" => $kategori]);
     }
 
-    public function getDataGrafikChart(Request $request, $id){
+    public function getDataGrafikChart(Request $request, $id)
+    {
         $toko = $request->input("shop_id", "semua");
         $channel = $request->input("channel", "semua");
-       
-        
+
+
         $filterPlatform = $channel !== 'semua'
             ? "AND c.platform = '$channel'" : "";
 
@@ -1283,12 +1295,14 @@ class CompareSalesController extends Controller
         return response()->json(['labels' => $labels, 'data' => $data]);
     }
 
-    public function twoPeriod(){
+    public function twoPeriod()
+    {
         $shop = Shop::all();
-      return view('comparesales.twoperiod.index', compact('shop'));
+        return view('comparesales.twoperiod.index', compact('shop'));
     }
 
-    public function getDataTwoPeriod(Request $request){
+    public function getDataTwoPeriod(Request $request)
+    {
         $periodeA = $request->periode1;
         $periodeB = $request->periode2;
 
@@ -1302,11 +1316,11 @@ class CompareSalesController extends Controller
 
         $toko = $request->input('shop_id', 'semua');
 
-            // jika nantinya butuh filter per toko, bisa ditambahkan di JOIN product_codes
-            $filterToko = $toko !== 'semua'
-                ? "AND shop_id = $toko"
-                : "";
-        
+        // jika nantinya butuh filter per toko, bisa ditambahkan di JOIN product_codes
+        $filterToko = $toko !== 'semua'
+            ? "AND shop_id = $toko"
+            : "";
+
 
         $kategori = DB::select("SELECT id, nama_kategori, 
  		SUM(pendapatan_per_1) AS pendapatan_per_1, 
@@ -1355,10 +1369,43 @@ class CompareSalesController extends Controller
          ) AS ac
       ) AS ax GROUP BY id ORDER BY pendapatan_per_1 DESC");
 
-       return response()->json(['data' => $kategori], 200);
+        return response()->json(['data' => $kategori], 200);
     }
 
-    public function switchData(Request $request){
-        dd('ada');
+    public function switchData(Request $request)
+    {
+        try {
+            DB::transaction(function () {
+                DB::table("multi_comparative_f_sales")
+                    ->where('month_status', 'previous')
+                    ->delete();
+                DB::table("multi_comparative_f_sales_twos")
+                    ->where('month_status', 'previous')
+                    ->delete();
+                DB::table("multi_comparative_f_sales_threes")
+                    ->where('month_status', 'previous')
+                    ->delete();
+                DB::table("multi_comparative_f_sales_fours")
+                    ->where('month_status', 'previous')
+                    ->delete();
+
+                DB::select("UPDATE multi_comparative_f_sales
+                            SET month_status = 'previous'
+                            WHERE month_status = 'current'");
+                DB::select("UPDATE multi_comparative_f_sales_twos
+                            SET month_status = 'previous'
+                            WHERE month_status = 'current'");
+                DB::select("UPDATE multi_comparative_f_sales_threes
+                            SET month_status = 'previous'
+                            WHERE month_status = 'current'");
+                DB::select("UPDATE multi_comparative_f_sales_fours
+                            SET month_status = 'previous'
+                            WHERE month_status = 'current'");
+            });
+
+            return response()->json(["message" => "berhasil memindahkan data"], 200);
+        } catch (\Exception $e) {
+            return response()->json(["message" => "Gagal memindahkan data"], 500);
+        }
     }
 }
