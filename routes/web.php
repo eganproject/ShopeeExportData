@@ -7,11 +7,11 @@ use App\Http\Controllers\CompareSalesController;
 use App\Http\Controllers\KategoriProdukController;
 use App\Http\Controllers\ShopController;
 
-Route::get('/', function () {
+Route::middleware('auth')->get('/', function () {
     return view('index');
 });
 
-Route::group(['prefix' => 'performa-produk'], function () {
+Route::middleware('auth')->prefix('performa-produk')->group(function () {
     Route::get('/', [PerformaProdukController::class, 'index'])->name('performa_produk.index');
     Route::get('/kategori', [KategoriProdukController::class, 'index'])->name('performa_produk.kategori');
     Route::get('/kategori/get-product-codes/{id}', [KategoriProdukController::class, 'getProductCodes'])->name('performa_produk.getProductCodes');
@@ -53,3 +53,7 @@ Route::group(['prefix' => 'performa-produk'], function () {
     Route::resource('/shops', ShopController::class);
 
 });
+
+Auth::routes(['register' => false]);
+
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
