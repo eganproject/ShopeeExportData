@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <link rel="icon" href="{{ asset('public/logo/cok-logo.png') }}" type="image/png" sizes="32x32"/>
     <title>Cahaya Optima Karya</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -40,12 +42,8 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold text-primary" href="#">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                    class="bi bi-bar-chart-fill me-2" viewBox="0 0 16 16">
-                    <path
-                        d="M1 13.5a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 0-1H14V2.5a.5.5 0 0 0-1 0V13H10V6.5a.5.5 0 0 0-1 0V13H6V9.5a.5.5 0 0 0-1 0V13H2v.5z" />
-                </svg>
-                Cahaya Optima Karya
+                <img src="{{ asset('public/logo/cok-logosss.png') }}"  height="64" alt="Cahaya Optima Karya" class="me-2" />
+                {{-- Cahaya Optima Karya --}}
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNavModern" aria-controls="navbarNavModern" aria-expanded="false"

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - COK Analytics</title>
-    
+    <link rel="icon" href="{{ asset('public/logo/cok-logo.png') }}" type="image/png" sizes="32x32"/>
     <!-- Impor Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -80,10 +80,8 @@
             
             <!-- Header Form -->
             <div class="text-center">
-                <div class="inline-block p-3 bg-slate-800/50 rounded-full mb-4 border border-slate-700">
-                    <i data-lucide="bar-chart-big" class="w-8 h-8 text-cyan-400"></i>
-                </div>
-                <h1 class="text-3xl font-bold text-white">Analytics Login</h1>
+                <img src="{{ asset('public/logo/cok-logo.png') }}" alt="Analytics Logo" class="w-24 h-24 mb-2 mx-auto">
+                <h3 class="text-2xl font-bold text-white">Selamat Datang</h3>
                 <p class="mt-2 text-sm text-slate-400">Masuk untuk mengakses dashboard Anda</p>
             </div>
 
