@@ -137,6 +137,8 @@
         .bg-gradient-success { background: linear-gradient(45deg, #10b981, #6ee7b7); }
         .bg-gradient-warning { background: linear-gradient(45deg, #f59e0b, #fbbf24); }
         .bg-gradient-info { background: linear-gradient(45deg, #3b82f6, #93c5fd); }
+        .bg-gradient-dark { background: linear-gradient(45deg, #1f2937, #4b5563); }
+        .bg-gradient-secondary { background: linear-gradient(45deg, #6c757d, #adb5bd); }
 
         /* =================================================================
         * 4. PANEL KONTROL & FORMULIR
@@ -270,6 +272,24 @@
         <div class="row g-4">
             <!-- KOLOM UTAMA (KIRI) -->
             <div class="col-xl-8">
+                <!-- TOTALS ROW -->
+                <div class="row g-4 mb-4 fade-in" style="animation-delay: 0.05s;">
+                    <div class="col-md-6">
+                        <div class="metric-card bg-gradient-dark h-100">
+                            <h6>Total Seluruh Periode (Saat Ini)</h6>
+                            <p class="metric-value mb-1" id="grandTotalCurrent">Rp 0</p>
+                            <i class="fas fa-coins metric-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="metric-card bg-gradient-secondary h-100">
+                            <h6>Total Seluruh Periode (Sebelumnya)</h6>
+                            <p class="metric-value mb-1" id="grandTotalPrevious">Rp 0</p>
+                            <i class="fas fa-history metric-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- KEY METRICS ROW -->
                 <div class="row g-4 mb-4">
                     <!-- Periode 1 -->
@@ -551,6 +571,9 @@
             // Mendaftarkan plugin datalabels secara global
             Chart.register(ChartDataLabels);
 
+            let grandTotalCurrent = 0;
+            let grandTotalPrevious = 0;
+
             // =================================================================
             // MANAJEMEN FORMULIR & UNGGAH
             // =================================================================
@@ -671,6 +694,11 @@
                         const periode_current = res.jumlah_penjualan_current.reduce((a, b) => Number(a) + Number(b), 0);
                         const periode_previous = res.jumlah_penjualan_previous.reduce((a, b) => Number(a) + Number(b), 0);
                         
+                        grandTotalCurrent += periode_current;
+                        grandTotalPrevious += periode_previous;
+                        $('#grandTotalCurrent').text(formatRupiah(grandTotalCurrent));
+                        $('#grandTotalPrevious').text(formatRupiah(grandTotalPrevious));
+
                         const elementMapping = {
                             'periode_1': { total: '#totalPeriode1', prev: '#prev_totalPeriode1' },
                             'periode_2': { total: '#totalPeriode2', prev: '#prev_totalPeriode2' },
