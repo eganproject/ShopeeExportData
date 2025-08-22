@@ -152,6 +152,12 @@
                     </button>
                 </div>
             </form>
+            <p class="mt-6 text-sm text-center text-slate-400">
+                Live streaming
+                <a href="https://live.cok-analytics.com" class="font-medium text-cyan-400 hover:text-cyan-300">
+                    Klik di sini
+                </a>
+            </p>
             
             <!-- Link ke Halaman Registrasi -->
             @if (Route::has('register'))
