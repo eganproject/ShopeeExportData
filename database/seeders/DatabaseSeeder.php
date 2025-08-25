@@ -24,12 +24,12 @@ class DatabaseSeeder extends Seeder
         // panggil user seeder
         User::create([
              "name"=> "Otomotif",
-                "email"=> "otomotif@cok.com",
+                "email"=> "otomotif@gmail.com",
                 "password"=> Hash::make("Bosoto123")
         ]);
         User::create([
              "name"=> "Otomotif",
-                "email"=> "automotive@cok.com",
+                "email"=> "automotive@gmail.com",
                 "password"=> Hash::make("Password!2")
         ]);
         User::create([
