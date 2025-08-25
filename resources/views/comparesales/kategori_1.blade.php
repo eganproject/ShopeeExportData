@@ -4,7 +4,33 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <style>
-           #loadingOverlay {
+        #table-container {
+            max-height: 1000px;
+            /* Adjust as needed */
+            overflow-y: auto;
+        }
+
+        #kategori-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background-color: #f8f9fa;
+        }
+
+        #kategori-table th:nth-child(2),
+        #kategori-table td:nth-child(2) {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background-color: #f8f9fa;
+        }
+
+        /* Top-left corner cell */
+        #kategori-table thead th:nth-child(2) {
+            z-index: 3;
+        }
+
+        #loadingOverlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -67,7 +93,7 @@
                     </div>
 
                 </div>
-                <div class="table-responsive">
+                <div class="table-responsive" id="table-container">
                     <table class="table table-hover align-middle" id="kategori-table">
                         <thead>
                             <tr>
