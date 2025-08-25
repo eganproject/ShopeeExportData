@@ -67,7 +67,7 @@ class CompareSalesController extends Controller
                         continue;
                     }
 
-                    if ($row[1] == 'Batal' || $row[1] == 'Belum Bayar') {
+                    if ($row[1] == 'Batal') {
                         continue;
                     }
 
@@ -95,7 +95,7 @@ class CompareSalesController extends Controller
                         continue;
                     }
 
-                    if ($row[1] == 'Dibatalkan' || $row[1] == 'Belum dibayar') {
+                    if ($row[1] == 'Dibatalkan') {
                         continue;
                     }
                     // Kolom AB (27), H (7), G (6), P (15)
@@ -229,7 +229,7 @@ class CompareSalesController extends Controller
                     $rowNumber++;
 
                     if ($platform === 'Shopee') {
-                        if ($rowNumber < 2 || $row[1] == 'Batal' || $row[1] == 'Belum Bayar') {
+                        if ($rowNumber < 2 || $row[1] == 'Batal') {
                             continue;
                         }
 
@@ -245,7 +245,7 @@ class CompareSalesController extends Controller
                         $v4 = is_numeric($cleanR) ? (int) $cleanR : 0;
 
                     } else { // Tiktok
-                        if ($rowNumber < 3 || $row[1] == 'Dibatalkan' || $row[1] == 'Belum dibayar') {
+                        if ($rowNumber < 3 || $row[1] == 'Dibatalkan') {
                             continue;
                         }
 
