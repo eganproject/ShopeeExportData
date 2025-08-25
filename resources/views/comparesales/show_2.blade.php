@@ -104,6 +104,35 @@
             justify-content: center;
             align-items: center;
         }
+
+        #subkategori-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: #f8f9fa;
+        }
+
+        #subkategori-table th:nth-child(1),
+        #subkategori-table td:nth-child(1) {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background-color: #f8f9fa;
+        }
+
+        #subkategori-table th:nth-child(2),
+        #subkategori-table td:nth-child(2) {
+            position: sticky;
+            left: 50px;
+            /* Adjust as needed */
+            z-index: 1;
+            background-color: #f8f9fa;
+        }
+
+        #subkategori-table thead th:nth-child(1),
+        #subkategori-table thead th:nth-child(2) {
+            z-index: 2;
+        }
     </style>
 @endpush
 
