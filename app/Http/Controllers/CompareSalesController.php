@@ -89,6 +89,8 @@ class CompareSalesController extends Controller
                     $v4 = is_numeric($cleanR)
                         ? (int) $cleanR
                         : 0;
+                    $jml_order = $row[18] ?? 0;
+                    $v4 = $v4 * $jml_order;
                 } else { // Tiktok
                     // Mulai dari baris ke-3
                     if ($rowNumber < 3) {
@@ -243,6 +245,8 @@ class CompareSalesController extends Controller
                         $rawR = $row[17] ?? '';
                         $cleanR = str_replace('.', '', $rawR);
                         $v4 = is_numeric($cleanR) ? (int) $cleanR : 0;
+                        $jml_order = $row[18] ?? 0;
+                        $v4 = $v4 * $jml_order;
 
                     } else { // Tiktok
                         if ($rowNumber < 3 || $row[1] == 'Dibatalkan') {
