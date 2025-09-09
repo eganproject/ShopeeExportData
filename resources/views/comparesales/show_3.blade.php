@@ -188,8 +188,9 @@
                 <div class="kpi-card bg-gradient-primary animated-card" style="animation-delay: 0.1s;">
                     <i class="fas fa-dollar-sign kpi-icon"></i>
                     <div class="kpi-content">
-                        <h5 class="fw-bold">Total Pendapatan (Bulan Ini)</h5>
+                        <h5 class="fw-bold">Total Pendapatan (Bulan Ini <span id="diff-total-revenue" class="text-muted fw-semibold fs-6"></span>)</h5>
                         <h2 class="display-6" id="kpi-total-revenue">Rp 0</h2>
+                        <p class="display-6 fs-5 text-warning fw-bold" id="kpi-prev-total-revenue">Rp 0</p>
                     </div>
                 </div>
             </div>
@@ -558,6 +559,9 @@
             });
 
             $('#kpi-total-revenue').text(formatRupiah(totalCurrentMonthRevenue));
+            $('#kpi-prev-total-revenue').text('Prev. ' + formatRupiah(totalPrevMonthRevenue));
+            $('#diff-total-revenue').text(formatRupiah(totalCurrentMonthRevenue - totalPrevMonthRevenue));
+
 
             const growth = (totalPrevMonthRevenue > 0) ? ((totalCurrentMonthRevenue - totalPrevMonthRevenue) /
                 totalPrevMonthRevenue) * 100 : (totalCurrentMonthRevenue > 0 ? 100 : 0);
