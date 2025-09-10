@@ -311,7 +311,7 @@
                                     <tr>
                                         <th class="text-center">No</th>
                                         <th class="text-center" style="min-width: 150px;">Kategori</th>
-                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
                                                 class="text-warning">(-month)</span></th>
                                         <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
                                                 class="text-primary">(current)</span></th>
@@ -341,6 +341,16 @@
                                         <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
                                                 class="text-primary">(current)</span></th>
                                         <th class="text-center" style="min-width: 100px;">p3-P3</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-primary">(current)</span></th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-primary">(current)</span></th>
+                                        <th class="text-center" style="min-width: 100px;">P3-P4</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-warning">(-month)</span></th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-primary">(current)</span></th>
+                                        <th class="text-center" style="min-width: 100px;">p4-P4</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -368,7 +378,7 @@
                                         <th class="text-center">No</th>
                                         <th class="text-center">SKU</th>
                                         <th class="text-center" style="min-width: 200px;">Nama</th>
-                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
                                                 class="text-warning">(-month)</span></th>
                                         <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
                                                 class="text-primary">(current)</span></th>
@@ -398,6 +408,16 @@
                                         <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
                                                 class="text-primary">(current)</span></th>
                                         <th class="text-center" style="min-width: 100px;">p3-P3</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span
+                                                class="text-primary">(current)</span></th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-primary">(current)</span></th>
+                                        <th class="text-center" style="min-width: 100px;">P3-P4</th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-warning">(-month)</span></th>
+                                        <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span
+                                                class="text-primary">(current)</span></th>
+                                        <th class="text-center" style="min-width: 100px;">p4-P4</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -560,9 +580,9 @@
                 }
             });
 
-            const currentMonthPeriodTotals = [0, 0, 0];
+            const currentMonthPeriodTotals = [0, 0, 0, 0];
             processedData.forEach(item => {
-                for (let i = 1; i <= 3; i++) {
+                for (let i = 1; i <= 4; i++) {
                     let periodValue = 0;
                     if (channel === 'semua') periodValue = parseFloat(item[`pendapatan_per_${i}`]) || 0;
                     else if (channel === 'shopee') periodValue = parseFloat(item[`pendapatan_shopee_per_${i}`]) ||
@@ -575,7 +595,7 @@
             window.revenueChart = new Chart(document.getElementById('revenueChart'), {
                 type: 'line',
                 data: {
-                    labels: ['Periode 1', 'Periode 2', 'Periode 3'],
+                    labels: ['Periode 1', 'Periode 2', 'Periode 3', 'Periode 4'],
                     datasets: [{
                         label: 'Pendapatan Bulan Ini',
                         data: currentMonthPeriodTotals,
@@ -675,7 +695,7 @@
             window.periodGrowthChart = new Chart(document.getElementById('periodGrowthChart'), {
                 type: 'bar',
                 data: {
-                    labels: ['P1 ke P2', 'P2 ke P3'],
+                    labels: ['P1 ke P2', 'P2 ke P3', 'P3 ke P4'],
                     datasets: [{
                         label: 'Pertumbuhan Pendapatan (%)',
                         data: periodGrowth,
@@ -759,20 +779,24 @@
                 }
 
                 let d = {
-                    1: p[1] - prev_p[3],
+                    1: p[1] - prev_p[4],
                     2: p[1] - prev_p[1],
                     3: p[2] - p[1],
                     4: p[2] - prev_p[2],
                     5: p[3] - p[2],
                     6: p[3] - prev_p[3],
+                    7: p[4] - p[3],
+                    8: p[4] - prev_p[4]
                 };
                 let pct = {
-                    1: prev_p[3] ? (d[1] / prev_p[3]) * 100 : (d[1] !== 0 ? 100 : 0),
+                    1: prev_p[4] ? (d[1] / prev_p[4]) * 100 : (d[1] !== 0 ? 100 : 0),
                     2: prev_p[1] ? (d[2] / prev_p[1]) * 100 : (d[2] !== 0 ? 100 : 0),
                     3: p[1] ? (d[3] / p[1]) * 100 : (d[3] !== 0 ? 100 : 0),
                     4: prev_p[2] ? (d[4] / prev_p[2]) * 100 : (d[4] !== 0 ? 100 : 0),
                     5: p[2] ? (d[5] / p[2]) * 100 : (d[5] !== 0 ? 100 : 0),
                     6: prev_p[3] ? (d[6] / prev_p[3]) * 100 : (d[6] !== 0 ? 100 : 0),
+                    7: p[3] ? (d[7] / p[3]) * 100 : (d[7] !== 0 ? 100 : 0),
+                    8: prev_p[4] ? (d[8] / prev_p[4]) * 100 : (d[8] !== 0 ? 100 : 0)
                 };
 
                 const row = `
@@ -780,37 +804,43 @@
                         <td class="text-center">${index + 1}</td>
                         ${tableId === 'kategori-table' ? `<td>${item.sku}</td>` : ''}
                         <td>${tableId === 'kategori-table' ? item.nama_produk : `<a href="/performa-produk/compare-sales/kategori/${item.id}">${item.nama_kategori}</a>`}</td>
-                        <td class="text-end">${formatRupiah(prev_p[3])}</td><td class="text-end">${formatRupiah(p[1])}</td><td class="text-center">${renderSelisih(d[1], pct[1])}</td>
+                        <td class="text-end">${formatRupiah(prev_p[4])}</td><td class="text-end">${formatRupiah(p[1])}</td><td class="text-center">${renderSelisih(d[1], pct[1])}</td>
                         <td class="text-end">${formatRupiah(prev_p[1])}</td><td class="text-end">${formatRupiah(p[1])}</td><td class="text-center">${renderSelisih(d[2], pct[2])}</td>
                         <td class="text-end">${formatRupiah(p[1])}</td><td class="text-end">${formatRupiah(p[2])}</td><td class="text-center">${renderSelisih(d[3], pct[3])}</td>
                         <td class="text-end">${formatRupiah(prev_p[2])}</td><td class="text-end">${formatRupiah(p[2])}</td><td class="text-center">${renderSelisih(d[4], pct[4])}</td>
                         <td class="text-end">${formatRupiah(p[2])}</td><td class="text-end">${formatRupiah(p[3])}</td><td class="text-center">${renderSelisih(d[5], pct[5])}</td>
                         <td class="text-end">${formatRupiah(prev_p[3])}</td><td class="text-end">${formatRupiah(p[3])}</td><td class="text-center">${renderSelisih(d[6], pct[6])}</td>
+                        <td class="text-end">${formatRupiah(p[3])}</td><td class="text-end">${formatRupiah(p[4])}</td><td class="text-center">${renderSelisih(d[7], pct[7])}</td>
+                        <td class="text-end">${formatRupiah(prev_p[4])}</td><td class="text-end">${formatRupiah(p[4])}</td><td class="text-center">${renderSelisih(d[8], pct[8])}</td>
                     </tr>`;
                 $(`#${tableId} tbody`).append(row);
             });
 
             const total_d = {
-                1: totals.p[1] - totals.prev_p[3],
+                1: totals.p[1] - totals.prev_p[4],
                 2: totals.p[1] - totals.prev_p[1],
                 3: totals.p[2] - totals.p[1],
                 4: totals.p[2] - totals.prev_p[2],
                 5: totals.p[3] - totals.p[2],
                 6: totals.p[3] - totals.prev_p[3],
+                7: totals.p[4] - totals.p[3],
+                8: totals.p[4] - totals.prev_p[4]
             };
             const total_pct = {
-                1: totals.prev_p[3] ? (total_d[1] / totals.prev_p[3]) * 100 : (total_d[1] !== 0 ? 100 : 0),
+                1: totals.prev_p[4] ? (total_d[1] / totals.prev_p[4]) * 100 : (total_d[1] !== 0 ? 100 : 0),
                 2: totals.prev_p[1] ? (total_d[2] / totals.prev_p[1]) * 100 : (total_d[2] !== 0 ? 100 : 0),
                 3: totals.p[1] ? (total_d[3] / totals.p[1]) * 100 : (total_d[3] !== 0 ? 100 : 0),
                 4: totals.prev_p[2] ? (total_d[4] / totals.prev_p[2]) * 100 : (total_d[4] !== 0 ? 100 : 0),
                 5: totals.p[2] ? (total_d[5] / totals.p[2]) * 100 : (total_d[5] !== 0 ? 100 : 0),
-                6: totals.prev_p[3] ? (total_d[6] / totals.prev_p[3]) * 100 : (total_d[6] !== 0 ? 100 : 0)
+                6: totals.prev_p[3] ? (total_d[6] / totals.prev_p[3]) * 100 : (total_d[6] !== 0 ? 100 : 0),
+                7: totals.p[3] ? (total_d[7] / totals.p[3]) * 100 : (total_d[7] !== 0 ? 100 : 0),
+                8: totals.prev_p[4] ? (total_d[8] / totals.prev_p[4]) * 100 : (total_d[8] !== 0 ? 100 : 0)
             };
 
             let tfoot =
                 `<tr class="fw-bold bg-light"><td colspan="${tableId === 'kategori-table' ? 3 : 2}" class="text-end">Total</td>`;
             tfoot +=
-                `<td class="text-end">${formatRupiah(totals.prev_p[3])}</td><td class="text-end">${formatRupiah(totals.p[1])}</td><td class="text-center">${renderSelisih(total_d[1], total_pct[1])}</td>`;
+                `<td class="text-end">${formatRupiah(totals.prev_p[4])}</td><td class="text-end">${formatRupiah(totals.p[1])}</td><td class="text-center">${renderSelisih(total_d[1], total_pct[1])}</td>`;
             tfoot +=
                 `<td class="text-end">${formatRupiah(totals.prev_p[1])}</td><td class="text-end">${formatRupiah(totals.p[1])}</td><td class="text-center">${renderSelisih(total_d[2], total_pct[2])}</td>`;
             tfoot +=
@@ -821,6 +851,10 @@
                 `<td class="text-end">${formatRupiah(totals.p[2])}</td><td class="text-end">${formatRupiah(totals.p[3])}</td><td class="text-center">${renderSelisih(total_d[5], total_pct[5])}</td>`;
             tfoot +=
                 `<td class="text-end">${formatRupiah(totals.prev_p[3])}</td><td class="text-end">${formatRupiah(totals.p[3])}</td><td class="text-center">${renderSelisih(total_d[6], total_pct[6])}</td>`;
+            tfoot +=
+                `<td class="text-end">${formatRupiah(totals.p[3])}</td><td class="text-end">${formatRupiah(totals.p[4])}</td><td class="text-center">${renderSelisih(total_d[7], total_pct[7])}</td>`;
+            tfoot +=
+                `<td class="text-end">${formatRupiah(totals.prev_p[4])}</td><td class="text-end">${formatRupiah(totals.p[4])}</td><td class="text-center">${renderSelisih(total_d[8], total_pct[8])}</td>`;
             tfoot += '</tr>';
             $(`#${tableId} tfoot`).html(tfoot);
 

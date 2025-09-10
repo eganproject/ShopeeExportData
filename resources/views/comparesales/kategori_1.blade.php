@@ -99,7 +99,7 @@
                             <tr>
                                 <th class="text-center">No</th>
                                 <th class="text-center" style="min-width: 150px;">Kategori</th>
-                                <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span class="text-warning">(-month)</span></th>
+                                <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span class="text-warning">(-month)</span></th>
                                 <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span class="text-primary">(current)</span></th>
                                 <th class="text-center" style="min-width: 100px;">p4-P1</th>
                                 <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span class="text-warning">(-month)</span></th>
@@ -117,12 +117,6 @@
                                 <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span class="text-warning">(-month)</span></th>
                                 <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span class="text-primary">(current)</span></th>
                                 <th class="text-center" style="min-width: 100px;">p3-P3</th>
-                                <th class="text-center" style="min-width: 100px;">Periode 3 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center" style="min-width: 100px;">P3-P4</th>
-                                <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span class="text-warning">(-month)</span></th>
-                                <th class="text-center" style="min-width: 100px;">Periode 4 <br> <span class="text-primary">(current)</span></th>
-                                <th class="text-center" style="min-width: 100px;">p4-P4</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -290,16 +284,6 @@
                     pb: 0,
                     diff: 0
                 },
-                7: {
-                    pa: 0,
-                    pb: 0,
-                    diff: 0
-                },
-                8: {
-                    pa: 0,
-                    pb: 0,
-                    diff: 0
-                },
             };
 
 
@@ -334,30 +318,26 @@
 
 
                 // Selisih & Persen
-                let d1 = p1 - prev_p4;
+                let d1 = p1 - prev_p3;
                 let d2 = p1 - prev_p1;
                 let d3 = p2 - p1;
                 let d4 = p2 - prev_p2;
                 let d5 = p3 - p2;
                 let d6 = p3 - prev_p3;
-                let d7 = p4 - p3;
-                let d8 = p4 - prev_p4;
 
-                let pct1 = prev_p4 > 0 ? (d1 / prev_p4) * 100 : (d1 !== 0 ? 100 : 0);
+                let pct1 = prev_p3 > 0 ? (d1 / prev_p3) * 100 : (d1 !== 0 ? 100 : 0);
                 let pct2 = prev_p1 > 0 ? (d2 / prev_p1) * 100 : (d2 !== 0 ? 100 : 0);
                 let pct3 = p1 > 0 ? (d3 / p1) * 100 : (d3 !== 0 ? 100 : 0);
                 let pct4 = prev_p2 > 0 ? (d4 / prev_p2) * 100 : (d4 !== 0 ? 100 : 0);
                 let pct5 = p2 > 0 ? (d5 / p2) * 100 : (d5 !== 0 ? 100 : 0);
                 let pct6 = prev_p3 > 0 ? (d6 / prev_p3) * 100 : (d6 !== 0 ? 100 : 0);
-                let pct7 = p3 > 0 ? (d7 / p3) * 100 : (d7 !== 0 ? 100 : 0);
-                let pct8 = prev_p4 > 0 ? (d8 / prev_p4) * 100 : (d8 !== 0 ? 100 : 0);
 
                 const row = `
                         <tr>
                             <td>${index + 1}</td>
                             <td><a href="/performa-produk/compare-sales/kategori/${item.id}"
                                                 class="text-decoration-none">${item.nama_kategori}</a></td>
-                            <td>${formatRupiah(prev_p4)}</td>
+                            <td>${formatRupiah(prev_p3)}</td>
                             <td>${formatRupiah(p1)}</td>
                             <td>${renderSelisih(d1, pct1)}</td>
                             <td>${formatRupiah(prev_p1)}</td>
@@ -375,17 +355,11 @@
                             <td>${formatRupiah(prev_p3)}</td>
                             <td>${formatRupiah(p3)}</td>
                             <td>${renderSelisih(d6, pct6)}</td>
-                            <td>${formatRupiah(p3)}</td>
-                            <td>${formatRupiah(p4)}</td>
-                            <td>${renderSelisih(d7, pct7)}</td>
-                            <td>${formatRupiah(prev_p4)}</td>
-                            <td>${formatRupiah(p4)}</td>
-                            <td>${renderSelisih(d8, pct8)}</td>
                             
                         </tr>
                     `;
 
-                sum[1].pa += parseFloat(prev_p4) || 0;
+                sum[1].pa += parseFloat(prev_p3) || 0;
                 sum[1].pb += parseFloat(p1) || 0;
                 sum[1].diff += parseFloat(d1) || 0;
 
@@ -409,21 +383,13 @@
                 sum[6].pb += parseFloat(p3) || 0;
                 sum[6].diff += parseFloat(d6) || 0;
 
-                sum[7].pa += parseFloat(p3) || 0;
-                sum[7].pb += parseFloat(p4) || 0;
-                sum[7].diff += parseFloat(d7) || 0;
-
-                sum[8].pa += parseFloat(prev_p4) || 0;
-                sum[8].pb += parseFloat(p4) || 0;
-                sum[8].diff += parseFloat(d8) || 0;
-
                 $('#kategori-table tbody').append(row);
             });
 
 
             let tfoot = `<tr class="fw-semibold">
         <td colspan="2" class="text-end">Total:</td>`;
-            for (let p = 1; p <= 8; p++) {
+            for (let p = 1; p <= 6; p++) {
                 tfoot += `
                   <td>${formatRupiah(sum[p].pa)}</td>
                   <td>${formatRupiah(sum[p].pb)}</td>`;

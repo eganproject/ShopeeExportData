@@ -293,7 +293,7 @@
                 <!-- KEY METRICS ROW -->
                 <div class="row g-4 mb-4">
                     <!-- Periode 1 -->
-                    <div class="col-md-6 col-xl-4 fade-in" style="animation-delay: 0.1s;">
+                    <div class="col-md-6 col-xl-3 fade-in" style="animation-delay: 0.1s;">
                         <div class="metric-card bg-gradient-primary h-100">
                             <h6>Total Periode 1</h6>
                             <p class="metric-value mb-1" id="totalPeriode1">Rp 0</p>
@@ -306,7 +306,7 @@
                         </div>
                     </div>
                     <!-- Periode 2 -->
-                    <div class="col-md-6 col-xl-4 fade-in" style="animation-delay: 0.2s;">
+                    <div class="col-md-6 col-xl-3 fade-in" style="animation-delay: 0.2s;">
                         <div class="metric-card bg-gradient-success h-100">
                             <h6>Total Periode 2</h6>
                             <p class="metric-value mb-1" id="totalPeriode2">Rp 0</p>
@@ -319,7 +319,7 @@
                         </div>
                     </div>
                     <!-- Periode 3 -->
-                    <div class="col-md-6 col-xl-4 fade-in" style="animation-delay: 0.3s;">
+                    <div class="col-md-6 col-xl-3 fade-in" style="animation-delay: 0.3s;">
                         <div class="metric-card bg-gradient-warning h-100">
                             <h6>Total Periode 3</h6>
                             <p class="metric-value mb-1" id="totalPeriode3">Rp 0</p>
@@ -331,7 +331,19 @@
                             </div>
                         </div>
                     </div>
-                   
+                    <!-- Periode 4 -->
+                    <div class="col-md-6 col-xl-3 fade-in" style="animation-delay: 0.4s;">
+                        <div class="metric-card bg-gradient-info h-100">
+                            <h6>Total Periode 4</h6>
+                            <p class="metric-value mb-1" id="totalPeriode4">Rp 0</p>
+                            <p class="metric-prev-value" id="prev_totalPeriode4">Sebelumnya: Rp 0</p>
+                            <i class="fas fa-signal metric-icon"></i>
+                            <div class="reset-buttons">
+                                <button type="button" onclick="resetDataPeriode('sales_fours', 'current')" class="btn-reset" title="Reset Periode Ini"><i class="fas fa-sync-alt"></i></button>
+                                <button type="button" onclick="resetDataPeriode('sales_fours', 'previous')" class="btn-reset" title="Reset Periode Lalu"><i class="fas fa-history"></i></button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- TABS UNTUK CHART LAINNYA -->
@@ -385,7 +397,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {{-- <div class="col-lg-6">
+                                    <div class="col-lg-6">
                                         <div class="card h-100 border-0 shadow-sm">
                                             <div class="card-body d-flex flex-column">
                                                 <h6 class="fw-semibold text-center text-dark mb-3">Distribusi Periode 4</h6>
@@ -394,7 +406,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div> --}}
+                                    </div>
                                 </div>
                             </div>
                             <!-- Konten Bar Charts -->
@@ -403,7 +415,7 @@
                                     <div class="col-lg-6"><div class="card h-100 border-0 shadow-sm"><div class="card-body"><h6 class="fw-semibold text-center text-dark">10 Teratas Periode 1</h6><canvas id="top10SalesChartP1"></canvas></div></div></div>
                                     <div class="col-lg-6"><div class="card h-100 border-0 shadow-sm"><div class="card-body"><h6 class="fw-semibold text-center text-dark">10 Teratas Periode 2</h6><canvas id="top10SalesChartP2"></canvas></div></div></div>
                                     <div class="col-lg-6"><div class="card h-100 border-0 shadow-sm"><div class="card-body"><h6 class="fw-semibold text-center text-dark">10 Teratas Periode 3</h6><canvas id="top10SalesChartP3"></canvas></div></div></div>
-                                    {{-- <div class="col-lg-6"><div class="card h-100 border-0 shadow-sm"><div class="card-body"><h6 class="fw-semibold text-center text-dark">10 Teratas Periode 4</h6><canvas id="top10SalesChartP4"></canvas></div></div></div> --}}
+                                    <div class="col-lg-6"><div class="card h-100 border-0 shadow-sm"><div class="card-body"><h6 class="fw-semibold text-center text-dark">10 Teratas Periode 4</h6><canvas id="top10SalesChartP4"></canvas></div></div></div>
                                 </div>
                             </div>
                         </div>
@@ -448,7 +460,7 @@
                                         <option value="1" {{ old('periode_ke') == '1' ? 'selected' : '' }}>Periode 1</option>
                                         <option value="2" {{ old('periode_ke') == '2' ? 'selected' : '' }}>Periode 2</option>
                                         <option value="3" {{ old('periode_ke') == '3' ? 'selected' : '' }}>Periode 3</option>
-                                        {{-- <option value="4" {{ old('periode_ke') == '4' ? 'selected' : '' }}>Periode 4</option> --}}
+                                        <option value="4" {{ old('periode_ke') == '4' ? 'selected' : '' }}>Periode 4</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -691,7 +703,7 @@
                             'periode_1': { total: '#totalPeriode1', prev: '#prev_totalPeriode1' },
                             'periode_2': { total: '#totalPeriode2', prev: '#prev_totalPeriode2' },
                             'periode_3': { total: '#totalPeriode3', prev: '#prev_totalPeriode3' },
-                            // 'periode_4': { total: '#totalPeriode4', prev: '#prev_totalPeriode4' },
+                            'periode_4': { total: '#totalPeriode4', prev: '#prev_totalPeriode4' },
                         };
                         
                         if(elementMapping[periode]){
@@ -790,12 +802,12 @@
             renderPie('piePeriodOne', 'periode_1');
             renderPie('piePeriodTwo', 'periode_2');
             renderPie('piePeriodThree', 'periode_3');
-            // renderPie('piePeriodFour', 'periode_4');
+            renderPie('piePeriodFour', 'periode_4');
             
             getTop10Sales('top10SalesChartP1', 'periode_1');
             getTop10Sales('top10SalesChartP2', 'periode_2');
             getTop10Sales('top10SalesChartP3', 'periode_3');
-            // getTop10Sales('top10SalesChartP4', 'periode_4');
+            getTop10Sales('top10SalesChartP4', 'periode_4');
 
 
             $('#shuffle-button').on('click', function() {
