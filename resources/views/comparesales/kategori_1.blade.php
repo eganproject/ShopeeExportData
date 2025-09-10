@@ -420,27 +420,27 @@
 
                 const row = `
                         <tr>
-                            <td class="text-center">${index + 1}</td>
-                            <td><a href="/performa-produk/compare-sales/kategori/${item.id}"
+                            <td class="text-center" data-order="${index + 1}">${index + 1}</td>
+                            <td data-order="${(item.nama_kategori || '').toString().toLowerCase()}"><a href="/performa-produk/compare-sales/kategori/${item.id}"
                                                 class="text-decoration-none">${item.nama_kategori}</a></td>
-                            <td class="num">${formatRupiah(prev_p3)}</td>
-                            <td class="num">${formatRupiah(p1)}</td>
-                            <td class="text-center">${renderSelisih(d1, pct1)}</td>
-                            <td class="num">${formatRupiah(prev_p1)}</td>
-                            <td class="num">${formatRupiah(p1)}</td>
-                            <td class="text-center">${renderSelisih(d2, pct2)}</td>
-                            <td class="num">${formatRupiah(p1)}</td>
-                            <td class="num">${formatRupiah(p2)}</td>
-                            <td class="text-center">${renderSelisih(d3, pct3)}</td>
-                            <td class="num">${formatRupiah(prev_p2)}</td>
-                            <td class="num">${formatRupiah(p2)}</td>
-                            <td class="text-center">${renderSelisih(d4, pct4)}</td>
-                            <td class="num">${formatRupiah(p2)}</td>
-                            <td class="num">${formatRupiah(p3)}</td>
-                            <td class="text-center">${renderSelisih(d5, pct5)}</td>
-                            <td class="num">${formatRupiah(prev_p3)}</td>
-                            <td class="num">${formatRupiah(p3)}</td>
-                            <td class="text-center">${renderSelisih(d6, pct6)}</td>
+                            <td class="num" data-order="${parseFloat(prev_p3) || 0}">${formatRupiah(prev_p3)}</td>
+                            <td class="num" data-order="${parseFloat(p1) || 0}">${formatRupiah(p1)}</td>
+                            <td class="text-center" data-order="${parseFloat(d1) || 0}">${renderSelisih(d1, pct1)}</td>
+                            <td class="num" data-order="${parseFloat(prev_p1) || 0}">${formatRupiah(prev_p1)}</td>
+                            <td class="num" data-order="${parseFloat(p1) || 0}">${formatRupiah(p1)}</td>
+                            <td class="text-center" data-order="${parseFloat(d2) || 0}">${renderSelisih(d2, pct2)}</td>
+                            <td class="num" data-order="${parseFloat(p1) || 0}">${formatRupiah(p1)}</td>
+                            <td class="num" data-order="${parseFloat(p2) || 0}">${formatRupiah(p2)}</td>
+                            <td class="text-center" data-order="${parseFloat(d3) || 0}">${renderSelisih(d3, pct3)}</td>
+                            <td class="num" data-order="${parseFloat(prev_p2) || 0}">${formatRupiah(prev_p2)}</td>
+                            <td class="num" data-order="${parseFloat(p2) || 0}">${formatRupiah(p2)}</td>
+                            <td class="text-center" data-order="${parseFloat(d4) || 0}">${renderSelisih(d4, pct4)}</td>
+                            <td class="num" data-order="${parseFloat(p2) || 0}">${formatRupiah(p2)}</td>
+                            <td class="num" data-order="${parseFloat(p3) || 0}">${formatRupiah(p3)}</td>
+                            <td class="text-center" data-order="${parseFloat(d5) || 0}">${renderSelisih(d5, pct5)}</td>
+                            <td class="num" data-order="${parseFloat(prev_p3) || 0}">${formatRupiah(prev_p3)}</td>
+                            <td class="num" data-order="${parseFloat(p3) || 0}">${formatRupiah(p3)}</td>
+                            <td class="text-center" data-order="${parseFloat(d6) || 0}">${renderSelisih(d6, pct6)}</td>
                             
                         </tr>
                     `;
@@ -486,6 +486,19 @@
             tfoot += '</tr>';
             $('#kategori-table tfoot').html(tfoot);
 
+            // Inisialisasi atau refresh DataTable untuk sorting per kolom
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#kategori-table')) {
+                $('#kategori-table').DataTable().destroy();
+            }
+            if ($.fn.dataTable) {
+                $('#kategori-table').DataTable({
+                    order: [],
+                    paging: false,
+                    info: false,
+                    autoWidth: false,
+                    language: { search: 'Cari:', zeroRecords: 'Tidak ada data' }
+                });
+            }
         }
 
         // ================= Metrics & Trend =================
