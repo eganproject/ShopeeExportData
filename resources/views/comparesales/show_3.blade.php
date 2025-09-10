@@ -777,15 +777,15 @@
 
                 const row = `
                     <tr>
-                        <td class="text-center">${index + 1}</td>
-                        ${tableId === 'kategori-table' ? `<td>${item.sku}</td>` : ''}
-                        <td>${tableId === 'kategori-table' ? item.nama_produk : `<a href="/performa-produk/compare-sales/kategori/${item.id}">${item.nama_kategori}</a>`}</td>
-                        <td class="text-end">${formatRupiah(prev_p[3])}</td><td class="text-end">${formatRupiah(p[1])}</td><td class="text-center">${renderSelisih(d[1], pct[1])}</td>
-                        <td class="text-end">${formatRupiah(prev_p[1])}</td><td class="text-end">${formatRupiah(p[1])}</td><td class="text-center">${renderSelisih(d[2], pct[2])}</td>
-                        <td class="text-end">${formatRupiah(p[1])}</td><td class="text-end">${formatRupiah(p[2])}</td><td class="text-center">${renderSelisih(d[3], pct[3])}</td>
-                        <td class="text-end">${formatRupiah(prev_p[2])}</td><td class="text-end">${formatRupiah(p[2])}</td><td class="text-center">${renderSelisih(d[4], pct[4])}</td>
-                        <td class="text-end">${formatRupiah(p[2])}</td><td class="text-end">${formatRupiah(p[3])}</td><td class="text-center">${renderSelisih(d[5], pct[5])}</td>
-                        <td class="text-end">${formatRupiah(prev_p[3])}</td><td class="text-end">${formatRupiah(p[3])}</td><td class="text-center">${renderSelisih(d[6], pct[6])}</td>
+                        <td class="text-center" data-order="${index + 1}">${index + 1}</td>
+                        ${tableId === 'kategori-table' ? `<td data-order="${(item.sku||'').toString().toLowerCase()}">${item.sku||''}</td>` : ''}
+                        <td data-order="${(tableId === 'kategori-table' ? (item.nama_produk||'') : (item.nama_kategori||'')).toString().toLowerCase()}">${tableId === 'kategori-table' ? item.nama_produk : `<a href="/performa-produk/compare-sales/kategori/${item.id}">${item.nama_kategori}</a>`}</td>
+                        <td class="text-end" data-order="${prev_p[3]}">${formatRupiah(prev_p[3])}</td><td class="text-end" data-order="${p[1]}">${formatRupiah(p[1])}</td><td class="text-center" data-order="${d[1]}">${renderSelisih(d[1], pct[1])}</td>
+                        <td class="text-end" data-order="${prev_p[1]}">${formatRupiah(prev_p[1])}</td><td class="text-end" data-order="${p[1]}">${formatRupiah(p[1])}</td><td class="text-center" data-order="${d[2]}">${renderSelisih(d[2], pct[2])}</td>
+                        <td class="text-end" data-order="${p[1]}">${formatRupiah(p[1])}</td><td class="text-end" data-order="${p[2]}">${formatRupiah(p[2])}</td><td class="text-center" data-order="${d[3]}">${renderSelisih(d[3], pct[3])}</td>
+                        <td class="text-end" data-order="${prev_p[2]}">${formatRupiah(prev_p[2])}</td><td class="text-end" data-order="${p[2]}">${formatRupiah(p[2])}</td><td class="text-center" data-order="${d[4]}">${renderSelisih(d[4], pct[4])}</td>
+                        <td class="text-end" data-order="${p[2]}">${formatRupiah(p[2])}</td><td class="text-end" data-order="${p[3]}">${formatRupiah(p[3])}</td><td class="text-center" data-order="${d[5]}">${renderSelisih(d[5], pct[5])}</td>
+                        <td class="text-end" data-order="${prev_p[3]}">${formatRupiah(prev_p[3])}</td><td class="text-end" data-order="${p[3]}">${formatRupiah(p[3])}</td><td class="text-center" data-order="${d[6]}">${renderSelisih(d[6], pct[6])}</td>
                     </tr>`;
                 $(`#${tableId} tbody`).append(row);
             });
