@@ -51,6 +51,7 @@
             align-items: center;
             gap: 20px;
             transition: all 0.3s ease-in-out;
+            min-height: 160px;
         }
 
         .kpi-card:hover {
@@ -183,28 +184,41 @@
         </div>
 
         {{-- Row 1: KPIs --}}
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="kpi-card bg-gradient-primary animated-card" style="animation-delay: 0.1s;">
-                    <i class="fas fa-dollar-sign kpi-icon"></i>
-                    <div class="kpi-content">
-                        <h5 class="fw-bold">Total Pendapatan (Bulan Ini <span id="diff-total-revenue" class="text-muted fw-semibold fs-6"></span>)</h5>
-                        <h2 class="display-6" id="kpi-total-revenue">Rp 0</h2>
-                        <p class="display-6 fs-5 text-warning fw-bold" id="kpi-prev-total-revenue">Rp 0</p>
+        <div class="row g-4 mb-4 align-items-stretch">
+            <div class="col-md-4 d-flex">
+                <div class="kpi-card bg-gradient-primary animated-card text-white w-100 h-100" style="animation-delay: 0.1s;">
+                    <i class="fas fa-sack-dollar kpi-icon"></i>
+                    <div class="kpi-content w-100">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div class="text-uppercase small opacity-75">Total Pendapatan (Bulan Ini)</div>
+                            <span id="kpi-rev-diff-pill" class="badge rounded-pill bg-secondary d-flex align-items-center gap-1">
+                                <i class="fas fa-minus"></i>
+                                <span id="kpi-rev-diff-pct">0%</span>
+                            </span>
+                        </div>
+                        <div class="display-6 fw-bold lh-1" id="kpi-total-revenue">Rp 0</div>
+                        <div class="small opacity-75">Bulan lalu: <span id="kpi-prev-total-revenue">Rp 0</span></div>
+                        <div class="small opacity-75">Δ <span id="diff-total-revenue">Rp 0</span> vs bulan lalu</div>
+                        <div class="progress mt-2" style="height: 6px; background: rgba(255,255,255,0.25);">
+                            <div id="kpi-rev-progress" class="progress-bar bg-warning" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="kpi-card bg-gradient-success animated-card" style="animation-delay: 0.2s;">
+            <div class="col-md-4 d-flex">
+                <div class="kpi-card bg-gradient-success animated-card w-100 h-100" style="animation-delay: 0.2s;">
                     <i class="fas fa-chart-line kpi-icon"></i>
-                    <div class="kpi-content">
-                        <h5 class="fw-bold">Pertumbuhan (MoM)</h5>
-                        <h2 class="display-6" id="kpi-growth">0%</h2>
+                    <div class="kpi-content w-100">
+                        <h5 class="fw-bold">Pertumbuhan P1 → P2 → P3</h5>
+                        <div class="d-flex justify-content-between"><div class="small opacity-75">P1 → P2</div><div class="h4 mb-0" id="kpi-p12-pct">0%</div></div>
+                        <div class="small opacity-75" id="kpi-p12-amt">(Rp 0)</div>
+                        <div class="d-flex justify-content-between mt-2"><div class="small opacity-75">P2 → P3</div><div class="h4 mb-0" id="kpi-p23-pct">0%</div></div>
+                        <div class="small opacity-75" id="kpi-p23-amt">(Rp 0)</div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="kpi-card bg-gradient-info animated-card" style="animation-delay: 0.3s;">
+            <div class="col-md-4 d-flex">
+                <div class="kpi-card bg-gradient-info animated-card w-100 h-100" style="animation-delay: 0.3s;">
                     <i class="fas fa-trophy kpi-icon"></i>
                     <div class="kpi-content">
                         <h5 class="fw-bold">Channel Terbaik (Bulan Ini)</h5>
@@ -539,14 +553,51 @@
             });
 
             $('#kpi-total-revenue').text(formatRupiah(totalCurrentMonthRevenue));
-            $('#kpi-prev-total-revenue').text('Prev. ' + formatRupiah(totalPrevMonthRevenue));
-            $('#diff-total-revenue').text(formatRupiah(totalCurrentMonthRevenue - totalPrevMonthRevenue));
+            $('#kpi-prev-total-revenue').text(formatRupiah(totalPrevMonthRevenue));
+            const diffAmt = totalCurrentMonthRevenue - totalPrevMonthRevenue;
+            $('#diff-total-revenue').text((diffAmt>=0?'+':'') + formatRupiah(Math.abs(diffAmt))).toggleClass('text-warning', diffAmt<0);
 
 
             const growth = (totalPrevMonthRevenue > 0) ? ((totalCurrentMonthRevenue - totalPrevMonthRevenue) /
                 totalPrevMonthRevenue) * 100 : (totalCurrentMonthRevenue > 0 ? 100 : 0);
-            $('#kpi-growth').text(`${growth.toFixed(2)}%`).removeClass('text-success text-danger').addClass(growth >= 0 ?
-                'text-white' : 'text-warning');
+            // Growth P1 -> P2 -> P3 (totals for current month)
+            // Aggregate totals by reading item fields per channel
+            let totalP1 = 0, totalP2 = 0, totalP3 = 0;
+            processedData.forEach(it => {
+                let p1=0,p2=0,p3=0;
+                if (channel === 'semua') {
+                    p1 = parseFloat(it.pendapatan_per_1) || 0;
+                    p2 = parseFloat(it.pendapatan_per_2) || 0;
+                    p3 = parseFloat(it.pendapatan_per_3) || 0;
+                } else if (channel === 'shopee') {
+                    p1 = parseFloat(it.pendapatan_shopee_per_1) || 0;
+                    p2 = parseFloat(it.pendapatan_shopee_per_2) || 0;
+                    p3 = parseFloat(it.pendapatan_shopee_per_3) || 0;
+                } else {
+                    p1 = parseFloat(it.pendapatan_tiktok_per_1) || 0;
+                    p2 = parseFloat(it.pendapatan_tiktok_per_2) || 0;
+                    p3 = parseFloat(it.pendapatan_tiktok_per_3) || 0;
+                }
+                totalP1 += p1; totalP2 += p2; totalP3 += p3;
+            });
+            const d12 = totalP2 - totalP1;
+            const d23 = totalP3 - totalP2;
+            const pct12 = totalP1 > 0 ? (d12 / totalP1) * 100 : (d12 !== 0 ? 100 : 0);
+            const pct23 = totalP2 > 0 ? (d23 / totalP2) * 100 : (d23 !== 0 ? 100 : 0);
+            $('#kpi-p12-pct').text(`${pct12.toFixed(1)}%`);
+            $('#kpi-p12-amt').text(`(${(d12>=0?'+':'')}${formatRupiah(Math.abs(d12))})`);
+            $('#kpi-p23-pct').text(`${pct23.toFixed(1)}%`);
+            $('#kpi-p23-amt').text(`(${(d23>=0?'+':'')}${formatRupiah(Math.abs(d23))})`);
+
+            // Update diff pill and progress bar in the revenue card
+            $('#kpi-rev-diff-pct').text(`${growth.toFixed(1)}%`);
+            const pill = $('#kpi-rev-diff-pill');
+            pill.removeClass('bg-success bg-danger bg-secondary');
+            pill.addClass(growth>0 ? 'bg-success' : growth<0 ? 'bg-danger' : 'bg-secondary');
+            pill.find('i').attr('class', growth>0 ? 'fas fa-arrow-up' : growth<0 ? 'fas fa-arrow-down' : 'fas fa-minus');
+            const pctComplete = (totalPrevMonthRevenue>0) ? (totalCurrentMonthRevenue/totalPrevMonthRevenue)*100 : (totalCurrentMonthRevenue>0 ? 100 : 0);
+            const pctClamped = Math.max(0, Math.min(100, pctComplete));
+            $('#kpi-rev-progress').css('width', pctClamped.toFixed(0) + '%').attr('aria-valuenow', pctClamped.toFixed(0));
 
             let bestChannel = '-';
             if (totalCurrentMonthShopee > totalCurrentMonthTiktok) bestChannel = 'Shopee';
