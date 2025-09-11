@@ -316,7 +316,20 @@
                         </h2>
                         <h4 class="fw-bold mb-0 text-center" id="sub_namaToko">Nama Toko</h4>
                         <h5 class="text-muted text-center" id="sub_namaChannel">Channel</h5>
-                        <div class="table-responsive mt-4">
+
+                        <div class="d-flex justify-content-end align-items-center mt-3">
+                            <div class="ms-auto w-100" style="max-width:320px;">
+                                <label for="subkategoriId" class="form-label mb-1"><i class="fas fa-filter me-2"></i>Filter Sub Kategori</label>
+                                <select name="subkategoriId" id="subkategoriId" class="form-select">
+                                    <option value="semua">Semua</option>
+                                    @foreach ($subkategori as $item)
+                                        <option value="{{ $item->nama_kategori }}">{{ $item->nama_kategori }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive mt-3">
                             {{-- Summary Table (Prev total vs Current total) --}}
                             <div class="mb-3" id="sub-summary">
                                 <div class="d-flex justify-content-between align-items-center px-2 pt-2">
@@ -345,16 +358,7 @@
                                 </div>
                             </div>
 
-                            <div style="max-width: 400px;" class="flex m-2">
-                                <label for="subkategoriId" class="form-label"><i
-                                        class="fas fa-store me-2"></i>Filter</label>
-                                <select name="subkategoriId" id="subkategoriId" class="form-select">
-                                    <option value="semua">Semua</option>
-                                    @foreach ($subkategori as $item)
-                                        <option value="{{ $item->nama_kategori }}">{{ $item->nama_kategori }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            
                             <table class="table table-hover align-middle" id="subkategori-table" style="width:100%;">
                                 <thead>
                                     <tr>
