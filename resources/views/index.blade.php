@@ -204,7 +204,7 @@
                                 <i class="fa-solid fa-calendar-days fa-2x"></i>
                             </div>
                             <h5 class="card-title">Comparative Sales</h5>
-                            <p class="card-text">Bandingkan sales dalam 4 periode.</p>
+                            <p class="card-text">Bandingkan sales dalam periode.</p>
                         </div>
                     </div>
                 </a>
