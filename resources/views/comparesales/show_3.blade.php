@@ -134,6 +134,13 @@
         #subkategori-table thead th:nth-child(2) {
             z-index: 2;
         }
+
+        /* Sub Kategori Summary table styling */
+        #sub-summary { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; }
+        #subkategori-summary-table thead th { position: sticky; top: 0; z-index: 2; background-color: #f8f9fa; }
+        #subkategori-summary-table th, #subkategori-summary-table td { white-space: nowrap; vertical-align: middle; }
+        #subkategori-summary-table th:nth-child(2), #subkategori-summary-table td:nth-child(2) { position: sticky; left: 0; z-index: 1; background-color: #fff; box-shadow: 4px 0 6px rgba(16,24,40,.05); }
+        #subkategori-summary-table thead th:nth-child(2) { z-index: 3; }
     </style>
 @endpush
 
@@ -310,6 +317,34 @@
                         <h4 class="fw-bold mb-0 text-center" id="sub_namaToko">Nama Toko</h4>
                         <h5 class="text-muted text-center" id="sub_namaChannel">Channel</h5>
                         <div class="table-responsive mt-4">
+                            {{-- Summary Table (Prev total vs Current total) --}}
+                            <div class="mb-3" id="sub-summary">
+                                <div class="d-flex justify-content-between align-items-center px-2 pt-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-table text-primary"></i>
+                                        <div>
+                                            <h6 class="fw-bold mb-0">Ringkasan Total per Sub Kategori</h6>
+                                            <small class="text-muted">Perbandingan jumlah semua periode previous vs current</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive px-2 pb-2">
+                                    <table class="table table-hover table-sm align-middle" id="subkategori-summary-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center" style="width:60px">No</th>
+                                                <th class="text-center" style="min-width: 180px;">Sub Kategori</th>
+                                                <th class="text-center" style="min-width: 140px;">Total Previous</th>
+                                                <th class="text-center" style="min-width: 140px;">Total Current</th>
+                                                <th class="text-center" style="min-width: 140px;">Perubahan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        <tfoot></tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
                             <div style="max-width: 400px;" class="flex m-2">
                                 <label for="subkategoriId" class="form-label"><i
                                         class="fas fa-store me-2"></i>Filter</label>
@@ -513,6 +548,7 @@
                     filteredSubKategoriData = subKategoriData.filter(item => item.nama_kategori === selectedSubKategori);
                 }
                 putTable(filteredSubKategoriData, 'subkategori-table');
+                generateSubSummaryTable(filteredSubKategoriData);
             }
         }
 
@@ -885,6 +921,79 @@
                     // This can be left empty as the footer is now static
                 }
             });
+        }
+
+        // Summary table for Sub Kategori: total previous (prev1+prev2+prev3) vs total current (p1+p2+p3)
+        function generateSubSummaryTable(data) {
+            const channel = $('#channel').val();
+            // destroy previous datatable first
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#subkategori-summary-table')) {
+                $('#subkategori-summary-table').DataTable().destroy();
+            }
+
+            const tbody = $('#subkategori-summary-table tbody');
+            const tfoot = $('#subkategori-summary-table tfoot');
+            if (!tbody.length) return;
+            tbody.empty(); tfoot.empty();
+
+            function rupiah(v){ return 'Rp ' + (v||0).toLocaleString('id-ID'); }
+            function badge(diff, pct){
+                const up = diff > 0, down = diff < 0;
+                const cls = up ? 'text-success' : down ? 'text-danger' : 'text-muted';
+                const icon = up ? '<i class="fas fa-caret-up"></i>' : down ? '<i class="fas fa-caret-down"></i>' : '<i class="fas fa-minus"></i>';
+                const pctText = (isFinite(pct) ? pct.toFixed(2) : '0.00') + '%';
+                const amtText = rupiah(Math.abs(diff));
+                return `<span class="${cls}">${icon} ${pctText} <span class="text-muted ms-1">(${amtText})</span></span>`;
+            }
+
+            let sumPrev = 0, sumCurr = 0;
+            (data||[]).forEach((item, i) => {
+                const p1 = parseFloat(channel==='semua'? item.pendapatan_per_1 : channel==='shopee'? item.pendapatan_shopee_per_1 : item.pendapatan_tiktok_per_1) || 0;
+                const p2 = parseFloat(channel==='semua'? item.pendapatan_per_2 : channel==='shopee'? item.pendapatan_shopee_per_2 : item.pendapatan_tiktok_per_2) || 0;
+                const p3 = parseFloat(channel==='semua'? item.pendapatan_per_3 : channel==='shopee'? item.pendapatan_shopee_per_3 : item.pendapatan_tiktok_per_3) || 0;
+                const prev1 = parseFloat(channel==='semua'? item.prev_pendapatan_per_1 : channel==='shopee'? item.prev_pendapatan_shopee_per_1 : item.prev_pendapatan_tiktok_per_1) || 0;
+                const prev2 = parseFloat(channel==='semua'? item.prev_pendapatan_per_2 : channel==='shopee'? item.prev_pendapatan_shopee_per_2 : item.prev_pendapatan_tiktok_per_2) || 0;
+                const prev3 = parseFloat(channel==='semua'? item.prev_pendapatan_per_3 : channel==='shopee'? item.prev_pendapatan_shopee_per_3 : item.prev_pendapatan_tiktok_per_3) || 0;
+
+                const totalPrev = prev1+prev2+prev3;
+                const totalCurr = p1+p2+p3;
+                const diff = totalCurr - totalPrev;
+                const pct = totalPrev>0 ? (diff/totalPrev)*100 : (diff!==0?100:0);
+
+                sumPrev += totalPrev; sumCurr += totalCurr;
+
+                const row = `
+                    <tr>
+                        <td class="text-center" data-order="${i+1}">${i+1}</td>
+                        <td data-order="${(item.nama_kategori||'').toString().toLowerCase()}">${item.nama_kategori||'-'}</td>
+                        <td class="text-end" data-order="${totalPrev}">${rupiah(totalPrev)}</td>
+                        <td class="text-end" data-order="${totalCurr}">${rupiah(totalCurr)}</td>
+                        <td class="text-center" data-order="${diff}">${badge(diff, pct)}</td>
+                    </tr>`;
+                tbody.append(row);
+            });
+
+            const tdiff = sumCurr - sumPrev;
+            const tpct = sumPrev>0 ? (tdiff/sumPrev)*100 : (tdiff!==0?100:0);
+            const foot = `
+                <tr class="fw-semibold">
+                    <td colspan="2" class="text-end">Total:</td>
+                    <td class="text-end">${rupiah(sumPrev)}</td>
+                    <td class="text-end">${rupiah(sumCurr)}</td>
+                    <td class="text-center">${badge(tdiff, tpct)}</td>
+                </tr>`;
+            tfoot.html(foot);
+
+            if ($.fn.dataTable) {
+                $('#subkategori-summary-table').DataTable({
+                    order: [],
+                    paging: false,
+                    info: false,
+                    autoWidth: false,
+                    searching: false,
+                    language: { zeroRecords: 'Tidak ada data' }
+                });
+            }
         }
 
         // Initial load
