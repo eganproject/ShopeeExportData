@@ -122,7 +122,7 @@
                         <div class="metric-card p-3 h-100">
                             <div class="d-flex align-items-center gap-2">
                                 <i class="bi bi-award text-warning"></i>
-                                <span class="label">Top Kategori</span>
+                                <span class="label">Top Kategori (Total Current)</span>
                             </div>
                             <div class="value mt-1" id="kpi-topcat-name">-</div>
                             <div class="label" id="kpi-topcat-value">-</div>
@@ -624,7 +624,7 @@
             const channel = $('#channel').val();
             const data = window.cachedKategoriData || [];
             let totals = { p1: 0, p2: 0, p3: 0, prev1: 0, prev2: 0, prev3: 0 };
-            let top = { name: '-', value: 0 };
+            let top = { name: '-', value: 0 }; // value = total current (p1+p2+p3)
             const arr = [];
             let consistentCount = 0; let consistentSumP3 = 0;
             data.forEach(item => {
@@ -637,15 +637,16 @@
                 const n1 = parseFloat(p1) || 0, n2 = parseFloat(p2) || 0, n3 = parseFloat(p3) || 0;
                 const nprev1 = parseFloat(prev1) || 0, nprev2 = parseFloat(prev2) || 0, nprev3 = parseFloat(prev3) || 0;
                 totals.p1 += n1; totals.p2 += n2; totals.p3 += n3; totals.prev1 += nprev1; totals.prev2 += nprev2; totals.prev3 += nprev3;
-                arr.push({ name: item.nama_kategori, v: n3 });
-                if (n3 > top.value) top = { name: item.nama_kategori, value: n3 };
+                const totalCurr = n1 + n2 + n3;
+                arr.push({ name: item.nama_kategori, v: totalCurr });
+                if (totalCurr > top.value) top = { name: item.nama_kategori, value: totalCurr };
                 if (n2 >= n1 && n3 >= n2) { consistentCount++; consistentSumP3 += n3; }
             });
             const sorted = arr.sort((a,b)=>b.v-a.v);
             const top3 = sorted.slice(0,3).reduce((s,i)=>s+i.v,0);
-            const contribTop3 = totals.p3 > 0 ? (top3 / totals.p3) * 100 : 0;
+            const mtd = totals.p1 + totals.p2 + totals.p3; // total current keseluruhan
+            const contribTop3 = mtd > 0 ? (top3 / mtd) * 100 : 0;
             // Month-to-date vs last month (sum of P1..P3)
-            const mtd = totals.p1 + totals.p2 + totals.p3;
             const prevMonth = totals.prev1 + totals.prev2 + totals.prev3;
             const mtdPct = prevMonth > 0 ? ((mtd - prevMonth) / prevMonth) * 100 : (mtd !== 0 ? 100 : 0);
             const mtdAmt = mtd - prevMonth;
