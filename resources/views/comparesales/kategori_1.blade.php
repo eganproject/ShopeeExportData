@@ -32,6 +32,11 @@
 
         #table-container { max-height: 1000px; overflow: auto; background: var(--cok-surface); border: 1px solid var(--cok-border); border-radius: 12px; }
         #kategori-table { margin: 0; }
+        #kategori-summary { background: var(--cok-surface); border: 1px solid var(--cok-border); border-radius: 12px; }
+        #kategori-summary-table thead th { position: sticky; top: 0; z-index: 2; background: var(--cok-surface-2); border-bottom: 1px solid var(--cok-border); }
+        #kategori-summary-table th, #kategori-summary-table td { white-space: nowrap; vertical-align: middle; }
+        #kategori-summary-table th:nth-child(2), #kategori-summary-table td:nth-child(2) { position: sticky; left: 0; z-index: 1; background-color: #fff; box-shadow: 4px 0 6px rgba(16,24,40,.05); }
+        #kategori-summary-table thead th:nth-child(2) { z-index: 3; }
 
         #kategori-table thead th {
             position: sticky; top: 0; z-index: 2;
@@ -163,6 +168,34 @@
                         </div>
                     </div>
                 </div>
+                {{-- Summary Table (Prev total vs Current total) --}}
+                <div class="mb-4" id="kategori-summary">
+                    <div class="d-flex justify-content-between align-items-center px-3 pt-3">
+                        <div class="page-heading">
+                            <span class="icon"><i class="bi bi-table"></i></span>
+                            <div>
+                                <h6 class="fw-bold mb-0">Ringkasan Total per Kategori</h6>
+                                <small class="text-muted">Perbandingan jumlah semua periode previous vs current</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive px-3 pb-3">
+                        <table class="table table-hover table-sm align-middle" id="kategori-summary-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width:60px">No</th>
+                                    <th class="text-center" style="min-width: 180px;">Kategori</th>
+                                    <th class="text-center" style="min-width: 140px;">Total Previous</th>
+                                    <th class="text-center" style="min-width: 140px;">Total Current</th>
+                                    <th class="text-center" style="min-width: 140px;">Perubahan</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="table-responsive" id="table-container">
                     <table class="table table-hover table-sm align-middle" id="kategori-table">
                         <thead>
@@ -212,6 +245,7 @@
         function changeChannel() {
 
             generateTable();
+            generateSummaryTable();
         }
         // Load data untuk Pie Chart via AJAX
         function getDataHere() {
@@ -234,6 +268,7 @@
                     window.cachedDataTiktok = res.dataTiktok;
 
                     generateTable();
+                    generateSummaryTable();
                     genereatePie();
                     updateKpis();
                     renderTrend();
@@ -307,8 +342,13 @@
             updateKpis();
             renderTrend();
 
+            // Pastikan DataTable lama dimatikan sebelum render ulang
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#kategori-table')) {
+                $('#kategori-table').DataTable().destroy();
+            }
             var data = window.cachedKategoriData;
             $('#kategori-table tbody').empty();
+            $('#kategori-table tfoot').empty();
 
             function formatRupiah(value) {
                 return 'Rp ' + (value || 0).toLocaleString('id-ID', {
@@ -497,6 +537,84 @@
                     info: false,
                     autoWidth: false,
                     language: { search: 'Cari:', zeroRecords: 'Tidak ada data' }
+                });
+            }
+        }
+
+        // Summary table: total previous (prev1+prev2+prev3) vs total current (p1+p2+p3)
+        function generateSummaryTable() {
+            const data = window.cachedKategoriData || [];
+            const channel = $('#channel').val();
+
+            function rupiah(v){ return 'Rp ' + (v||0).toLocaleString('id-ID'); }
+            function badge(diff, pct){
+                const up = diff > 0, down = diff < 0;
+                const cls = up ? 'diff-up' : down ? 'diff-down' : 'diff-zero';
+                const icon = up ? 'arrow-up-right' : down ? 'arrow-down-right' : 'dash-lg';
+                const pctText = (isFinite(pct) ? pct.toFixed(2) : '0.00') + '%';
+                const amtText = 'Rp ' + Math.abs(diff).toLocaleString('id-ID');
+                return `<span class=\"badge diff-badge ${cls}\"><i class=\"bi bi-${icon} me-1\"></i>${pctText} <span class=\"text-muted ms-1\">(${amtText})</span></span>`;
+            }
+
+            // Matikan DataTable lama sebelum render ulang
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#kategori-summary-table')) {
+                $('#kategori-summary-table').DataTable().destroy();
+            }
+            const tbody = $('#kategori-summary-table tbody');
+            const tfoot = $('#kategori-summary-table tfoot');
+            if (!tbody.length) return;
+            tbody.empty(); tfoot.empty();
+
+            let sumPrev = 0, sumCurr = 0;
+            data.forEach((item, i) => {
+                const p1 = channel == 'semua' ? item.pendapatan_per_1 : channel == 'shopee' ? item.pendapatan_shopee_per_1 : item.pendapatan_tiktok_per_1;
+                const p2 = channel == 'semua' ? item.pendapatan_per_2 : channel == 'shopee' ? item.pendapatan_shopee_per_2 : item.pendapatan_tiktok_per_2;
+                const p3 = channel == 'semua' ? item.pendapatan_per_3 : channel == 'shopee' ? item.pendapatan_shopee_per_3 : item.pendapatan_tiktok_per_3;
+                const prev1 = channel == 'semua' ? item.prev_pendapatan_per_1 : channel == 'shopee' ? item.prev_pendapatan_shopee_per_1 : item.prev_pendapatan_tiktok_per_1;
+                const prev2 = channel == 'semua' ? item.prev_pendapatan_per_2 : channel == 'shopee' ? item.prev_pendapatan_shopee_per_2 : item.prev_pendapatan_tiktok_per_2;
+                const prev3 = channel == 'semua' ? item.prev_pendapatan_per_3 : channel == 'shopee' ? item.prev_pendapatan_shopee_per_3 : item.prev_pendapatan_tiktok_per_3;
+
+                const n1 = parseFloat(p1)||0, n2=parseFloat(p2)||0, n3=parseFloat(p3)||0;
+                const pn1=parseFloat(prev1)||0, pn2=parseFloat(prev2)||0, pn3=parseFloat(prev3)||0;
+                const totalPrev = pn1+pn2+pn3; const totalCurr = n1+n2+n3; const diff = totalCurr-totalPrev;
+                const pct = totalPrev>0 ? (diff/totalPrev)*100 : (diff!==0?100:0);
+
+                sumPrev += totalPrev; sumCurr += totalCurr;
+
+                const row = `
+                    <tr>
+                        <td class=\"text-center\" data-order=\"${i+1}\">${i+1}</td>
+                        <td data-order=\"${(item.nama_kategori||'').toString().toLowerCase()}\"><a href=\"/performa-produk/compare-sales/kategori/${item.id}\" class=\"text-decoration-none\">${item.nama_kategori}</a></td>
+                        <td class=\"num\" data-order=\"${totalPrev}\">${rupiah(totalPrev)}</td>
+                        <td class=\"num\" data-order=\"${totalCurr}\">${rupiah(totalCurr)}</td>
+                        <td class=\"text-center\" data-order=\"${diff}\">${badge(diff, pct)}</td>
+                    </tr>`;
+                tbody.append(row);
+            });
+
+            const tdiff = sumCurr - sumPrev;
+            const tpct = sumPrev>0 ? (tdiff/sumPrev)*100 : (tdiff!==0?100:0);
+            const foot = `
+                <tr class=\"fw-semibold\">
+                    <td colspan=\"2\" class=\"text-end\">Total:</td>
+                    <td class=\"num\">${rupiah(sumPrev)}</td>
+                    <td class=\"num\">${rupiah(sumCurr)}</td>
+                    <td class=\"text-center\">${badge(tdiff, tpct)}</td>
+                </tr>`;
+            tfoot.html(foot);
+
+            // Init/refresh DataTable
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#kategori-summary-table')) {
+                $('#kategori-summary-table').DataTable().destroy();
+            }
+            if ($.fn.dataTable) {
+                $('#kategori-summary-table').DataTable({
+                    order: [],
+                    paging: false,
+                    info: false,
+                    autoWidth: false,
+                    searching: false,
+                    language: { zeroRecords: 'Tidak ada data' }
                 });
             }
         }
