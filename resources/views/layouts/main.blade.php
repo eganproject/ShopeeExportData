@@ -97,6 +97,14 @@
                             
                         </ul>
                     </li>
+                    @if(optional(auth()->user())->shop_id == 0)
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold {{ request()->is('performa-produk/user-activities') ? 'active text-primary' : '' }}"
+                           href="{{ route('userActivities.index') }}">
+                           <i class="bi bi-clock-history me-2"></i>User Activity
+                        </a>
+                    </li>
+                    @endif
                     <!-- Add this new list item for logout -->
                     <li class="nav-item">
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PerformaProdukController;
 use App\Http\Controllers\ComparePerformaController;
 use App\Http\Controllers\CompareSalesController;
+use App\Http\Controllers\UserActivityController;
 use App\Http\Controllers\KategoriProdukController;
 use App\Http\Controllers\ShopController;
 
@@ -51,6 +52,10 @@ Route::middleware('auth')->prefix('performa-produk')->group(function () {
     Route::get('/compare-sales/kategori/get-sub-kategori/{id}', [CompareSalesController::class, 'getSubKategori'])->name('compareSales.getSubKategori');
     Route::get('/compare-sales/kategori/get-data-grafik-chart/{id}', [CompareSalesController::class, 'getDataGrafikChart'])->name('compareSales.getDataGrafikChart');
     Route::resource('/shops', ShopController::class);
+
+    // User Activity
+    Route::get('/user-activities', [UserActivityController::class, 'index'])->name('userActivities.index');
+    Route::get('/user-activities/data', [UserActivityController::class, 'data'])->name('userActivities.data');
 
 });
 
