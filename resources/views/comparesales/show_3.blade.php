@@ -370,7 +370,7 @@
                                                 class="text-warning">(-month)</span></th>
                                         <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
                                                 class="text-primary">(current)</span></th>
-                                        <th class="text-center" style="min-width: 100px;">p4-P1</th>
+                                        <th class="text-center" style="min-width: 100px;">p3-P1</th>
                                         <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
                                                 class="text-warning">(-month)</span></th>
                                         <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
@@ -427,7 +427,7 @@
                                                 class="text-warning">(-month)</span></th>
                                         <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
                                                 class="text-primary">(current)</span></th>
-                                        <th class="text-center" style="min-width: 100px;">p4-P1</th>
+                                        <th class="text-center" style="min-width: 100px;">p3-P1</th>
                                         <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
                                                 class="text-warning">(-month)</span></th>
                                         <th class="text-center" style="min-width: 100px;">Periode 1 <br> <span
