@@ -13,6 +13,7 @@ class UserActivity extends Model
         'user_id',
         'shop_id',
         'action',
+        'description',
         'route',
         'url',
         'method',
@@ -21,4 +22,3 @@ class UserActivity extends Model
         'payload',
     ];
 }
-

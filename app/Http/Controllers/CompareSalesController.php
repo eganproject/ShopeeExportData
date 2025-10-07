@@ -19,14 +19,14 @@ class CompareSalesController extends Controller
 {
     public function index(Request $request)
     {
-        $this->logActivity($request, 'compare_sales.index');
+        $this->logActivity($request, 'compare_sales.index', 'Mengakses halaman Utama Compare Sales');
         $userShopId = optional(auth()->user())->shop_id ?? 0;
         $shop = $userShopId == 0 ? Shop::all() : Shop::where('id', $userShopId)->get();
         // Logic to fetch and display product performance data
         return view('comparesales.index_1', compact('shop'));
     }
 
-    private function logActivity(Request $request, string $action, array $meta = []): void
+    private function logActivity(Request $request, string $action, ?string $description = null, array $meta = []): void
     {
         try {
             $user = Auth::user();
@@ -34,6 +34,7 @@ class CompareSalesController extends Controller
                 'user_id' => optional($user)->id,
                 'shop_id' => optional($user)->shop_id ?? 0,
                 'action' => $action,
+                'description' => $description,
                 'route' => optional($request->route())->getName(),
                 'url' => $request->fullUrl(),
                 'method' => $request->method(),
@@ -48,7 +49,7 @@ class CompareSalesController extends Controller
 
     public function import(Request $request)
     {
-        $this->logActivity($request, 'compare_sales.import');
+        $this->logActivity($request, 'compare_sales.import', 'Import data Compare Sales (single file)');
         // 1. Validasi input
         $request->validate([
             'platform' => 'required|in:Shopee,Tiktok',
@@ -209,7 +210,7 @@ class CompareSalesController extends Controller
 
     public function import2(Request $request)
     {
-        $this->logActivity($request, 'compare_sales.import_multi');
+        $this->logActivity($request, 'compare_sales.import_multi', 'Import data Compare Sales (multi file)');
 
         // 1. Validasi input
         $request->validate([
@@ -360,7 +361,7 @@ class CompareSalesController extends Controller
 
     public function reset(Request $request)
     {
-        $this->logActivity($request, 'compare_sales.reset', [
+        $this->logActivity($request, 'compare_sales.reset', 'Reset data Compare Sales', [
             'periode' => $request->periode,
             'month_status' => $request->month_status,
         ]);
@@ -380,7 +381,7 @@ class CompareSalesController extends Controller
 
     public function chart(Request $request)
     {
-        $this->logActivity($request, 'compare_sales.chart', [ 'periode' => $request->periode ]);
+        // Only track page views and DB-changing actions (no log for read-only chart AJAX)
         $userShopId = optional(auth()->user())->shop_id ?? 0;
         if ($request->periode == 'periode_1') {
             $data = DB::table('multi_comparative_f_sales')
@@ -510,7 +511,7 @@ class CompareSalesController extends Controller
 
     public function getTop10Sales(Request $request)
     {
-        $this->logActivity($request, 'compare_sales.top10', [ 'periode' => $request->periode ]);
+        // Only track page views and DB-changing actions (no log for read-only top10 AJAX)
         $userShopId = optional(auth()->user())->shop_id ?? 0;
         if ($request->periode == 'periode_1') {
 
@@ -570,7 +571,10 @@ class CompareSalesController extends Controller
     public function kategori(Request $request)
     {
         // log page or ajax usage
-        $this->logActivity($request, $request->ajax() ? 'compare_sales.kategori.ajax' : 'compare_sales.kategori.view');
+        // Track only page views for this endpoint; skip logging when AJAX
+        if (!$request->ajax()) {
+            $this->logActivity($request, 'compare_sales.kategori.view', 'Mengakses halaman Kategori');
+        }
         if ($request->ajax()) {
             $userShopId = optional(auth()->user())->shop_id ?? 0;
             $toko = $request->input('toko', 'semua');
@@ -799,10 +803,17 @@ class CompareSalesController extends Controller
 
     public function show(Request $request, $id)
     {
-        $this->logActivity($request, 'compare_sales.show', [ 'kategori_id' => $id ]);
         $userShopId = optional(auth()->user())->shop_id ?? 0;
         $shops = $userShopId == 0 ? Shop::all() : Shop::where('id', $userShopId)->get();
         $kategori = KategoriProduk::find($id);
+        // Log setelah mengetahui nama kategori agar deskripsi lebih informatif
+        $kategoriName = optional($kategori)->nama_kategori ?: '-';
+        $this->logActivity(
+            $request,
+            'compare_sales.show',
+            'Mengakses halaman Detail Kategori: ' . $kategoriName,
+            [ 'kategori_id' => $id, 'kategori_nama' => $kategoriName ]
+        );
         $subkategori = KategoriProduk::where('parent_id', $id)->get();
 
         return view("comparesales.show_3", compact(['kategori', 'shops', 'subkategori']));
@@ -810,7 +821,7 @@ class CompareSalesController extends Controller
 
     function getDetailKategori(Request $request, $id)
     {
-        $this->logActivity($request, 'compare_sales.kategori.detail', [ 'kategori_id' => $id ]);
+        // Read-only data endpoint; not logged
         $userShopId = optional(auth()->user())->shop_id ?? 0;
         $toko = $request->input('shop_id', 'semua');
         if ($userShopId != 0) {
@@ -1265,7 +1276,7 @@ class CompareSalesController extends Controller
 
     public function getDataGrafikChart(Request $request, $id)
     {
-        $this->logActivity($request, 'compare_sales.kategori.grafik', [ 'kategori_id' => $id, 'channel' => $request->input('channel') ]);
+        // Read-only data endpoint; not logged
         $userShopId = optional(auth()->user())->shop_id ?? 0;
         $toko = $request->input("shop_id", "semua");
         if ($userShopId != 0) {
@@ -1362,7 +1373,7 @@ class CompareSalesController extends Controller
 
     public function twoPeriod(Request $request)
     {
-        $this->logActivity($request, 'compare_sales.two_period.view');
+        $this->logActivity($request, 'compare_sales.two_period.view', 'Mengakses halaman Bandingkan 2 Periode');
         $userShopId = optional(auth()->user())->shop_id ?? 0;
         $shop = $userShopId == 0 ? Shop::all() : Shop::where('id', $userShopId)->get();
         return view('comparesales.twoperiod.index', compact('shop'));
@@ -1370,7 +1381,7 @@ class CompareSalesController extends Controller
 
     public function getDataTwoPeriod(Request $request)
     {
-        $this->logActivity($request, 'compare_sales.two_period.data', [ 'periode1' => $request->periode1, 'periode2' => $request->periode2 ]);
+        // Read-only data endpoint; not logged
         $periodeA = $request->periode1;
         $periodeB = $request->periode2;
 
@@ -1446,7 +1457,7 @@ class CompareSalesController extends Controller
 
     public function switchData(Request $request)
     {
-        $this->logActivity($request, 'compare_sales.switch_data');
+        $this->logActivity($request, 'compare_sales.switch_data', 'Memindahkan data current ke previous (switch data)');
         try {
             DB::transaction(function () {
                 DB::table("multi_comparative_f_sales")

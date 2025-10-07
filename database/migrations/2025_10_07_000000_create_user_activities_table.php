@@ -13,6 +13,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->integer('shop_id')->default(0);
             $table->string('action');
+            $table->string('description')->nullable();
             $table->string('route')->nullable();
             $table->string('url');
             $table->string('method', 10);
@@ -30,4 +31,3 @@ return new class extends Migration
         Schema::dropIfExists('user_activities');
     }
 };
-
