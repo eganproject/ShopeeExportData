@@ -152,7 +152,9 @@
                         <div class="col-lg-4 col-md-6">
                             <label for="toko" class="form-label mb-1">Toko</label>
                             <select class="form-select" aria-label="Pilih toko" id="toko" onchange="getDataHere()">
-                                <option value="semua">Semua Toko</option>
+                                @if(optional(auth()->user())->shop_id == 0)
+                                    <option value="semua">Semua Toko</option>
+                                @endif
                                 @foreach ($shops as $item)
                                     <option value="{{ $item->id }}">{{ $item->name }}</option>
                                 @endforeach

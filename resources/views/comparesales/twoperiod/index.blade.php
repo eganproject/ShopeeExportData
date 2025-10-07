@@ -45,7 +45,9 @@
                     <div class="col-md-4">
                         <label for="shop_id" class="form-label">Toko</label>
                         <select name="shop_id" id="shop_id" class="form-select">
-                            <option value="semua">Semua Toko</option>
+                            @if(optional(auth()->user())->shop_id == 0)
+                                <option value="semua">Semua Toko</option>
+                            @endif
                             @foreach ($shop as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                             @endforeach

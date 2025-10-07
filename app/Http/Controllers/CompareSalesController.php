@@ -12,18 +12,43 @@ use App\Models\MultiComparativeFSalesTwo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\UserActivity;
 
 class CompareSalesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $shop = Shop::all();
+        $this->logActivity($request, 'compare_sales.index');
+        $userShopId = optional(auth()->user())->shop_id ?? 0;
+        $shop = $userShopId == 0 ? Shop::all() : Shop::where('id', $userShopId)->get();
         // Logic to fetch and display product performance data
         return view('comparesales.index_1', compact('shop'));
     }
 
+    private function logActivity(Request $request, string $action, array $meta = []): void
+    {
+        try {
+            $user = Auth::user();
+            UserActivity::create([
+                'user_id' => optional($user)->id,
+                'shop_id' => optional($user)->shop_id ?? 0,
+                'action' => $action,
+                'route' => optional($request->route())->getName(),
+                'url' => $request->fullUrl(),
+                'method' => $request->method(),
+                'ip' => $request->ip(),
+                'user_agent' => (string) $request->header('User-Agent'),
+                'payload' => json_encode($meta ?: $request->except(['password', '_token', 'file', 'file.*'])),
+            ]);
+        } catch (\Throwable $e) {
+            // Swallow logging errors to not affect UX
+        }
+    }
+
     public function import(Request $request)
     {
+        $this->logActivity($request, 'compare_sales.import');
         // 1. Validasi input
         $request->validate([
             'platform' => 'required|in:Shopee,Tiktok',
@@ -184,6 +209,7 @@ class CompareSalesController extends Controller
 
     public function import2(Request $request)
     {
+        $this->logActivity($request, 'compare_sales.import_multi');
 
         // 1. Validasi input
         $request->validate([
@@ -334,6 +360,10 @@ class CompareSalesController extends Controller
 
     public function reset(Request $request)
     {
+        $this->logActivity($request, 'compare_sales.reset', [
+            'periode' => $request->periode,
+            'month_status' => $request->month_status,
+        ]);
         if ($request->periode) {
             DB::table("multi_comparative_f_$request->periode")
                 ->where('month_status', $request->month_status)
@@ -350,10 +380,13 @@ class CompareSalesController extends Controller
 
     public function chart(Request $request)
     {
+        $this->logActivity($request, 'compare_sales.chart', [ 'periode' => $request->periode ]);
+        $userShopId = optional(auth()->user())->shop_id ?? 0;
         if ($request->periode == 'periode_1') {
             $data = DB::table('multi_comparative_f_sales')
                 ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
                 SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('platform')
                 ->get();
 
@@ -377,6 +410,7 @@ class CompareSalesController extends Controller
             $data = DB::table('multi_comparative_f_sales_twos')
                 ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
                 SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('platform')
                 ->get();
 
@@ -400,6 +434,7 @@ class CompareSalesController extends Controller
             $data = DB::table('multi_comparative_f_sales_threes')
                 ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
                 SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('platform')
                 ->get();
 
@@ -424,6 +459,7 @@ class CompareSalesController extends Controller
             $data = DB::table('multi_comparative_f_sales_fours')
                 ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
                 SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('platform')
                 ->get();
 
@@ -448,6 +484,7 @@ class CompareSalesController extends Controller
             $data = DB::table('multi_comparative_f_sales_fives')
                 ->selectRaw('SUM(CASE WHEN month_status = "current" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_current, 
                 SUM(CASE WHEN month_status = "previous" THEN pendapatan ELSE 0 END) AS jumlah_penjualan_previous, platform as labels')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('platform')
                 ->get();
 
@@ -473,11 +510,14 @@ class CompareSalesController extends Controller
 
     public function getTop10Sales(Request $request)
     {
+        $this->logActivity($request, 'compare_sales.top10', [ 'periode' => $request->periode ]);
+        $userShopId = optional(auth()->user())->shop_id ?? 0;
         if ($request->periode == 'periode_1') {
 
             $rows = DB::table('multi_comparative_f_sales')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
                 ->where('month_status', 'current')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('sku')
                 ->orderByDesc('total')
                 ->limit(10)
@@ -487,6 +527,7 @@ class CompareSalesController extends Controller
             $rows = DB::table('multi_comparative_f_sales_twos')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
                 ->where('month_status', 'current')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('sku')
                 ->orderByDesc('total')
                 ->limit(10)
@@ -495,6 +536,7 @@ class CompareSalesController extends Controller
             $rows = DB::table('multi_comparative_f_sales_threes')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
                 ->where('month_status', 'current')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('sku')
                 ->orderByDesc('total')
                 ->limit(10)
@@ -503,6 +545,7 @@ class CompareSalesController extends Controller
             $rows = DB::table('multi_comparative_f_sales_fours')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
                 ->where('month_status', 'current')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('sku')
                 ->orderByDesc('total')
                 ->limit(10)
@@ -511,6 +554,7 @@ class CompareSalesController extends Controller
             $rows = DB::table('multi_comparative_f_sales_fives')
                 ->select('sku', DB::raw('SUM(pendapatan) as total'))
                 ->where('month_status', 'current')
+                ->when($userShopId != 0, function ($q) use ($userShopId) { $q->where('shop_id', $userShopId); })
                 ->groupBy('sku')
                 ->orderByDesc('total')
                 ->limit(10)
@@ -525,11 +569,14 @@ class CompareSalesController extends Controller
 
     public function kategori(Request $request)
     {
-
-
+        // log page or ajax usage
+        $this->logActivity($request, $request->ajax() ? 'compare_sales.kategori.ajax' : 'compare_sales.kategori.view');
         if ($request->ajax()) {
-
+            $userShopId = optional(auth()->user())->shop_id ?? 0;
             $toko = $request->input('toko', 'semua');
+            if ($userShopId != 0) {
+                $toko = $userShopId;
+            }
 
             // jika nantinya butuh filter per toko, bisa ditambahkan di JOIN product_codes
             $filterToko = $toko !== 'semua'
@@ -743,15 +790,18 @@ class CompareSalesController extends Controller
             ]);
         }
 
-        $shops = Shop::all();
+        $userShopId = optional(auth()->user())->shop_id ?? 0;
+        $shops = $userShopId == 0 ? Shop::all() : Shop::where('id', $userShopId)->get();
         return view('comparesales.kategori_1', compact('shops'));
     }
 
 
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $shops = Shop::all();
+        $this->logActivity($request, 'compare_sales.show', [ 'kategori_id' => $id ]);
+        $userShopId = optional(auth()->user())->shop_id ?? 0;
+        $shops = $userShopId == 0 ? Shop::all() : Shop::where('id', $userShopId)->get();
         $kategori = KategoriProduk::find($id);
         $subkategori = KategoriProduk::where('parent_id', $id)->get();
 
@@ -760,7 +810,12 @@ class CompareSalesController extends Controller
 
     function getDetailKategori(Request $request, $id)
     {
+        $this->logActivity($request, 'compare_sales.kategori.detail', [ 'kategori_id' => $id ]);
+        $userShopId = optional(auth()->user())->shop_id ?? 0;
         $toko = $request->input('shop_id', 'semua');
+        if ($userShopId != 0) {
+            $toko = $userShopId;
+        }
 
         // jika nantinya butuh filter per toko, bisa ditambahkan di JOIN product_codes
         $filterToko = $toko !== 'semua'
@@ -1210,7 +1265,12 @@ class CompareSalesController extends Controller
 
     public function getDataGrafikChart(Request $request, $id)
     {
+        $this->logActivity($request, 'compare_sales.kategori.grafik', [ 'kategori_id' => $id, 'channel' => $request->input('channel') ]);
+        $userShopId = optional(auth()->user())->shop_id ?? 0;
         $toko = $request->input("shop_id", "semua");
+        if ($userShopId != 0) {
+            $toko = $userShopId;
+        }
         $channel = $request->input("channel", "semua");
 
 
@@ -1300,14 +1360,17 @@ class CompareSalesController extends Controller
         return response()->json(['labels' => $labels, 'data' => $data]);
     }
 
-    public function twoPeriod()
+    public function twoPeriod(Request $request)
     {
-        $shop = Shop::all();
+        $this->logActivity($request, 'compare_sales.two_period.view');
+        $userShopId = optional(auth()->user())->shop_id ?? 0;
+        $shop = $userShopId == 0 ? Shop::all() : Shop::where('id', $userShopId)->get();
         return view('comparesales.twoperiod.index', compact('shop'));
     }
 
     public function getDataTwoPeriod(Request $request)
     {
+        $this->logActivity($request, 'compare_sales.two_period.data', [ 'periode1' => $request->periode1, 'periode2' => $request->periode2 ]);
         $periodeA = $request->periode1;
         $periodeB = $request->periode2;
 
@@ -1319,7 +1382,11 @@ class CompareSalesController extends Controller
         $BmonthlyStatus = $periodeBArray[0];
         $Btable = $periodeBArray[1];
 
+        $userShopId = optional(auth()->user())->shop_id ?? 0;
         $toko = $request->input('shop_id', 'semua');
+        if ($userShopId != 0) {
+            $toko = $userShopId;
+        }
 
         // jika nantinya butuh filter per toko, bisa ditambahkan di JOIN product_codes
         $filterToko = $toko !== 'semua'
@@ -1379,6 +1446,7 @@ class CompareSalesController extends Controller
 
     public function switchData(Request $request)
     {
+        $this->logActivity($request, 'compare_sales.switch_data');
         try {
             DB::transaction(function () {
                 DB::table("multi_comparative_f_sales")
