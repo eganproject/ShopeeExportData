@@ -284,7 +284,8 @@ class CompareSalesController extends Controller
                         $utf8Name = mb_convert_encoding($rawName, 'UTF-8', 'Windows-1252');
                         $cleanName = preg_replace('/[^\P{C}\n]+/u', '', $utf8Name);
 
-                        $rawDate = $row[27] ?? null;
+                        $rawDate = $row[29] ?? null;
+                       
                         $v1 = null;
                         if ($rawDate) {
                             try {
