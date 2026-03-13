@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\UserActivity;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -36,5 +38,28 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
+    }
+
+    /**
+     * The user has been authenticated.
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        try {
+            UserActivity::create([
+                'user_id' => optional($user)->id,
+                'shop_id' => optional($user)->shop_id ?? 0,
+                'action' => 'auth.login',
+                'description' => 'User login',
+                'route' => optional($request->route())->getName(),
+                'url' => $request->fullUrl(),
+                'method' => $request->method(),
+                'ip' => $request->ip(),
+                'user_agent' => (string) $request->header('User-Agent'),
+                'payload' => json_encode(['email' => $request->input('email')]),
+            ]);
+        } catch (\Throwable $e) {
+            // Swallow logging errors to not affect UX
+        }
     }
 }
